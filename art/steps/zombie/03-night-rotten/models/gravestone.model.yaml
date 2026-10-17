@@ -1,0 +1,25 @@
+name: gravestone
+description: >
+  Weathered headstone with a rounded top and a mossy base, over a fresh dirt mound (the grave the
+  zombie came out of). One view, facing the camera; same light and camera as the zombie.
+size: [24, 26]
+pivot: [12, 22]
+origin: [0, 0, 0]
+directions: 1
+outline: auto
+status: draft
+style_version: 1
+tags: [prop]
+
+materials:
+  stone: { keys: ["2", "3", "4", "5"] }
+  moss:  { keys: ["l", "m", "n"] }
+  dirt:  { keys: ["g", "h", "i"] }
+
+parts:
+  - ellipsoid: { center: [-11, 0, 0], radii: [10, 6, 3], material: dirt }  # mound behind the stone
+  - box: { from: [-1, -6, 0], to: [1, 6, 14], material: stone }
+  - cylinder: { base: [-1, 0, 14], height: 3, radius: 6, axis: x, material: stone }
+  - box: { from: [-2, -7, 0], to: [2, 7, 1], material: moss }               # mossy plinth
+  - box: { from: [2, 0, 6], to: [2, 0, 13], material: moss }                # carved cross, overgrown
+  - box: { from: [2, -2, 11], to: [2, 2, 11], material: moss }

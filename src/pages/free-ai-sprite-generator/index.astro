@@ -1,0 +1,26 @@
+---
+import Landing from "../../layouts/Landing.astro";
+---
+
+<Landing
+  title="Free, open-source AI sprite generator · PAGAN"
+  description="Make game sprites with your AI agent, free: no credits, no account, no cloud. PAGAN renders 3D-modelled characters and vehicles into consistent 8-16 heading sprite sheets with animations."
+  heading="A free, open-source AI sprite generator"
+  points={[
+    "<b>Free forever</b>: MIT-licensed, runs offline on your machine. No credits, no subscription, no API key.",
+    "<b>Consistent</b>: one 3D model renders every heading and animation frame with the same camera and light.",
+    "<b>Editable</b>: the art is text in your repo. Change one line and rebuild; review changes like code.",
+    "<b>Game-ready</b>: sprite sheets, manifest.json for any engine, Godot resources, palette-swap tables.",
+    "<b>Honest about limits</b>: it isn't a painter. For one-off illustrations, an image model is faster.",
+  ]}
+  code={`You:   "a zombie that shambles towards the player"
+Agent: writes models/zombie.model.yaml
+       pagan lint      -> 0 errors, 0 warnings
+       pagan preview   -> looks, fixes
+       pagan build     -> zombie.png, zombie.tres, manifest.json`}
+>
+  <p>
+    PAGAN doesn't generate sprites with an image model. Your AI agent writes them in PAGAN's notation and
+    PAGAN renders them, which is why they match each other, animate cleanly and cost nothing.
+  </p>
+</Landing>

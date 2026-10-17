@@ -1,0 +1,153 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+}
+const { title, description, image = "og/pagan.png" } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const url = (p: string) => base + p.replace(/^\//, "");
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(url(image), Astro.site);
+const nav = [
+  ["Demo", "#demo"],
+  ["Features", "#features"],
+  ["Compare", "#compare"],
+  ["Install", "#install"],
+  ["Docs", "docs/"],
+];
+const home = Astro.url.pathname.replace(/\/?$/, "/") === base;
+---
+
+<!doctype html>
+<html lang="en" data-base={base}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" sizes="32x32" href={url("brand/mark@2x.png")} />
+    <link rel="icon" type="image/png" sizes="16x16" href={url("brand/mark@1x.png")} />
+    <link rel="apple-touch-icon" href={url("brand/mark@12x.png")} />
+    <meta name="theme-color" content="#13121b" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <a class="skip sr-only" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="wrap bar">
+        <a class="brand" href={base} aria-label="PAGAN home">
+          <img class="px" src={url("brand/logo@4x.png")} width="136" height="32" alt="PAGAN" />
+        </a>
+        <nav aria-label="Main">
+          {nav.map(([label, href]) => <a href={href.startsWith("#") ? (home ? href : base + href) : url(href)}>{label}</a>)}
+          <a class="gh" href="https://github.com/lukasgolino/PAGAN">GitHub</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer>
+      <div class="wrap foot">
+        <div>
+          <img class="px" src={url("brand/mark@2x.png")} width="32" height="32" alt="" />
+          <p>
+            PAGAN: Pixel Art Grammar And Notation. MIT-licensed, free, no account.<br />
+            The logo, icon and every image on this site were made with PAGAN.
+          </p>
+        </div>
+        <nav aria-label="Footer">
+          <a href={url("docs/")}>Docs</a>
+          <a href={url("docs/reference/")}>Reference</a>
+          <a href={url("docs/changelog/")}>Changelog</a>
+          <a href="https://github.com/lukasgolino/PAGAN">GitHub</a>
+          <a href="https://github.com/lukasgolino/PAGAN/blob/main/LICENSE">MIT License</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip:focus {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    width: auto;
+    height: auto;
+    clip: auto;
+    z-index: 100;
+    background: var(--ember);
+    color: var(--ink);
+    padding: 8px 12px;
+  }
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(19, 18, 27, 0.88);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+  }
+  nav {
+    display: flex;
+    gap: 22px;
+    font-family: var(--font-pixel);
+    font-size: 0.85rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  nav a:hover {
+    color: var(--spark);
+  }
+  .gh {
+    color: var(--text);
+  }
+  @media (max-width: 720px) {
+    .top nav a:not(.gh):not([href$="#demo"]) {
+      display: none;
+    }
+  }
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 0 56px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .foot > div {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .foot nav {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+</style>

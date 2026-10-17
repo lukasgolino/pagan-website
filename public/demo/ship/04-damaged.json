@@ -1,0 +1,1634 @@
+{
+ "scenario": "ship",
+ "id": "04-damaged",
+ "agent": "A `damaged` animation: she lists 14° to starboard, shot holes in the sails (hidden parts that cut the cloth only in these poses), the fore topsail gone, fire and smoke on the stern castle. The normal frames are untouched.",
+ "ran": [
+  "pagan lint",
+  "pagan fit ship",
+  "pagan preview ship --bg \"#174a5e\""
+ ],
+ "show": {
+  "asset": "ship",
+  "animation": "damaged",
+  "heading": "se",
+  "rotate": true
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 3,
+  "warnings": 0
+ },
+ "diffs": {
+  "03-sixteen": [
+   {
+    "path": "models/ship.model.yaml",
+    "status": "modified",
+    "added": 34,
+    "removed": 1,
+    "diff": "@@ -3,7 +3,8 @@\n   Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns),\n   forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit,\n   red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 16 headings so it turns\n-  smoothly; the pennants flutter in the \"sail\" animation.\n+  smoothly; the pennants flutter in the \"sail\" animation. \"damaged\": listing to starboard, shot holes\n+  in the main sails, the fore topsail shot away, fire and smoke on the stern castle.\n size: [92, 70]\n pivot: [46, 46]\n origin: [32, 0, 0]          # the hull's centre at the waterline lands on the pivot\n@@ -22,6 +23,8 @@\n   trim: { ramp: gold }\n   sail: { keys: [\"8\", \"9\", \"a\", \"b\"], two_sided: true }\n   flag: { ramp: red }\n+  smoke: { keys: [\"0\", \"1\", \"2\"] }\n+  fire:  { keys: [\"f\"] }\n \n parts:\n   - hull: { from: [0, 0, 0], length: 64, beam: 19, height: 7, bow: 0.4, stern: 0.1, material: hull, top: deck, rim: rail }\n@@ -45,11 +48,34 @@\n   - sail: { at: [24, 0, 27], width: 15, height: 9, bulge: 1.8, brace: 30, material: sail, yard: mast }\n   - sail: { at: [45, 0, 11], width: 17, height: 11, bulge: 2, brace: 30, material: sail, yard: mast }\n   - sail: { at: [45, 0, 24], width: 12, height: 8, bulge: 1.6, brace: 30, material: sail, yard: mast }\n+    id: fore_topsail\n   - triangle: { points: [[48, 0, 10], [70, 0, 13], [46, 0, 34]], material: sail }             # jib\n   - box: { from: [20, 0, 41], to: [24, 0, 42], material: flag }                                # pennants\n     id: pennant\n   - box: { from: [42, 0, 35], to: [44, 0, 36], material: flag }\n     id: fore_pennant\n+  # battle damage: hidden overlays, only in the \"damaged\" poses (holes placed with pagan.api.sail_cells)\n+  - box: { from: [22, -7, 17], to: [25, -5, 20], material: sail }\n+    id: shot_holes\n+    hidden: true\n+    carve: true\n+  - box: { from: [27, 1, 14], to: [30, 4, 16], material: sail }\n+    id: shot_holes\n+    hidden: true\n+    carve: true\n+  - box: { from: [24, -5, 30], to: [26, -3, 32], material: sail }\n+    id: shot_holes\n+    hidden: true\n+    carve: true\n+  - box: { from: [6, -3, 11], to: [7, -2, 11], material: fire }       # a hit on the stern castle\n+    id: fire\n+    hidden: true\n+  - ellipsoid: { center: [6, -3, 15], radii: [2, 2, 2], material: smoke }\n+    id: smoke_low\n+    hidden: true\n+  - ellipsoid: { center: [5, -4, 20], radii: [3, 3, 2], material: smoke }\n+    id: smoke_high\n+    hidden: true\n \n animations:\n   sail:\n@@ -59,3 +85,10 @@\n       - { pennant: { offset: [0, 1, 0] }, fore_pennant: { offset: [0, 1, 0] } }\n       - {}\n       - { pennant: { offset: [0, -1, 0] }, fore_pennant: { offset: [0, -1, 0] } }\n+  damaged:\n+    fps: 6\n+    poses:\n+      - { roll: 14, hide: [fore_topsail, fore_pennant], show: [shot_holes, fire, smoke_low] }\n+      - { roll: 14, hide: [fore_topsail, fore_pennant], show: [shot_holes, fire, smoke_low, smoke_high], pennant: { offset: [0, 1, 0] } }\n+      - { roll: 14, hide: [fore_topsail, fore_pennant], show: [shot_holes, fire, smoke_high] }\n+      - { roll: 14, hide: [fore_topsail, fore_pennant], show: [shot_holes, fire, smoke_low], pennant: { offset: [0, -1, 0] } }"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "modified",
+    "added": 1,
+    "removed": 0,
+    "diff": "@@ -37,3 +37,4 @@\n   palette `harbor`, 8 headings.\n - 2026-10-17: \"Give it sails\" -> square sails on both masts, a jib, pennants with a `sail` animation.\n - 2026-10-17: \"16 headings so it turns smoothly\" -> `directions: 16`.\n+- 2026-10-17: \"Show it damaged\" -> `damaged` animation: hidden shot holes (carve), fire, smoke, fore topsail hidden, `roll: 14`."
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "damaged_e": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_e_0",
+     "damaged_e_1",
+     "damaged_e_2",
+     "damaged_e_3"
+    ],
+    "loop": true
+   },
+   "damaged_ene": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_ene_0",
+     "damaged_ene_1",
+     "damaged_ene_2",
+     "damaged_ene_3"
+    ],
+    "loop": true
+   },
+   "damaged_ese": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_ese_0",
+     "damaged_ese_1",
+     "damaged_ese_2",
+     "damaged_ese_3"
+    ],
+    "loop": true
+   },
+   "damaged_n": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_n_0",
+     "damaged_n_1",
+     "damaged_n_2",
+     "damaged_n_3"
+    ],
+    "loop": true
+   },
+   "damaged_ne": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_ne_0",
+     "damaged_ne_1",
+     "damaged_ne_2",
+     "damaged_ne_3"
+    ],
+    "loop": true
+   },
+   "damaged_nne": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_nne_0",
+     "damaged_nne_1",
+     "damaged_nne_2",
+     "damaged_nne_3"
+    ],
+    "loop": true
+   },
+   "damaged_nnw": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_nnw_0",
+     "damaged_nnw_1",
+     "damaged_nnw_2",
+     "damaged_nnw_3"
+    ],
+    "loop": true
+   },
+   "damaged_nw": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_nw_0",
+     "damaged_nw_1",
+     "damaged_nw_2",
+     "damaged_nw_3"
+    ],
+    "loop": true
+   },
+   "damaged_s": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_s_0",
+     "damaged_s_1",
+     "damaged_s_2",
+     "damaged_s_3"
+    ],
+    "loop": true
+   },
+   "damaged_se": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_se_0",
+     "damaged_se_1",
+     "damaged_se_2",
+     "damaged_se_3"
+    ],
+    "loop": true
+   },
+   "damaged_sse": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_sse_0",
+     "damaged_sse_1",
+     "damaged_sse_2",
+     "damaged_sse_3"
+    ],
+    "loop": true
+   },
+   "damaged_ssw": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_ssw_0",
+     "damaged_ssw_1",
+     "damaged_ssw_2",
+     "damaged_ssw_3"
+    ],
+    "loop": true
+   },
+   "damaged_sw": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_sw_0",
+     "damaged_sw_1",
+     "damaged_sw_2",
+     "damaged_sw_3"
+    ],
+    "loop": true
+   },
+   "damaged_w": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_w_0",
+     "damaged_w_1",
+     "damaged_w_2",
+     "damaged_w_3"
+    ],
+    "loop": true
+   },
+   "damaged_wnw": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_wnw_0",
+     "damaged_wnw_1",
+     "damaged_wnw_2",
+     "damaged_wnw_3"
+    ],
+    "loop": true
+   },
+   "damaged_wsw": {
+    "fps": 6.0,
+    "frames": [
+     "damaged_wsw_0",
+     "damaged_wsw_1",
+     "damaged_wsw_2",
+     "damaged_wsw_3"
+    ],
+    "loop": true
+   },
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "ene": {
+    "fps": 1.0,
+    "frames": [
+     "ene"
+    ],
+    "loop": true
+   },
+   "ese": {
+    "fps": 1.0,
+    "frames": [
+     "ese"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nne": {
+    "fps": 1.0,
+    "frames": [
+     "nne"
+    ],
+    "loop": true
+   },
+   "nnw": {
+    "fps": 1.0,
+    "frames": [
+     "nnw"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "sail_e": {
+    "fps": 6.0,
+    "frames": [
+     "sail_e_0",
+     "sail_e_1",
+     "sail_e_2",
+     "sail_e_3"
+    ],
+    "loop": true
+   },
+   "sail_ene": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ene_0",
+     "sail_ene_1",
+     "sail_ene_2",
+     "sail_ene_3"
+    ],
+    "loop": true
+   },
+   "sail_ese": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ese_0",
+     "sail_ese_1",
+     "sail_ese_2",
+     "sail_ese_3"
+    ],
+    "loop": true
+   },
+   "sail_n": {
+    "fps": 6.0,
+    "frames": [
+     "sail_n_0",
+     "sail_n_1",
+     "sail_n_2",
+     "sail_n_3"
+    ],
+    "loop": true
+   },
+   "sail_ne": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ne_0",
+     "sail_ne_1",
+     "sail_ne_2",
+     "sail_ne_3"
+    ],
+    "loop": true
+   },
+   "sail_nne": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nne_0",
+     "sail_nne_1",
+     "sail_nne_2",
+     "sail_nne_3"
+    ],
+    "loop": true
+   },
+   "sail_nnw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nnw_0",
+     "sail_nnw_1",
+     "sail_nnw_2",
+     "sail_nnw_3"
+    ],
+    "loop": true
+   },
+   "sail_nw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nw_0",
+     "sail_nw_1",
+     "sail_nw_2",
+     "sail_nw_3"
+    ],
+    "loop": true
+   },
+   "sail_s": {
+    "fps": 6.0,
+    "frames": [
+     "sail_s_0",
+     "sail_s_1",
+     "sail_s_2",
+     "sail_s_3"
+    ],
+    "loop": true
+   },
+   "sail_se": {
+    "fps": 6.0,
+    "frames": [
+     "sail_se_0",
+     "sail_se_1",
+     "sail_se_2",
+     "sail_se_3"
+    ],
+    "loop": true
+   },
+   "sail_sse": {
+    "fps": 6.0,
+    "frames": [
+     "sail_sse_0",
+     "sail_sse_1",
+     "sail_sse_2",
+     "sail_sse_3"
+    ],
+    "loop": true
+   },
+   "sail_ssw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ssw_0",
+     "sail_ssw_1",
+     "sail_ssw_2",
+     "sail_ssw_3"
+    ],
+    "loop": true
+   },
+   "sail_sw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_sw_0",
+     "sail_sw_1",
+     "sail_sw_2",
+     "sail_sw_3"
+    ],
+    "loop": true
+   },
+   "sail_w": {
+    "fps": 6.0,
+    "frames": [
+     "sail_w_0",
+     "sail_w_1",
+     "sail_w_2",
+     "sail_w_3"
+    ],
+    "loop": true
+   },
+   "sail_wnw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_wnw_0",
+     "sail_wnw_1",
+     "sail_wnw_2",
+     "sail_wnw_3"
+    ],
+    "loop": true
+   },
+   "sail_wsw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_wsw_0",
+     "sail_wsw_1",
+     "sail_wsw_2",
+     "sail_wsw_3"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sse": {
+    "fps": 1.0,
+    "frames": [
+     "sse"
+    ],
+    "loop": true
+   },
+   "ssw": {
+    "fps": 1.0,
+    "frames": [
+     "ssw"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   },
+   "wnw": {
+    "fps": 1.0,
+    "frames": [
+     "wnw"
+    ],
+    "loop": true
+   },
+   "wsw": {
+    "fps": 1.0,
+    "frames": [
+     "wsw"
+    ],
+    "loop": true
+   }
+  },
+  "description": "Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns), forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit, red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 16 headings so it turns smoothly; the pennants flutter in the \"sail\" animation. \"damaged\": listing to starboard, shot holes in the main sails, the fore topsail shot away, fire and smoke on the stern castle.",
+  "frames": {
+   "damaged_e_0": [
+    460,
+    0,
+    92,
+    70
+   ],
+   "damaged_e_1": [
+    552,
+    0,
+    92,
+    70
+   ],
+   "damaged_e_2": [
+    644,
+    0,
+    92,
+    70
+   ],
+   "damaged_e_3": [
+    0,
+    70,
+    92,
+    70
+   ],
+   "damaged_ene_0": [
+    552,
+    70,
+    92,
+    70
+   ],
+   "damaged_ene_1": [
+    644,
+    70,
+    92,
+    70
+   ],
+   "damaged_ene_2": [
+    0,
+    140,
+    92,
+    70
+   ],
+   "damaged_ene_3": [
+    92,
+    140,
+    92,
+    70
+   ],
+   "damaged_ese_0": [
+    368,
+    1190,
+    92,
+    70
+   ],
+   "damaged_ese_1": [
+    460,
+    1190,
+    92,
+    70
+   ],
+   "damaged_ese_2": [
+    552,
+    1190,
+    92,
+    70
+   ],
+   "damaged_ese_3": [
+    644,
+    1190,
+    92,
+    70
+   ],
+   "damaged_n_0": [
+    92,
+    350,
+    92,
+    70
+   ],
+   "damaged_n_1": [
+    184,
+    350,
+    92,
+    70
+   ],
+   "damaged_n_2": [
+    276,
+    350,
+    92,
+    70
+   ],
+   "damaged_n_3": [
+    368,
+    350,
+    92,
+    70
+   ],
+   "damaged_ne_0": [
+    644,
+    140,
+    92,
+    70
+   ],
+   "damaged_ne_1": [
+    0,
+    210,
+    92,
+    70
+   ],
+   "damaged_ne_2": [
+    92,
+    210,
+    92,
+    70
+   ],
+   "damaged_ne_3": [
+    184,
+    210,
+    92,
+    70
+   ],
+   "damaged_nne_0": [
+    0,
+    280,
+    92,
+    70
+   ],
+   "damaged_nne_1": [
+    92,
+    280,
+    92,
+    70
+   ],
+   "damaged_nne_2": [
+    184,
+    280,
+    92,
+    70
+   ],
+   "damaged_nne_3": [
+    276,
+    280,
+    92,
+    70
+   ],
+   "damaged_nnw_0": [
+    184,
+    420,
+    92,
+    70
+   ],
+   "damaged_nnw_1": [
+    276,
+    420,
+    92,
+    70
+   ],
+   "damaged_nnw_2": [
+    368,
+    420,
+    92,
+    70
+   ],
+   "damaged_nnw_3": [
+    460,
+    420,
+    92,
+    70
+   ],
+   "damaged_nw_0": [
+    276,
+    490,
+    92,
+    70
+   ],
+   "damaged_nw_1": [
+    368,
+    490,
+    92,
+    70
+   ],
+   "damaged_nw_2": [
+    460,
+    490,
+    92,
+    70
+   ],
+   "damaged_nw_3": [
+    552,
+    490,
+    92,
+    70
+   ],
+   "damaged_s_0": [
+    92,
+    980,
+    92,
+    70
+   ],
+   "damaged_s_1": [
+    184,
+    980,
+    92,
+    70
+   ],
+   "damaged_s_2": [
+    276,
+    980,
+    92,
+    70
+   ],
+   "damaged_s_3": [
+    368,
+    980,
+    92,
+    70
+   ],
+   "damaged_se_0": [
+    276,
+    1120,
+    92,
+    70
+   ],
+   "damaged_se_1": [
+    368,
+    1120,
+    92,
+    70
+   ],
+   "damaged_se_2": [
+    460,
+    1120,
+    92,
+    70
+   ],
+   "damaged_se_3": [
+    552,
+    1120,
+    92,
+    70
+   ],
+   "damaged_sse_0": [
+    184,
+    1050,
+    92,
+    70
+   ],
+   "damaged_sse_1": [
+    276,
+    1050,
+    92,
+    70
+   ],
+   "damaged_sse_2": [
+    368,
+    1050,
+    92,
+    70
+   ],
+   "damaged_sse_3": [
+    460,
+    1050,
+    92,
+    70
+   ],
+   "damaged_ssw_0": [
+    0,
+    910,
+    92,
+    70
+   ],
+   "damaged_ssw_1": [
+    92,
+    910,
+    92,
+    70
+   ],
+   "damaged_ssw_2": [
+    184,
+    910,
+    92,
+    70
+   ],
+   "damaged_ssw_3": [
+    276,
+    910,
+    92,
+    70
+   ],
+   "damaged_sw_0": [
+    644,
+    770,
+    92,
+    70
+   ],
+   "damaged_sw_1": [
+    0,
+    840,
+    92,
+    70
+   ],
+   "damaged_sw_2": [
+    92,
+    840,
+    92,
+    70
+   ],
+   "damaged_sw_3": [
+    184,
+    840,
+    92,
+    70
+   ],
+   "damaged_w_0": [
+    460,
+    630,
+    92,
+    70
+   ],
+   "damaged_w_1": [
+    552,
+    630,
+    92,
+    70
+   ],
+   "damaged_w_2": [
+    644,
+    630,
+    92,
+    70
+   ],
+   "damaged_w_3": [
+    0,
+    700,
+    92,
+    70
+   ],
+   "damaged_wnw_0": [
+    368,
+    560,
+    92,
+    70
+   ],
+   "damaged_wnw_1": [
+    460,
+    560,
+    92,
+    70
+   ],
+   "damaged_wnw_2": [
+    552,
+    560,
+    92,
+    70
+   ],
+   "damaged_wnw_3": [
+    644,
+    560,
+    92,
+    70
+   ],
+   "damaged_wsw_0": [
+    552,
+    700,
+    92,
+    70
+   ],
+   "damaged_wsw_1": [
+    644,
+    700,
+    92,
+    70
+   ],
+   "damaged_wsw_2": [
+    0,
+    770,
+    92,
+    70
+   ],
+   "damaged_wsw_3": [
+    92,
+    770,
+    92,
+    70
+   ],
+   "e": [
+    0,
+    0,
+    92,
+    70
+   ],
+   "ene": [
+    92,
+    70,
+    92,
+    70
+   ],
+   "ese": [
+    644,
+    1120,
+    92,
+    70
+   ],
+   "n": [
+    368,
+    280,
+    92,
+    70
+   ],
+   "ne": [
+    184,
+    140,
+    92,
+    70
+   ],
+   "nne": [
+    276,
+    210,
+    92,
+    70
+   ],
+   "nnw": [
+    460,
+    350,
+    92,
+    70
+   ],
+   "nw": [
+    552,
+    420,
+    92,
+    70
+   ],
+   "s": [
+    368,
+    910,
+    92,
+    70
+   ],
+   "sail_e_0": [
+    92,
+    0,
+    92,
+    70
+   ],
+   "sail_e_1": [
+    184,
+    0,
+    92,
+    70
+   ],
+   "sail_e_2": [
+    276,
+    0,
+    92,
+    70
+   ],
+   "sail_e_3": [
+    368,
+    0,
+    92,
+    70
+   ],
+   "sail_ene_0": [
+    184,
+    70,
+    92,
+    70
+   ],
+   "sail_ene_1": [
+    276,
+    70,
+    92,
+    70
+   ],
+   "sail_ene_2": [
+    368,
+    70,
+    92,
+    70
+   ],
+   "sail_ene_3": [
+    460,
+    70,
+    92,
+    70
+   ],
+   "sail_ese_0": [
+    0,
+    1190,
+    92,
+    70
+   ],
+   "sail_ese_1": [
+    92,
+    1190,
+    92,
+    70
+   ],
+   "sail_ese_2": [
+    184,
+    1190,
+    92,
+    70
+   ],
+   "sail_ese_3": [
+    276,
+    1190,
+    92,
+    70
+   ],
+   "sail_n_0": [
+    460,
+    280,
+    92,
+    70
+   ],
+   "sail_n_1": [
+    552,
+    280,
+    92,
+    70
+   ],
+   "sail_n_2": [
+    644,
+    280,
+    92,
+    70
+   ],
+   "sail_n_3": [
+    0,
+    350,
+    92,
+    70
+   ],
+   "sail_ne_0": [
+    276,
+    140,
+    92,
+    70
+   ],
+   "sail_ne_1": [
+    368,
+    140,
+    92,
+    70
+   ],
+   "sail_ne_2": [
+    460,
+    140,
+    92,
+    70
+   ],
+   "sail_ne_3": [
+    552,
+    140,
+    92,
+    70
+   ],
+   "sail_nne_0": [
+    368,
+    210,
+    92,
+    70
+   ],
+   "sail_nne_1": [
+    460,
+    210,
+    92,
+    70
+   ],
+   "sail_nne_2": [
+    552,
+    210,
+    92,
+    70
+   ],
+   "sail_nne_3": [
+    644,
+    210,
+    92,
+    70
+   ],
+   "sail_nnw_0": [
+    552,
+    350,
+    92,
+    70
+   ],
+   "sail_nnw_1": [
+    644,
+    350,
+    92,
+    70
+   ],
+   "sail_nnw_2": [
+    0,
+    420,
+    92,
+    70
+   ],
+   "sail_nnw_3": [
+    92,
+    420,
+    92,
+    70
+   ],
+   "sail_nw_0": [
+    644,
+    420,
+    92,
+    70
+   ],
+   "sail_nw_1": [
+    0,
+    490,
+    92,
+    70
+   ],
+   "sail_nw_2": [
+    92,
+    490,
+    92,
+    70
+   ],
+   "sail_nw_3": [
+    184,
+    490,
+    92,
+    70
+   ],
+   "sail_s_0": [
+    460,
+    910,
+    92,
+    70
+   ],
+   "sail_s_1": [
+    552,
+    910,
+    92,
+    70
+   ],
+   "sail_s_2": [
+    644,
+    910,
+    92,
+    70
+   ],
+   "sail_s_3": [
+    0,
+    980,
+    92,
+    70
+   ],
+   "sail_se_0": [
+    644,
+    1050,
+    92,
+    70
+   ],
+   "sail_se_1": [
+    0,
+    1120,
+    92,
+    70
+   ],
+   "sail_se_2": [
+    92,
+    1120,
+    92,
+    70
+   ],
+   "sail_se_3": [
+    184,
+    1120,
+    92,
+    70
+   ],
+   "sail_sse_0": [
+    552,
+    980,
+    92,
+    70
+   ],
+   "sail_sse_1": [
+    644,
+    980,
+    92,
+    70
+   ],
+   "sail_sse_2": [
+    0,
+    1050,
+    92,
+    70
+   ],
+   "sail_sse_3": [
+    92,
+    1050,
+    92,
+    70
+   ],
+   "sail_ssw_0": [
+    368,
+    840,
+    92,
+    70
+   ],
+   "sail_ssw_1": [
+    460,
+    840,
+    92,
+    70
+   ],
+   "sail_ssw_2": [
+    552,
+    840,
+    92,
+    70
+   ],
+   "sail_ssw_3": [
+    644,
+    840,
+    92,
+    70
+   ],
+   "sail_sw_0": [
+    276,
+    770,
+    92,
+    70
+   ],
+   "sail_sw_1": [
+    368,
+    770,
+    92,
+    70
+   ],
+   "sail_sw_2": [
+    460,
+    770,
+    92,
+    70
+   ],
+   "sail_sw_3": [
+    552,
+    770,
+    92,
+    70
+   ],
+   "sail_w_0": [
+    92,
+    630,
+    92,
+    70
+   ],
+   "sail_w_1": [
+    184,
+    630,
+    92,
+    70
+   ],
+   "sail_w_2": [
+    276,
+    630,
+    92,
+    70
+   ],
+   "sail_w_3": [
+    368,
+    630,
+    92,
+    70
+   ],
+   "sail_wnw_0": [
+    0,
+    560,
+    92,
+    70
+   ],
+   "sail_wnw_1": [
+    92,
+    560,
+    92,
+    70
+   ],
+   "sail_wnw_2": [
+    184,
+    560,
+    92,
+    70
+   ],
+   "sail_wnw_3": [
+    276,
+    560,
+    92,
+    70
+   ],
+   "sail_wsw_0": [
+    184,
+    700,
+    92,
+    70
+   ],
+   "sail_wsw_1": [
+    276,
+    700,
+    92,
+    70
+   ],
+   "sail_wsw_2": [
+    368,
+    700,
+    92,
+    70
+   ],
+   "sail_wsw_3": [
+    460,
+    700,
+    92,
+    70
+   ],
+   "se": [
+    552,
+    1050,
+    92,
+    70
+   ],
+   "sse": [
+    460,
+    980,
+    92,
+    70
+   ],
+   "ssw": [
+    276,
+    840,
+    92,
+    70
+   ],
+   "sw": [
+    184,
+    770,
+    92,
+    70
+   ],
+   "w": [
+    0,
+    630,
+    92,
+    70
+   ],
+   "wnw": [
+    644,
+    490,
+    92,
+    70
+   ],
+   "wsw": [
+    92,
+    700,
+    92,
+    70
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -11.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/ship.tres",
+  "headings": [
+   "e",
+   "ene",
+   "ne",
+   "nne",
+   "n",
+   "nnw",
+   "nw",
+   "wnw",
+   "w",
+   "wsw",
+   "sw",
+   "ssw",
+   "s",
+   "sse",
+   "se",
+   "ese"
+  ],
+  "kind": "model",
+  "palette": "harbor",
+  "pivot": [
+   46,
+   46
+  ],
+  "sheet": "res://assets/generated/sprites/ship.png",
+  "size": [
+   92,
+   70
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "player",
+   "vehicle",
+   "ship"
+  ],
+  "variants": {}
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 23712
+  },
+  {
+   "path": "assets/generated/sprites/ship.png",
+   "bytes": 85382
+  },
+  {
+   "path": "assets/generated/sprites/ship.tres",
+   "bytes": 29868
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/ship.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/ship.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 92, 70)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(1254 lines in all)"
+ },
+ "palettes": {
+  "harbor": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#120d0c",
+     "name": "tar"
+    },
+    {
+     "key": "1",
+     "hex": "#2a1c17",
+     "name": "rope_dark"
+    },
+    {
+     "key": "2",
+     "hex": "#47302a",
+     "name": "rope"
+    },
+    {
+     "key": "3",
+     "hex": "#3a2117",
+     "name": "oak_deep"
+    },
+    {
+     "key": "4",
+     "hex": "#5c3521",
+     "name": "oak_dark"
+    },
+    {
+     "key": "5",
+     "hex": "#86502c",
+     "name": "oak"
+    },
+    {
+     "key": "6",
+     "hex": "#ad7140",
+     "name": "oak_light"
+    },
+    {
+     "key": "7",
+     "hex": "#d39a5c",
+     "name": "oak_pale"
+    },
+    {
+     "key": "8",
+     "hex": "#6e6252",
+     "name": "canvas_shadow"
+    },
+    {
+     "key": "9",
+     "hex": "#a2947c",
+     "name": "canvas_dark"
+    },
+    {
+     "key": "a",
+     "hex": "#cdbf9f",
+     "name": "canvas"
+    },
+    {
+     "key": "b",
+     "hex": "#efe5c8",
+     "name": "canvas_light"
+    },
+    {
+     "key": "c",
+     "hex": "#4a2c10",
+     "name": "brass_dark"
+    },
+    {
+     "key": "d",
+     "hex": "#a8772a",
+     "name": "brass"
+    },
+    {
+     "key": "e",
+     "hex": "#f0c860",
+     "name": "lamp"
+    },
+    {
+     "key": "f",
+     "hex": "#fff2b8",
+     "name": "lamp_glow"
+    },
+    {
+     "key": "g",
+     "hex": "#4a1416",
+     "name": "red_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#8c2426",
+     "name": "red"
+    },
+    {
+     "key": "i",
+     "hex": "#d0463a",
+     "name": "red_light"
+    },
+    {
+     "key": "j",
+     "hex": "#14284a",
+     "name": "blue_deep"
+    },
+    {
+     "key": "k",
+     "hex": "#24508c",
+     "name": "blue"
+    },
+    {
+     "key": "l",
+     "hex": "#4a8ad0",
+     "name": "blue_light"
+    },
+    {
+     "key": "m",
+     "hex": "#163a22",
+     "name": "green_deep"
+    },
+    {
+     "key": "n",
+     "hex": "#2a6e3a",
+     "name": "green"
+    },
+    {
+     "key": "o",
+     "hex": "#58ad5c",
+     "name": "green_light"
+    },
+    {
+     "key": "p",
+     "hex": "#4a3a0c",
+     "name": "gold_deep"
+    },
+    {
+     "key": "q",
+     "hex": "#a07c18",
+     "name": "gold"
+    },
+    {
+     "key": "r",
+     "hex": "#e6c43a",
+     "name": "gold_light"
+    },
+    {
+     "key": "s",
+     "hex": "#0e2a3a",
+     "name": "sea_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#174a5e",
+     "name": "sea"
+    },
+    {
+     "key": "u",
+     "hex": "#2a7286",
+     "name": "sea_light"
+    },
+    {
+     "key": "v",
+     "hex": "#5aa6b0",
+     "name": "foam"
+    }
+   ],
+   "ramps": {
+    "rope": [
+     "0",
+     "1",
+     "2"
+    ],
+    "oak": [
+     "3",
+     "4",
+     "5",
+     "6",
+     "7"
+    ],
+    "canvas": [
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "brass": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "red": [
+     "g",
+     "h",
+     "i"
+    ],
+    "blue": [
+     "j",
+     "k",
+     "l"
+    ],
+    "green": [
+     "m",
+     "n",
+     "o"
+    ],
+    "gold": [
+     "p",
+     "q",
+     "r"
+    ],
+    "sea": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ]
+   }
+  }
+ },
+ "sheet": "04-damaged/ship.png",
+ "changes": null,
+ "ground": null,
+ "status": "draft",
+ "next": [
+  {
+   "to": "05-fleet",
+   "say": "Team colours for 4 players."
+  }
+ ]
+}

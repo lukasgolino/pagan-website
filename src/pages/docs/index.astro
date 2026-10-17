@@ -1,0 +1,26 @@
+---
+import Doc from "../../layouts/Doc.astro";
+import { asset } from "../../lib/data";
+---
+
+<Doc title="Docs" description="PAGAN documentation: the agent workflow, the full notation reference and the changelog.">
+  <h1>PAGAN docs</h1>
+  <p>
+    These pages are generated from the files that ship with PAGAN, so they always match the release.
+    The same text is what your agent reads: the skill installs it into your repo, and the MCP server
+    serves it as <code>pagan://workflow</code> and <code>pagan://reference</code>.
+  </p>
+  <ul>
+    <li><a href={asset("docs/workflow/")}>Workflow</a>: how an agent sets up a game's art, makes an asset, and changes the look over time.</li>
+    <li><a href={asset("docs/reference/")}>Notation reference</a>: palettes, sprites, tilesets, 3D models, <code>pagan.toml</code>, commands, lint rules, build output.</li>
+    <li><a href={asset("docs/changelog/")}>Changelog</a>: every release, and what forces a version bump.</li>
+  </ul>
+  <h2>Five-minute start</h2>
+  <pre><code>pip install "pagan @ git+https://github.com/lukasgolino/PAGAN"
+pagan init my-art --perspective top-down-3/4
+cd my-art
+pagan new palette dusk          # then: pagan config set default_palette dusk
+pagan new model ship --size 96x96 --directions 8
+pagan lint && pagan preview ship
+pagan build                     # sheets + manifest.json (+ Godot resources)</code></pre>
+</Doc>

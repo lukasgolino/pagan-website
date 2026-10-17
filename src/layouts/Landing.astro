@@ -1,0 +1,93 @@
+---
+// Short topic pages for search ("AI pixel art for Godot", ...): one claim, the facts, then the demo.
+import Base from "./Base.astro";
+import { asset } from "../lib/data";
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  points: string[];
+  code: string;
+}
+const { title, description, heading, points, code } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <section class="landing">
+    <div class="wrap grid">
+      <div>
+        <span class="eyebrow">PAGAN</span>
+        <h1>{heading}</h1>
+        <div class="lede"><slot /></div>
+        <ul>{points.map((p) => <li set:html={p} />)}</ul>
+        <div class="cta">
+          <a class="btn" href={asset("#demo")}>Try the demo</a>
+          <a class="btn ghost" href={asset("#install")}>Install</a>
+        </div>
+      </div>
+      <div>
+        <div class="art panel">
+          <pagan-sprite step="ship/04-teams" heading="se" anim="sail" variant="blue" scale="3" turn label="A PAGAN ship; drag to turn it" />
+          <pagan-sprite step="zombie/02-attack" heading="sw" anim="walk" scale="3" />
+        </div>
+        <pre class="code"><code>{code}</code></pre>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import "../scripts/pagan-sprite";
+</script>
+
+<style>
+  .landing {
+    border-top: 0;
+    padding-top: 64px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 48px;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+  }
+  ul {
+    color: var(--muted);
+    padding-left: 1.2em;
+  }
+  li {
+    margin-bottom: 8px;
+  }
+  .cta {
+    display: flex;
+    gap: 14px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .art {
+    background: #174a5e;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px;
+    margin-bottom: 14px;
+    cursor: grab;
+  }
+  .art :global(canvas) {
+    max-width: 100%;
+    height: auto;
+  }
+  .code {
+    font-size: 12.5px;
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

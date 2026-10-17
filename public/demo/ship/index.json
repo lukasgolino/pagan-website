@@ -1,0 +1,80 @@
+{
+ "id": "ship",
+ "title": "Sailing game",
+ "pitch": "A brig from bare hull to 16 headings, team colours and battle damage.",
+ "start": "01-hull",
+ "sea": "#174a5e",
+ "actors": null,
+ "steps": {
+  "01-hull": {
+   "user": "I'm making a sailing game. Give me a ship.",
+   "next": [
+    {
+     "to": "02-sails",
+     "say": "Give it sails."
+    }
+   ],
+   "parents": []
+  },
+  "02-sails": {
+   "user": "Give it sails.",
+   "next": [
+    {
+     "to": "03-sixteen",
+     "say": "16 headings, so it turns smoothly."
+    }
+   ],
+   "parents": [
+    "01-hull"
+   ]
+  },
+  "03-sixteen": {
+   "user": "16 headings, so it turns smoothly.",
+   "next": [
+    {
+     "to": "04-teams",
+     "say": "Team colours for 4 players."
+    },
+    {
+     "to": "04-damaged",
+     "say": "Show it damaged."
+    }
+   ],
+   "parents": [
+    "02-sails"
+   ]
+  },
+  "04-teams": {
+   "user": "Team colours for 4 players.",
+   "next": [
+    {
+     "to": "05-fleet",
+     "say": "Show it damaged."
+    }
+   ],
+   "parents": [
+    "03-sixteen"
+   ]
+  },
+  "04-damaged": {
+   "user": "Show it damaged.",
+   "next": [
+    {
+     "to": "05-fleet",
+     "say": "Team colours for 4 players."
+    }
+   ],
+   "parents": [
+    "03-sixteen"
+   ]
+  },
+  "05-fleet": {
+   "user": "Both: team colours and damage.",
+   "next": [],
+   "parents": [
+    "04-teams",
+    "04-damaged"
+   ]
+  }
+ }
+}

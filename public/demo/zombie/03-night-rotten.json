@@ -1,0 +1,848 @@
+{
+ "scenario": "zombie",
+ "id": "03-night-rotten",
+ "agent": "One command for the whole game: `pagan palette adjust grave --lightness -0.07 --saturation 0.85`. Every asset on the palette changed at once: zombie, ground and headstones. Drag the slider to compare.",
+ "ran": [
+  "pagan palette adjust grave --lightness -0.07 --saturation 0.85 --dry-run",
+  "pagan palette adjust grave --lightness -0.07 --saturation 0.85",
+  "pagan gallery"
+ ],
+ "show": {
+  "asset": "zombie",
+  "animation": "walk",
+  "heading": "se",
+  "compare": true
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 7,
+  "warnings": 0
+ },
+ "diffs": {
+  "02-rotten": [
+   {
+    "path": "palettes/grave.pal.yaml",
+    "status": "modified",
+    "added": 36,
+    "removed": 36,
+    "diff": "@@ -1,42 +1,42 @@\n name: grave\n # Moonlit graveyard: cold night ground, sickly flesh, faded clothes, one bloody accent. 36 colors.\n colors:\n-  \"0\": { hex: \"#0b0a10\", name: ink }\n-  \"1\": { hex: \"#1a1a24\", name: night }\n-  \"2\": { hex: \"#2c2d3a\", name: slate_dark }\n-  \"3\": { hex: \"#474a5a\", name: slate }\n-  \"4\": { hex: \"#6c7183\", name: stone }\n-  \"5\": { hex: \"#9da3b2\", name: stone_light }\n-  \"6\": { hex: \"#d6dae2\", name: moon }\n-  \"7\": { hex: \"#1f2a1f\", name: rot_deep }\n-  \"8\": { hex: \"#3a4d33\", name: rot }\n-  \"9\": { hex: \"#5f7748\", name: flesh }\n-  \"a\": { hex: \"#8fa35f\", name: flesh_light }\n-  \"b\": { hex: \"#c3cc86\", name: flesh_pale }\n-  \"c\": { hex: \"#1b2133\", name: denim_deep }\n-  \"d\": { hex: \"#2d3a57\", name: denim }\n-  \"e\": { hex: \"#4a5d82\", name: denim_light }\n-  \"f\": { hex: \"#7486a8\", name: denim_faded }\n-  \"g\": { hex: \"#24171a\", name: mud_deep }\n-  \"h\": { hex: \"#3e2a26\", name: mud }\n-  \"i\": { hex: \"#5e4434\", name: earth }\n-  \"j\": { hex: \"#836446\", name: earth_light }\n-  \"k\": { hex: \"#121c19\", name: grass_deep }\n-  \"l\": { hex: \"#1d2f27\", name: grass_dark }\n-  \"m\": { hex: \"#2c4636\", name: grass }\n-  \"n\": { hex: \"#43614a\", name: grass_light }\n-  \"o\": { hex: \"#3d1018\", name: blood_deep }\n-  \"p\": { hex: \"#6e1c26\", name: blood }\n-  \"q\": { hex: \"#a8333a\", name: blood_light }\n-  \"r\": { hex: \"#d9e88a\", name: eye_glow }\n-  \"s\": { hex: \"#2e2620\", name: rag_deep }\n-  \"t\": { hex: \"#4d4035\", name: rag }\n-  \"u\": { hex: \"#71604f\", name: rag_light }\n-  \"v\": { hex: \"#998470\", name: rag_pale }\n-  \"w\": { hex: \"#2b2a17\", name: decay_deep }\n-  \"x\": { hex: \"#4f4b26\", name: decay }\n-  \"y\": { hex: \"#7d7537\", name: decay_light }\n-  \"z\": { hex: \"#ab9f5a\", name: decay_pale }\n+  \"0\": { hex: \"#020103\", name: ink }\n+  \"1\": { hex: \"#0b0b12\", name: night }\n+  \"2\": { hex: \"#1c1c27\", name: slate_dark }\n+  \"3\": { hex: \"#353845\", name: slate }\n+  \"4\": { hex: \"#595d6c\", name: stone }\n+  \"5\": { hex: \"#898e9a\", name: stone_light }\n+  \"6\": { hex: \"#c0c3ca\", name: moon }\n+  \"7\": { hex: \"#101910\", name: rot_deep }\n+  \"8\": { hex: \"#2a3a24\", name: rot }\n+  \"9\": { hex: \"#4e623b\", name: flesh }\n+  \"a\": { hex: \"#7c8c54\", name: flesh_light }\n+  \"b\": { hex: \"#adb57b\", name: flesh_pale }\n+  \"c\": { hex: \"#0c111f\", name: denim_deep }\n+  \"d\": { hex: \"#1e2840\", name: denim }\n+  \"e\": { hex: \"#3a4a68\", name: denim_light }\n+  \"f\": { hex: \"#63718d\", name: denim_faded }\n+  \"g\": { hex: \"#12080b\", name: mud_deep }\n+  \"h\": { hex: \"#2a1a17\", name: mud }\n+  \"i\": { hex: \"#483326\", name: earth }\n+  \"j\": { hex: \"#6b5239\", name: earth_light }\n+  \"k\": { hex: \"#050c0a\", name: grass_deep }\n+  \"l\": { hex: \"#0f1d17\", name: grass_dark }\n+  \"m\": { hex: \"#1e3326\", name: grass }\n+  \"n\": { hex: \"#344c3a\", name: grass_light }\n+  \"o\": { hex: \"#27040a\", name: blood_deep }\n+  \"p\": { hex: \"#531019\", name: blood }\n+  \"q\": { hex: \"#88292e\", name: blood_light }\n+  \"r\": { hex: \"#c3d082\", name: eye_glow }\n+  \"s\": { hex: \"#1c1611\", name: rag_deep }\n+  \"t\": { hex: \"#392e26\", name: rag }\n+  \"u\": { hex: \"#5b4d3f\", name: rag_light }\n+  \"v\": { hex: \"#817060\", name: rag_pale }\n+  \"w\": { hex: \"#1a190a\", name: decay_deep }\n+  \"x\": { hex: \"#3c381a\", name: decay }\n+  \"y\": { hex: \"#67612e\", name: decay_light }\n+  \"z\": { hex: \"#938a51\", name: decay_pale }\n ramps:\n   stone: [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\"]\n   flesh: [\"7\", \"8\", \"9\", \"a\", \"b\"]"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "modified",
+    "added": 2,
+    "removed": 0,
+    "diff": "@@ -38,3 +38,5 @@\n - 2026-10-17: \"Top-down zombie game, a zombie that shambles towards the player.\" Defaults used: pixel art,\n   top-down 3/4, palette `grave`, 8 headings.\n - 2026-10-17: \"Make him more rotten\" -> new `decay` ramp for the skin, bone showing on forearm, cheek and ribs.\n+- 2026-10-17: \"Make the night darker\" -> `pagan palette adjust grave --lightness -0.07 --saturation 0.85`\n+  (every asset at once)."
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   },
+   "walk_e": {
+    "fps": 6.0,
+    "frames": [
+     "walk_e_0",
+     "walk_e_1",
+     "walk_e_2",
+     "walk_e_3",
+     "walk_e_4",
+     "walk_e_5"
+    ],
+    "loop": true
+   },
+   "walk_n": {
+    "fps": 6.0,
+    "frames": [
+     "walk_n_0",
+     "walk_n_1",
+     "walk_n_2",
+     "walk_n_3",
+     "walk_n_4",
+     "walk_n_5"
+    ],
+    "loop": true
+   },
+   "walk_ne": {
+    "fps": 6.0,
+    "frames": [
+     "walk_ne_0",
+     "walk_ne_1",
+     "walk_ne_2",
+     "walk_ne_3",
+     "walk_ne_4",
+     "walk_ne_5"
+    ],
+    "loop": true
+   },
+   "walk_nw": {
+    "fps": 6.0,
+    "frames": [
+     "walk_nw_0",
+     "walk_nw_1",
+     "walk_nw_2",
+     "walk_nw_3",
+     "walk_nw_4",
+     "walk_nw_5"
+    ],
+    "loop": true
+   },
+   "walk_s": {
+    "fps": 6.0,
+    "frames": [
+     "walk_s_0",
+     "walk_s_1",
+     "walk_s_2",
+     "walk_s_3",
+     "walk_s_4",
+     "walk_s_5"
+    ],
+    "loop": true
+   },
+   "walk_se": {
+    "fps": 6.0,
+    "frames": [
+     "walk_se_0",
+     "walk_se_1",
+     "walk_se_2",
+     "walk_se_3",
+     "walk_se_4",
+     "walk_se_5"
+    ],
+    "loop": true
+   },
+   "walk_sw": {
+    "fps": 6.0,
+    "frames": [
+     "walk_sw_0",
+     "walk_sw_1",
+     "walk_sw_2",
+     "walk_sw_3",
+     "walk_sw_4",
+     "walk_sw_5"
+    ],
+    "loop": true
+   },
+   "walk_w": {
+    "fps": 6.0,
+    "frames": [
+     "walk_w_0",
+     "walk_w_1",
+     "walk_w_2",
+     "walk_w_3",
+     "walk_w_4",
+     "walk_w_5"
+    ],
+    "loop": true
+   }
+  },
+  "description": "Shambling zombie, well rotten: hunched forward, arms reaching out, torn rag shirt with a blood stain, faded jeans, mottled yellow-brown decaying skin with bone showing through the forearm, cheek and ribs, sunken glowing eyes, patchy dark hair. Top-down 3/4 view, 8 headings, 6-frame shamble where the legs drag in turn and the arms sway (the torso stays planted, so nothing jumps).",
+  "frames": {
+   "e": [
+    0,
+    0,
+    44,
+    48
+   ],
+   "n": [
+    264,
+    48,
+    44,
+    48
+   ],
+   "ne": [
+    308,
+    0,
+    44,
+    48
+   ],
+   "nw": [
+    220,
+    96,
+    44,
+    48
+   ],
+   "s": [
+    88,
+    240,
+    44,
+    48
+   ],
+   "se": [
+    44,
+    288,
+    44,
+    48
+   ],
+   "sw": [
+    132,
+    192,
+    44,
+    48
+   ],
+   "w": [
+    176,
+    144,
+    44,
+    48
+   ],
+   "walk_e_0": [
+    44,
+    0,
+    44,
+    48
+   ],
+   "walk_e_1": [
+    88,
+    0,
+    44,
+    48
+   ],
+   "walk_e_2": [
+    132,
+    0,
+    44,
+    48
+   ],
+   "walk_e_3": [
+    176,
+    0,
+    44,
+    48
+   ],
+   "walk_e_4": [
+    220,
+    0,
+    44,
+    48
+   ],
+   "walk_e_5": [
+    264,
+    0,
+    44,
+    48
+   ],
+   "walk_n_0": [
+    308,
+    48,
+    44,
+    48
+   ],
+   "walk_n_1": [
+    0,
+    96,
+    44,
+    48
+   ],
+   "walk_n_2": [
+    44,
+    96,
+    44,
+    48
+   ],
+   "walk_n_3": [
+    88,
+    96,
+    44,
+    48
+   ],
+   "walk_n_4": [
+    132,
+    96,
+    44,
+    48
+   ],
+   "walk_n_5": [
+    176,
+    96,
+    44,
+    48
+   ],
+   "walk_ne_0": [
+    0,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_1": [
+    44,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_2": [
+    88,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_3": [
+    132,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_4": [
+    176,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_5": [
+    220,
+    48,
+    44,
+    48
+   ],
+   "walk_nw_0": [
+    264,
+    96,
+    44,
+    48
+   ],
+   "walk_nw_1": [
+    308,
+    96,
+    44,
+    48
+   ],
+   "walk_nw_2": [
+    0,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_3": [
+    44,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_4": [
+    88,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_5": [
+    132,
+    144,
+    44,
+    48
+   ],
+   "walk_s_0": [
+    132,
+    240,
+    44,
+    48
+   ],
+   "walk_s_1": [
+    176,
+    240,
+    44,
+    48
+   ],
+   "walk_s_2": [
+    220,
+    240,
+    44,
+    48
+   ],
+   "walk_s_3": [
+    264,
+    240,
+    44,
+    48
+   ],
+   "walk_s_4": [
+    308,
+    240,
+    44,
+    48
+   ],
+   "walk_s_5": [
+    0,
+    288,
+    44,
+    48
+   ],
+   "walk_se_0": [
+    88,
+    288,
+    44,
+    48
+   ],
+   "walk_se_1": [
+    132,
+    288,
+    44,
+    48
+   ],
+   "walk_se_2": [
+    176,
+    288,
+    44,
+    48
+   ],
+   "walk_se_3": [
+    220,
+    288,
+    44,
+    48
+   ],
+   "walk_se_4": [
+    264,
+    288,
+    44,
+    48
+   ],
+   "walk_se_5": [
+    308,
+    288,
+    44,
+    48
+   ],
+   "walk_sw_0": [
+    176,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_1": [
+    220,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_2": [
+    264,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_3": [
+    308,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_4": [
+    0,
+    240,
+    44,
+    48
+   ],
+   "walk_sw_5": [
+    44,
+    240,
+    44,
+    48
+   ],
+   "walk_w_0": [
+    220,
+    144,
+    44,
+    48
+   ],
+   "walk_w_1": [
+    264,
+    144,
+    44,
+    48
+   ],
+   "walk_w_2": [
+    308,
+    144,
+    44,
+    48
+   ],
+   "walk_w_3": [
+    0,
+    192,
+    44,
+    48
+   ],
+   "walk_w_4": [
+    44,
+    192,
+    44,
+    48
+   ],
+   "walk_w_5": [
+    88,
+    192,
+    44,
+    48
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -17.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/zombie.tres",
+  "headings": [
+   "e",
+   "ne",
+   "n",
+   "nw",
+   "w",
+   "sw",
+   "s",
+   "se"
+  ],
+  "kind": "model",
+  "palette": "grave",
+  "pivot": [
+   22,
+   41
+  ],
+  "sheet": "res://assets/generated/sprites/zombie.png",
+  "size": [
+   44,
+   48
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "enemy",
+   "character"
+  ],
+  "variants": {}
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 11518
+  },
+  {
+   "path": "assets/generated/sprites/gravestone.png",
+   "bytes": 332
+  },
+  {
+   "path": "assets/generated/sprites/gravestone.tres",
+   "bytes": 408
+  },
+  {
+   "path": "assets/generated/sprites/zombie.png",
+   "bytes": 17316
+  },
+  {
+   "path": "assets/generated/sprites/zombie.tres",
+   "bytes": 11420
+  },
+  {
+   "path": "assets/generated/tiles/graveyard.png",
+   "bytes": 506
+  },
+  {
+   "path": "assets/generated/tiles/graveyard.tres",
+   "bytes": 403
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/zombie.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/zombie.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 44, 48)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(478 lines in all)"
+ },
+ "palettes": {
+  "grave": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#020103",
+     "name": "ink"
+    },
+    {
+     "key": "1",
+     "hex": "#0b0b12",
+     "name": "night"
+    },
+    {
+     "key": "2",
+     "hex": "#1c1c27",
+     "name": "slate_dark"
+    },
+    {
+     "key": "3",
+     "hex": "#353845",
+     "name": "slate"
+    },
+    {
+     "key": "4",
+     "hex": "#595d6c",
+     "name": "stone"
+    },
+    {
+     "key": "5",
+     "hex": "#898e9a",
+     "name": "stone_light"
+    },
+    {
+     "key": "6",
+     "hex": "#c0c3ca",
+     "name": "moon"
+    },
+    {
+     "key": "7",
+     "hex": "#101910",
+     "name": "rot_deep"
+    },
+    {
+     "key": "8",
+     "hex": "#2a3a24",
+     "name": "rot"
+    },
+    {
+     "key": "9",
+     "hex": "#4e623b",
+     "name": "flesh"
+    },
+    {
+     "key": "a",
+     "hex": "#7c8c54",
+     "name": "flesh_light"
+    },
+    {
+     "key": "b",
+     "hex": "#adb57b",
+     "name": "flesh_pale"
+    },
+    {
+     "key": "c",
+     "hex": "#0c111f",
+     "name": "denim_deep"
+    },
+    {
+     "key": "d",
+     "hex": "#1e2840",
+     "name": "denim"
+    },
+    {
+     "key": "e",
+     "hex": "#3a4a68",
+     "name": "denim_light"
+    },
+    {
+     "key": "f",
+     "hex": "#63718d",
+     "name": "denim_faded"
+    },
+    {
+     "key": "g",
+     "hex": "#12080b",
+     "name": "mud_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#2a1a17",
+     "name": "mud"
+    },
+    {
+     "key": "i",
+     "hex": "#483326",
+     "name": "earth"
+    },
+    {
+     "key": "j",
+     "hex": "#6b5239",
+     "name": "earth_light"
+    },
+    {
+     "key": "k",
+     "hex": "#050c0a",
+     "name": "grass_deep"
+    },
+    {
+     "key": "l",
+     "hex": "#0f1d17",
+     "name": "grass_dark"
+    },
+    {
+     "key": "m",
+     "hex": "#1e3326",
+     "name": "grass"
+    },
+    {
+     "key": "n",
+     "hex": "#344c3a",
+     "name": "grass_light"
+    },
+    {
+     "key": "o",
+     "hex": "#27040a",
+     "name": "blood_deep"
+    },
+    {
+     "key": "p",
+     "hex": "#531019",
+     "name": "blood"
+    },
+    {
+     "key": "q",
+     "hex": "#88292e",
+     "name": "blood_light"
+    },
+    {
+     "key": "r",
+     "hex": "#c3d082",
+     "name": "eye_glow"
+    },
+    {
+     "key": "s",
+     "hex": "#1c1611",
+     "name": "rag_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#392e26",
+     "name": "rag"
+    },
+    {
+     "key": "u",
+     "hex": "#5b4d3f",
+     "name": "rag_light"
+    },
+    {
+     "key": "v",
+     "hex": "#817060",
+     "name": "rag_pale"
+    },
+    {
+     "key": "w",
+     "hex": "#1a190a",
+     "name": "decay_deep"
+    },
+    {
+     "key": "x",
+     "hex": "#3c381a",
+     "name": "decay"
+    },
+    {
+     "key": "y",
+     "hex": "#67612e",
+     "name": "decay_light"
+    },
+    {
+     "key": "z",
+     "hex": "#938a51",
+     "name": "decay_pale"
+    }
+   ],
+   "ramps": {
+    "stone": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6"
+    ],
+    "flesh": [
+     "7",
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "denim": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "earth": [
+     "g",
+     "h",
+     "i",
+     "j"
+    ],
+    "grass": [
+     "k",
+     "l",
+     "m",
+     "n"
+    ],
+    "blood": [
+     "o",
+     "p",
+     "q"
+    ],
+    "rag": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ],
+    "decay": [
+     "w",
+     "x",
+     "y",
+     "z"
+    ]
+   }
+  }
+ },
+ "sheet": "03-night-rotten/zombie.png",
+ "changes": null,
+ "ground": "03-night-rotten/ground.png",
+ "status": "draft",
+ "next": []
+}

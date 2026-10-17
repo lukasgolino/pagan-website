@@ -1,0 +1,69 @@
+name: ship
+description: >
+  Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns),
+  forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit,
+  red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 16 headings so it turns
+  smoothly; the pennants flutter in the "sail" animation. Team colours for 4 players (red, blue,
+  green, gold) on the pennants, gunwales and the hull stripe.
+size: [92, 70]
+pivot: [46, 46]
+origin: [32, 0, 0]          # the hull's centre at the waterline lands on the pivot
+directions: 16
+outline: auto
+status: draft
+style_version: 1
+tags: [player, vehicle, ship]
+
+materials:
+  hull: { keys: ["3", "4", "5", "7"] }
+  deck: { keys: ["4", "5", "6"] }
+  rail: { keys: ["g", "h"] }                 # team colour: painted gunwales
+  tar:  { keys: ["1", "2"] }                 # gun ports, hatch
+  mast: { keys: ["1", "2", "4"] }
+  lamp: { keys: ["e"] }                       # one key = unshaded: lanterns glow
+  trim: { ramp: red }                        # team colour
+  sail: { keys: ["8", "9", "a", "b"], two_sided: true }
+  flag: { ramp: red }                        # team colour
+
+parts:
+  - hull: { from: [0, 0, 0], length: 64, beam: 19, height: 7, bow: 0.4, stern: 0.1, material: hull, top: deck, rim: rail }
+  - box: { from: [0, -6, 7], to: [12, 6, 10], material: hull, top: deck, rim: rail }      # stern castle
+  - box: { from: [51, -5, 7], to: [56, 5, 8], material: hull, top: deck, rim: rail }       # forecastle
+  - box: { from: [1, -9, 3], to: [50, -9, 3], material: trim }                             # team stripe
+    mirror: true
+  - box: { from: [16, -9, 5], to: [17, -9, 6], material: tar }                             # gun ports
+    mirror: true
+  - box: { from: [26, -9, 5], to: [27, -9, 6], material: tar }
+    mirror: true
+  - box: { from: [36, -9, 5], to: [37, -9, 6], material: tar }
+    mirror: true
+  - box: { from: [30, -2, 7], to: [35, 2, 7], material: tar }                               # cargo hatch
+  - box: { from: [-1, 2, 8], to: [-1, 3, 9], material: lamp }                             # stern lanterns
+    mirror: true
+  - cylinder: { base: [24, 0, 7], height: 36, material: mast }                             # main mast
+  - cylinder: { base: [45, 0, 7], height: 30, material: mast }                             # fore mast
+  - line: { from: [60, 0, 8], to: [73, 0, 14], material: mast }                            # bowsprit
+  - sail: { at: [24, 0, 12], width: 20, height: 13, bulge: 2.2, brace: 30, material: sail, yard: mast }
+  - sail: { at: [24, 0, 27], width: 15, height: 9, bulge: 1.8, brace: 30, material: sail, yard: mast }
+  - sail: { at: [45, 0, 11], width: 17, height: 11, bulge: 2, brace: 30, material: sail, yard: mast }
+  - sail: { at: [45, 0, 24], width: 12, height: 8, bulge: 1.6, brace: 30, material: sail, yard: mast }
+  - triangle: { points: [[48, 0, 10], [70, 0, 13], [46, 0, 34]], material: sail }             # jib
+  - box: { from: [20, 0, 41], to: [24, 0, 42], material: flag }                                # pennants
+    id: pennant
+  - box: { from: [42, 0, 35], to: [44, 0, 36], material: flag }
+    id: fore_pennant
+
+animations:
+  sail:
+    fps: 6
+    poses:
+      - {}
+      - { pennant: { offset: [0, 1, 0] }, fore_pennant: { offset: [0, 1, 0] } }
+      - {}
+      - { pennant: { offset: [0, -1, 0] }, fore_pennant: { offset: [0, -1, 0] } }
+
+base_variant: red             # the base colours are team red; the manifest lists all four the same way
+variants:
+  blue:  { ramp_swap: { red: blue } }
+  green: { ramp_swap: { red: green } }
+  gold:  { ramp_swap: { red: gold } }

@@ -1,0 +1,12 @@
+[
+ {
+  "id": "zombie",
+  "title": "Zombie game",
+  "pitch": "A shambling 3D zombie: 8 headings, attacks, a horde, a darker night."
+ },
+ {
+  "id": "ship",
+  "title": "Sailing game",
+  "pitch": "A brig from bare hull to 16 headings, team colours and battle damage."
+ }
+]

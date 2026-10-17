@@ -1,0 +1,1170 @@
+{
+ "scenario": "zombie",
+ "id": "02-horde",
+ "agent": "One model, 9 zombies: `variant_axes` combine 3 skin tones with 3 shirts. The manifest has a colour swap table for each, so your game can recolour one sheet in a shader, or use the 9 sheets.",
+ "ran": [
+  "pagan lint",
+  "pagan preview zombie"
+ ],
+ "show": {
+  "asset": "zombie",
+  "animation": "walk",
+  "heading": "se",
+  "horde": true
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 25,
+  "warnings": 0
+ },
+ "diffs": {
+  "01-shamble": [
+   {
+    "path": "models/zombie.model.yaml",
+    "status": "modified",
+    "added": 10,
+    "removed": 0,
+    "diff": "@@ -77,3 +77,13 @@\n       - { left_leg: { offset: [-1, 0, 0] }, right_leg: { offset: [2, 0, 0] }, right_arm: { offset: [0, 0, 1] } }\n       - { left_leg: { offset: [0, 0, 0] }, right_leg: { offset: [1, 0, 0] }, head: { offset: [0, 0, -1] } }\n       - { left_leg: { offset: [1, 0, 0] }, right_leg: { offset: [0, 0, 0] }, left_arm: { offset: [0, 0, -1] } }\n+\n+variant_axes:                # 3 x 3 = 9 zombies from one model\n+  skin:\n+    green: {}\n+    ash:    { key_swap: { \"8\": \"I\", \"9\": \"J\", \"a\": \"K\", \"b\": \"L\" } }\n+    pallid: { key_swap: { \"8\": \"M\", \"9\": \"N\", \"a\": \"O\", \"b\": \"P\" } }\n+  shirt:\n+    rag: {}\n+    flannel: { key_swap: { \"s\": \"A\", \"t\": \"B\", \"u\": \"C\", \"v\": \"D\" } }\n+    scrubs:  { key_swap: { \"s\": \"E\", \"t\": \"F\", \"u\": \"G\", \"v\": \"H\" } }"
+   },
+   {
+    "path": "palettes/grave.pal.yaml",
+    "status": "modified",
+    "added": 21,
+    "removed": 1,
+    "diff": "@@ -1,5 +1,5 @@\n name: grave\n-# Moonlit graveyard: cold night ground, sickly flesh, faded clothes, one bloody accent. 32 colors.\n+# Moonlit graveyard: cold night ground, sickly flesh, faded clothes, one bloody accent. 48 colors.\n colors:\n   \"0\": { hex: \"#0b0a10\", name: ink }\n   \"1\": { hex: \"#1a1a24\", name: night }\n@@ -33,6 +33,22 @@\n   \"t\": { hex: \"#4d4035\", name: rag }\n   \"u\": { hex: \"#71604f\", name: rag_light }\n   \"v\": { hex: \"#998470\", name: rag_pale }\n+  \"A\": { hex: \"#2e1418\", name: flannel_deep }\n+  \"B\": { hex: \"#5a2228\", name: flannel }\n+  \"C\": { hex: \"#86363a\", name: flannel_light }\n+  \"D\": { hex: \"#b0585a\", name: flannel_pale }\n+  \"E\": { hex: \"#1a2a26\", name: scrubs_deep }\n+  \"F\": { hex: \"#264840\", name: scrubs }\n+  \"G\": { hex: \"#3b6e62\", name: scrubs_light }\n+  \"H\": { hex: \"#5f9a8a\", name: scrubs_pale }\n+  \"I\": { hex: \"#2c3238\", name: ash_deep }\n+  \"J\": { hex: \"#4c5660\", name: ash }\n+  \"K\": { hex: \"#76838c\", name: ash_light }\n+  \"L\": { hex: \"#a4b0b4\", name: ash_pale }\n+  \"M\": { hex: \"#3a2c3c\", name: pallor_deep }\n+  \"N\": { hex: \"#665068\", name: pallor }\n+  \"O\": { hex: \"#937a90\", name: pallor_light }\n+  \"P\": { hex: \"#c2aabb\", name: pallor_pale }\n ramps:\n   stone: [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\"]\n   flesh: [\"7\", \"8\", \"9\", \"a\", \"b\"]\n@@ -41,3 +57,7 @@\n   grass: [\"k\", \"l\", \"m\", \"n\"]\n   blood: [\"o\", \"p\", \"q\"]\n   rag:   [\"s\", \"t\", \"u\", \"v\"]\n+  flannel: [\"A\", \"B\", \"C\", \"D\"]\n+  scrubs: [\"E\", \"F\", \"G\", \"H\"]\n+  ash:   [\"I\", \"J\", \"K\", \"L\"]\n+  pallor: [\"M\", \"N\", \"O\", \"P\"]"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "modified",
+    "added": 1,
+    "removed": 0,
+    "diff": "@@ -37,3 +37,4 @@\n \n - 2026-10-17: \"Top-down zombie game, a zombie that shambles towards the player.\" Defaults used: pixel art,\n   top-down 3/4, palette `grave`, 8 headings.\n+- 2026-10-17: \"Now a whole horde\" -> `variant_axes`: 3 skin tones x 3 shirts = 9 zombies from one model."
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   },
+   "walk_e": {
+    "fps": 6.0,
+    "frames": [
+     "walk_e_0",
+     "walk_e_1",
+     "walk_e_2",
+     "walk_e_3",
+     "walk_e_4",
+     "walk_e_5"
+    ],
+    "loop": true
+   },
+   "walk_n": {
+    "fps": 6.0,
+    "frames": [
+     "walk_n_0",
+     "walk_n_1",
+     "walk_n_2",
+     "walk_n_3",
+     "walk_n_4",
+     "walk_n_5"
+    ],
+    "loop": true
+   },
+   "walk_ne": {
+    "fps": 6.0,
+    "frames": [
+     "walk_ne_0",
+     "walk_ne_1",
+     "walk_ne_2",
+     "walk_ne_3",
+     "walk_ne_4",
+     "walk_ne_5"
+    ],
+    "loop": true
+   },
+   "walk_nw": {
+    "fps": 6.0,
+    "frames": [
+     "walk_nw_0",
+     "walk_nw_1",
+     "walk_nw_2",
+     "walk_nw_3",
+     "walk_nw_4",
+     "walk_nw_5"
+    ],
+    "loop": true
+   },
+   "walk_s": {
+    "fps": 6.0,
+    "frames": [
+     "walk_s_0",
+     "walk_s_1",
+     "walk_s_2",
+     "walk_s_3",
+     "walk_s_4",
+     "walk_s_5"
+    ],
+    "loop": true
+   },
+   "walk_se": {
+    "fps": 6.0,
+    "frames": [
+     "walk_se_0",
+     "walk_se_1",
+     "walk_se_2",
+     "walk_se_3",
+     "walk_se_4",
+     "walk_se_5"
+    ],
+    "loop": true
+   },
+   "walk_sw": {
+    "fps": 6.0,
+    "frames": [
+     "walk_sw_0",
+     "walk_sw_1",
+     "walk_sw_2",
+     "walk_sw_3",
+     "walk_sw_4",
+     "walk_sw_5"
+    ],
+    "loop": true
+   },
+   "walk_w": {
+    "fps": 6.0,
+    "frames": [
+     "walk_w_0",
+     "walk_w_1",
+     "walk_w_2",
+     "walk_w_3",
+     "walk_w_4",
+     "walk_w_5"
+    ],
+    "loop": true
+   }
+  },
+  "description": "Shambling zombie: hunched forward, arms reaching out, torn rag shirt with a blood stain, faded jeans, sickly green skin, sunken glowing eyes, patchy dark hair. Top-down 3/4 view, 8 headings, 6-frame shamble where the legs drag in turn and the arms sway (the torso stays planted, so nothing jumps).",
+  "frames": {
+   "e": [
+    0,
+    0,
+    44,
+    48
+   ],
+   "n": [
+    264,
+    48,
+    44,
+    48
+   ],
+   "ne": [
+    308,
+    0,
+    44,
+    48
+   ],
+   "nw": [
+    220,
+    96,
+    44,
+    48
+   ],
+   "s": [
+    88,
+    240,
+    44,
+    48
+   ],
+   "se": [
+    44,
+    288,
+    44,
+    48
+   ],
+   "sw": [
+    132,
+    192,
+    44,
+    48
+   ],
+   "w": [
+    176,
+    144,
+    44,
+    48
+   ],
+   "walk_e_0": [
+    44,
+    0,
+    44,
+    48
+   ],
+   "walk_e_1": [
+    88,
+    0,
+    44,
+    48
+   ],
+   "walk_e_2": [
+    132,
+    0,
+    44,
+    48
+   ],
+   "walk_e_3": [
+    176,
+    0,
+    44,
+    48
+   ],
+   "walk_e_4": [
+    220,
+    0,
+    44,
+    48
+   ],
+   "walk_e_5": [
+    264,
+    0,
+    44,
+    48
+   ],
+   "walk_n_0": [
+    308,
+    48,
+    44,
+    48
+   ],
+   "walk_n_1": [
+    0,
+    96,
+    44,
+    48
+   ],
+   "walk_n_2": [
+    44,
+    96,
+    44,
+    48
+   ],
+   "walk_n_3": [
+    88,
+    96,
+    44,
+    48
+   ],
+   "walk_n_4": [
+    132,
+    96,
+    44,
+    48
+   ],
+   "walk_n_5": [
+    176,
+    96,
+    44,
+    48
+   ],
+   "walk_ne_0": [
+    0,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_1": [
+    44,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_2": [
+    88,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_3": [
+    132,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_4": [
+    176,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_5": [
+    220,
+    48,
+    44,
+    48
+   ],
+   "walk_nw_0": [
+    264,
+    96,
+    44,
+    48
+   ],
+   "walk_nw_1": [
+    308,
+    96,
+    44,
+    48
+   ],
+   "walk_nw_2": [
+    0,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_3": [
+    44,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_4": [
+    88,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_5": [
+    132,
+    144,
+    44,
+    48
+   ],
+   "walk_s_0": [
+    132,
+    240,
+    44,
+    48
+   ],
+   "walk_s_1": [
+    176,
+    240,
+    44,
+    48
+   ],
+   "walk_s_2": [
+    220,
+    240,
+    44,
+    48
+   ],
+   "walk_s_3": [
+    264,
+    240,
+    44,
+    48
+   ],
+   "walk_s_4": [
+    308,
+    240,
+    44,
+    48
+   ],
+   "walk_s_5": [
+    0,
+    288,
+    44,
+    48
+   ],
+   "walk_se_0": [
+    88,
+    288,
+    44,
+    48
+   ],
+   "walk_se_1": [
+    132,
+    288,
+    44,
+    48
+   ],
+   "walk_se_2": [
+    176,
+    288,
+    44,
+    48
+   ],
+   "walk_se_3": [
+    220,
+    288,
+    44,
+    48
+   ],
+   "walk_se_4": [
+    264,
+    288,
+    44,
+    48
+   ],
+   "walk_se_5": [
+    308,
+    288,
+    44,
+    48
+   ],
+   "walk_sw_0": [
+    176,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_1": [
+    220,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_2": [
+    264,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_3": [
+    308,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_4": [
+    0,
+    240,
+    44,
+    48
+   ],
+   "walk_sw_5": [
+    44,
+    240,
+    44,
+    48
+   ],
+   "walk_w_0": [
+    220,
+    144,
+    44,
+    48
+   ],
+   "walk_w_1": [
+    264,
+    144,
+    44,
+    48
+   ],
+   "walk_w_2": [
+    308,
+    144,
+    44,
+    48
+   ],
+   "walk_w_3": [
+    0,
+    192,
+    44,
+    48
+   ],
+   "walk_w_4": [
+    44,
+    192,
+    44,
+    48
+   ],
+   "walk_w_5": [
+    88,
+    192,
+    44,
+    48
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -17.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/zombie.tres",
+  "headings": [
+   "e",
+   "ne",
+   "n",
+   "nw",
+   "w",
+   "sw",
+   "s",
+   "se"
+  ],
+  "kind": "model",
+  "palette": "grave",
+  "pivot": [
+   22,
+   41
+  ],
+  "sheet": "res://assets/generated/sprites/zombie.png",
+  "size": [
+   44,
+   48
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "enemy",
+   "character"
+  ],
+  "variant_axes": {
+   "shirt": {
+    "flannel": {
+     "swap": {
+      "#2e2620": "#2e1418",
+      "#4d4035": "#5a2228",
+      "#71604f": "#86363a",
+      "#998470": "#b0585a"
+     },
+     "swap_exact": true
+    },
+    "rag": {
+     "swap": {},
+     "swap_exact": true
+    },
+    "scrubs": {
+     "swap": {
+      "#2e2620": "#1a2a26",
+      "#4d4035": "#264840",
+      "#71604f": "#3b6e62",
+      "#998470": "#5f9a8a"
+     },
+     "swap_exact": true
+    }
+   },
+   "skin": {
+    "ash": {
+     "swap": {
+      "#3a4d33": "#2c3238",
+      "#5f7748": "#4c5660",
+      "#8fa35f": "#76838c",
+      "#c3cc86": "#a4b0b4"
+     },
+     "swap_exact": true
+    },
+    "green": {
+     "swap": {},
+     "swap_exact": true
+    },
+    "pallid": {
+     "swap": {
+      "#3a4d33": "#3a2c3c",
+      "#5f7748": "#665068",
+      "#8fa35f": "#937a90",
+      "#c3cc86": "#c2aabb"
+     },
+     "swap_exact": true
+    }
+   }
+  },
+  "variants": {
+   "ash+flannel": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.ash+flannel.tres",
+    "sheet": "res://assets/generated/sprites/zombie.ash+flannel.png",
+    "swap": {
+     "#2e2620": "#2e1418",
+     "#3a4d33": "#2c3238",
+     "#4d4035": "#5a2228",
+     "#5f7748": "#4c5660",
+     "#71604f": "#86363a",
+     "#8fa35f": "#76838c",
+     "#998470": "#b0585a",
+     "#c3cc86": "#a4b0b4"
+    },
+    "swap_exact": true
+   },
+   "ash+rag": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.ash+rag.tres",
+    "sheet": "res://assets/generated/sprites/zombie.ash+rag.png",
+    "swap": {
+     "#3a4d33": "#2c3238",
+     "#5f7748": "#4c5660",
+     "#8fa35f": "#76838c",
+     "#c3cc86": "#a4b0b4"
+    },
+    "swap_exact": true
+   },
+   "ash+scrubs": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.ash+scrubs.tres",
+    "sheet": "res://assets/generated/sprites/zombie.ash+scrubs.png",
+    "swap": {
+     "#2e2620": "#1a2a26",
+     "#3a4d33": "#2c3238",
+     "#4d4035": "#264840",
+     "#5f7748": "#4c5660",
+     "#71604f": "#3b6e62",
+     "#8fa35f": "#76838c",
+     "#998470": "#5f9a8a",
+     "#c3cc86": "#a4b0b4"
+    },
+    "swap_exact": true
+   },
+   "green+flannel": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.green+flannel.tres",
+    "sheet": "res://assets/generated/sprites/zombie.green+flannel.png",
+    "swap": {
+     "#2e2620": "#2e1418",
+     "#4d4035": "#5a2228",
+     "#71604f": "#86363a",
+     "#998470": "#b0585a"
+    },
+    "swap_exact": true
+   },
+   "green+rag": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.green+rag.tres",
+    "sheet": "res://assets/generated/sprites/zombie.green+rag.png",
+    "swap": {},
+    "swap_exact": true
+   },
+   "green+scrubs": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.green+scrubs.tres",
+    "sheet": "res://assets/generated/sprites/zombie.green+scrubs.png",
+    "swap": {
+     "#2e2620": "#1a2a26",
+     "#4d4035": "#264840",
+     "#71604f": "#3b6e62",
+     "#998470": "#5f9a8a"
+    },
+    "swap_exact": true
+   },
+   "pallid+flannel": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.pallid+flannel.tres",
+    "sheet": "res://assets/generated/sprites/zombie.pallid+flannel.png",
+    "swap": {
+     "#2e2620": "#2e1418",
+     "#3a4d33": "#3a2c3c",
+     "#4d4035": "#5a2228",
+     "#5f7748": "#665068",
+     "#71604f": "#86363a",
+     "#8fa35f": "#937a90",
+     "#998470": "#b0585a",
+     "#c3cc86": "#c2aabb"
+    },
+    "swap_exact": true
+   },
+   "pallid+rag": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.pallid+rag.tres",
+    "sheet": "res://assets/generated/sprites/zombie.pallid+rag.png",
+    "swap": {
+     "#3a4d33": "#3a2c3c",
+     "#5f7748": "#665068",
+     "#8fa35f": "#937a90",
+     "#c3cc86": "#c2aabb"
+    },
+    "swap_exact": true
+   },
+   "pallid+scrubs": {
+    "godot_sprite_frames": "res://assets/generated/sprites/zombie.pallid+scrubs.tres",
+    "sheet": "res://assets/generated/sprites/zombie.pallid+scrubs.png",
+    "swap": {
+     "#2e2620": "#1a2a26",
+     "#3a4d33": "#3a2c3c",
+     "#4d4035": "#264840",
+     "#5f7748": "#665068",
+     "#71604f": "#3b6e62",
+     "#8fa35f": "#937a90",
+     "#998470": "#5f9a8a",
+     "#c3cc86": "#c2aabb"
+    },
+    "swap_exact": true
+   }
+  }
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 17378
+  },
+  {
+   "path": "assets/generated/sprites/gravestone.png",
+   "bytes": 325
+  },
+  {
+   "path": "assets/generated/sprites/gravestone.tres",
+   "bytes": 408
+  },
+  {
+   "path": "assets/generated/sprites/zombie.ash+flannel.png",
+   "bytes": 16747
+  },
+  {
+   "path": "assets/generated/sprites/zombie.ash+flannel.tres",
+   "bytes": 11432
+  },
+  {
+   "path": "assets/generated/sprites/zombie.ash+rag.png",
+   "bytes": 16849
+  },
+  {
+   "path": "assets/generated/sprites/zombie.ash+rag.tres",
+   "bytes": 11428
+  },
+  {
+   "path": "assets/generated/sprites/zombie.ash+scrubs.png",
+   "bytes": 16843
+  },
+  {
+   "path": "assets/generated/sprites/zombie.ash+scrubs.tres",
+   "bytes": 11431
+  },
+  {
+   "path": "assets/generated/sprites/zombie.green+flannel.png",
+   "bytes": 16877
+  },
+  {
+   "path": "assets/generated/sprites/zombie.green+flannel.tres",
+   "bytes": 11434
+  },
+  {
+   "path": "assets/generated/sprites/zombie.green+rag.png",
+   "bytes": 16938
+  },
+  {
+   "path": "assets/generated/sprites/zombie.green+rag.tres",
+   "bytes": 11430
+  },
+  {
+   "path": "assets/generated/sprites/zombie.green+scrubs.png",
+   "bytes": 16888
+  },
+  {
+   "path": "assets/generated/sprites/zombie.green+scrubs.tres",
+   "bytes": 11433
+  },
+  {
+   "path": "assets/generated/sprites/zombie.pallid+flannel.png",
+   "bytes": 16743
+  },
+  {
+   "path": "assets/generated/sprites/zombie.pallid+flannel.tres",
+   "bytes": 11435
+  },
+  {
+   "path": "assets/generated/sprites/zombie.pallid+rag.png",
+   "bytes": 16890
+  },
+  {
+   "path": "assets/generated/sprites/zombie.pallid+rag.tres",
+   "bytes": 11431
+  },
+  {
+   "path": "assets/generated/sprites/zombie.pallid+scrubs.png",
+   "bytes": 16904
+  },
+  {
+   "path": "assets/generated/sprites/zombie.pallid+scrubs.tres",
+   "bytes": 11434
+  },
+  {
+   "path": "assets/generated/sprites/zombie.png",
+   "bytes": 16938
+  },
+  {
+   "path": "assets/generated/sprites/zombie.tres",
+   "bytes": 11420
+  },
+  {
+   "path": "assets/generated/tiles/graveyard.png",
+   "bytes": 508
+  },
+  {
+   "path": "assets/generated/tiles/graveyard.tres",
+   "bytes": 403
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/zombie.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/zombie.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 44, 48)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(478 lines in all)"
+ },
+ "palettes": {
+  "grave": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#0b0a10",
+     "name": "ink"
+    },
+    {
+     "key": "1",
+     "hex": "#1a1a24",
+     "name": "night"
+    },
+    {
+     "key": "2",
+     "hex": "#2c2d3a",
+     "name": "slate_dark"
+    },
+    {
+     "key": "3",
+     "hex": "#474a5a",
+     "name": "slate"
+    },
+    {
+     "key": "4",
+     "hex": "#6c7183",
+     "name": "stone"
+    },
+    {
+     "key": "5",
+     "hex": "#9da3b2",
+     "name": "stone_light"
+    },
+    {
+     "key": "6",
+     "hex": "#d6dae2",
+     "name": "moon"
+    },
+    {
+     "key": "7",
+     "hex": "#1f2a1f",
+     "name": "rot_deep"
+    },
+    {
+     "key": "8",
+     "hex": "#3a4d33",
+     "name": "rot"
+    },
+    {
+     "key": "9",
+     "hex": "#5f7748",
+     "name": "flesh"
+    },
+    {
+     "key": "a",
+     "hex": "#8fa35f",
+     "name": "flesh_light"
+    },
+    {
+     "key": "b",
+     "hex": "#c3cc86",
+     "name": "flesh_pale"
+    },
+    {
+     "key": "c",
+     "hex": "#1b2133",
+     "name": "denim_deep"
+    },
+    {
+     "key": "d",
+     "hex": "#2d3a57",
+     "name": "denim"
+    },
+    {
+     "key": "e",
+     "hex": "#4a5d82",
+     "name": "denim_light"
+    },
+    {
+     "key": "f",
+     "hex": "#7486a8",
+     "name": "denim_faded"
+    },
+    {
+     "key": "g",
+     "hex": "#24171a",
+     "name": "mud_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#3e2a26",
+     "name": "mud"
+    },
+    {
+     "key": "i",
+     "hex": "#5e4434",
+     "name": "earth"
+    },
+    {
+     "key": "j",
+     "hex": "#836446",
+     "name": "earth_light"
+    },
+    {
+     "key": "k",
+     "hex": "#121c19",
+     "name": "grass_deep"
+    },
+    {
+     "key": "l",
+     "hex": "#1d2f27",
+     "name": "grass_dark"
+    },
+    {
+     "key": "m",
+     "hex": "#2c4636",
+     "name": "grass"
+    },
+    {
+     "key": "n",
+     "hex": "#43614a",
+     "name": "grass_light"
+    },
+    {
+     "key": "o",
+     "hex": "#3d1018",
+     "name": "blood_deep"
+    },
+    {
+     "key": "p",
+     "hex": "#6e1c26",
+     "name": "blood"
+    },
+    {
+     "key": "q",
+     "hex": "#a8333a",
+     "name": "blood_light"
+    },
+    {
+     "key": "r",
+     "hex": "#d9e88a",
+     "name": "eye_glow"
+    },
+    {
+     "key": "s",
+     "hex": "#2e2620",
+     "name": "rag_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#4d4035",
+     "name": "rag"
+    },
+    {
+     "key": "u",
+     "hex": "#71604f",
+     "name": "rag_light"
+    },
+    {
+     "key": "v",
+     "hex": "#998470",
+     "name": "rag_pale"
+    },
+    {
+     "key": "A",
+     "hex": "#2e1418",
+     "name": "flannel_deep"
+    },
+    {
+     "key": "B",
+     "hex": "#5a2228",
+     "name": "flannel"
+    },
+    {
+     "key": "C",
+     "hex": "#86363a",
+     "name": "flannel_light"
+    },
+    {
+     "key": "D",
+     "hex": "#b0585a",
+     "name": "flannel_pale"
+    },
+    {
+     "key": "E",
+     "hex": "#1a2a26",
+     "name": "scrubs_deep"
+    },
+    {
+     "key": "F",
+     "hex": "#264840",
+     "name": "scrubs"
+    },
+    {
+     "key": "G",
+     "hex": "#3b6e62",
+     "name": "scrubs_light"
+    },
+    {
+     "key": "H",
+     "hex": "#5f9a8a",
+     "name": "scrubs_pale"
+    },
+    {
+     "key": "I",
+     "hex": "#2c3238",
+     "name": "ash_deep"
+    },
+    {
+     "key": "J",
+     "hex": "#4c5660",
+     "name": "ash"
+    },
+    {
+     "key": "K",
+     "hex": "#76838c",
+     "name": "ash_light"
+    },
+    {
+     "key": "L",
+     "hex": "#a4b0b4",
+     "name": "ash_pale"
+    },
+    {
+     "key": "M",
+     "hex": "#3a2c3c",
+     "name": "pallor_deep"
+    },
+    {
+     "key": "N",
+     "hex": "#665068",
+     "name": "pallor"
+    },
+    {
+     "key": "O",
+     "hex": "#937a90",
+     "name": "pallor_light"
+    },
+    {
+     "key": "P",
+     "hex": "#c2aabb",
+     "name": "pallor_pale"
+    }
+   ],
+   "ramps": {
+    "stone": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6"
+    ],
+    "flesh": [
+     "7",
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "denim": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "earth": [
+     "g",
+     "h",
+     "i",
+     "j"
+    ],
+    "grass": [
+     "k",
+     "l",
+     "m",
+     "n"
+    ],
+    "blood": [
+     "o",
+     "p",
+     "q"
+    ],
+    "rag": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ],
+    "flannel": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "scrubs": [
+     "E",
+     "F",
+     "G",
+     "H"
+    ],
+    "ash": [
+     "I",
+     "J",
+     "K",
+     "L"
+    ],
+    "pallor": [
+     "M",
+     "N",
+     "O",
+     "P"
+    ]
+   }
+  }
+ },
+ "sheet": "02-horde/zombie.png",
+ "changes": null,
+ "ground": "02-horde/ground.png",
+ "status": "draft",
+ "next": [
+  {
+   "to": "03-night-horde",
+   "say": "Make the night darker."
+  }
+ ]
+}

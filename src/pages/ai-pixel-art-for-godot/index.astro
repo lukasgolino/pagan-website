@@ -1,0 +1,30 @@
+---
+import Landing from "../../layouts/Landing.astro";
+---
+
+<Landing
+  title="AI pixel art for Godot 4 · PAGAN"
+  description="Let your AI agent make pixel art for your Godot 4 game: SpriteFrames and TileSet resources, 8-16 consistent headings from 3D models, verified in headless Godot. Free and open source."
+  heading="AI pixel art for Godot 4, as resources Godot loads"
+  points={[
+    "<b>SpriteFrames</b> <code>.tres</code> for every sprite and model: one animation per heading (<code>walk_se</code>, <code>attack_n</code>…).",
+    "<b>TileSet</b> <code>.tres</code> for tilesets, including animated tiles; atlas coordinates in <code>manifest.json</code>.",
+    "Pivots as <code>godot_offset</code>, normal maps for Godot's 2D lights, team colours as variant sheets or swap tables.",
+    "Every resource format is copied from what Godot 4.7's ResourceSaver writes and verified by loading it in headless Godot.",
+    "Free, MIT, offline. Your agent writes the art; you review it like code.",
+  ]}
+  code={`# pagan.toml, inside your Godot project
+output_dir = "../assets/generated"
+export = ["png", "godot"]
+
+# in GDScript
+$Zombie.sprite_frames = load("res://assets/generated/sprites/zombie.tres")
+$Zombie.offset = Vector2(0, -17)   # manifest: godot_offset
+$Zombie.play("walk_" + heading)`}
+>
+  <p>
+    PAGAN is a text language for game art. Your agent (Claude with the PAGAN skill, or any agent over
+    MCP) writes the sprites, tiles and 3D models; <code>pagan build</code> turns them into PNG sheets and
+    Godot resources that drop straight into your project.
+  </p>
+</Landing>

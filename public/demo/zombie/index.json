@@ -1,0 +1,98 @@
+{
+ "id": "zombie",
+ "title": "Zombie game",
+ "pitch": "A shambling 3D zombie: 8 headings, attacks, a horde, a darker night.",
+ "start": "01-shamble",
+ "sea": null,
+ "actors": [
+  [
+   64,
+   62
+  ],
+  [
+   28,
+   72
+  ],
+  [
+   100,
+   66
+  ]
+ ],
+ "steps": {
+  "01-shamble": {
+   "user": "I'm making a top-down zombie game. Give me a zombie that shambles towards the player.",
+   "next": [
+    {
+     "to": "02-attack",
+     "say": "Give him an attack animation."
+    },
+    {
+     "to": "02-rotten",
+     "say": "Make him more rotten."
+    },
+    {
+     "to": "02-horde",
+     "say": "Now a whole horde."
+    }
+   ],
+   "parents": []
+  },
+  "02-attack": {
+   "user": "Give him an attack animation.",
+   "next": [
+    {
+     "to": "03-night-attack",
+     "say": "Make the night darker."
+    }
+   ],
+   "parents": [
+    "01-shamble"
+   ]
+  },
+  "02-rotten": {
+   "user": "Make him more rotten.",
+   "next": [
+    {
+     "to": "03-night-rotten",
+     "say": "Make the night darker."
+    }
+   ],
+   "parents": [
+    "01-shamble"
+   ]
+  },
+  "02-horde": {
+   "user": "Now a whole horde.",
+   "next": [
+    {
+     "to": "03-night-horde",
+     "say": "Make the night darker."
+    }
+   ],
+   "parents": [
+    "01-shamble"
+   ]
+  },
+  "03-night-attack": {
+   "user": "Make the night darker.",
+   "next": [],
+   "parents": [
+    "02-attack"
+   ]
+  },
+  "03-night-rotten": {
+   "user": "Make the night darker.",
+   "next": [],
+   "parents": [
+    "02-rotten"
+   ]
+  },
+  "03-night-horde": {
+   "user": "Make the night darker.",
+   "next": [],
+   "parents": [
+    "02-horde"
+   ]
+  }
+ }
+}

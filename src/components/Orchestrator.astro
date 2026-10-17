@@ -1,0 +1,158 @@
+---
+import { step } from "../lib/data";
+
+const z = step("zombie", "02-attack");
+const offset = JSON.stringify(z.manifest.godot_offset);
+---
+
+<section id="agents">
+  <div class="wrap grid">
+    <div>
+      <span class="eyebrow">Let your agent do it</span>
+      <h2>An agent building your game calls PAGAN like a service</h2>
+      <p class="lede">
+        While you play-test, an orchestrator agent asks PAGAN for the art it needs, reads back the
+        manifest and wires the sprite into the scene. <code>manifest.json</code> is the contract, so it
+        works for any engine; Godot resources come for free.
+      </p>
+      <ol class="timeline" id="timeline">
+        <li>
+          <span class="who o">orchestrator → pagan</span>
+          <code>write_asset zombie.model.yaml</code>
+          <p>"Wave 2 needs an enemy: top-down, 8 directions, walk + attack."</p>
+        </li>
+        <li>
+          <span class="who p">pagan → orchestrator</span>
+          <code>{"{"}"ok": true, "errors": 0, "warnings": 0, preview: image{"}"}</code>
+          <p>It looks at the preview, then calls <code>build</code>.</p>
+        </li>
+        <li>
+          <span class="who p">pagan → game</span>
+          <code>sprites/zombie.png · zombie.tres · manifest.json</code>
+          <p>{z.files.length} files, frame rects, 8 headings × walk + attack, pivot.</p>
+        </li>
+        <li>
+          <span class="who o">orchestrator → game</span>
+          <code>Enemy.tscn: sprite_frames = zombie.tres, offset = Vector2{offset.replace("[", "(").replace("]", ")")}</code>
+          <p>The zombie appears in wave 2.</p>
+        </li>
+      </ol>
+    </div>
+    <div class="play panel">
+      <div class="ground">
+        <pagan-sprite step="zombie/02-attack" heading="sw" anim="walk" scale="4" label="The zombie walking in the game"></pagan-sprite>
+      </div>
+      <p>Wave 2 · <span>zombie.tres</span> · walk_sw</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import "../scripts/pagan-sprite";
+  const tl = document.getElementById("timeline")!;
+  new IntersectionObserver(
+    (es, io) => {
+      if (es.some((e) => e.isIntersecting)) {
+        tl.classList.add("go");
+        io.disconnect();
+      }
+    },
+    { threshold: 0.3 },
+  ).observe(tl);
+</script>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+  }
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+    border-left: 2px solid var(--line);
+  }
+  .timeline li {
+    padding: 0 0 18px 20px;
+    position: relative;
+    opacity: 0.25;
+    transition: opacity 0.5s;
+  }
+  .timeline li::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    background: var(--line);
+  }
+  .timeline.go li {
+    opacity: 1;
+  }
+  .timeline.go li::before {
+    background: var(--glow);
+  }
+  .timeline.go li:nth-child(2) {
+    transition-delay: 0.7s;
+  }
+  .timeline.go li:nth-child(3) {
+    transition-delay: 1.4s;
+  }
+  .timeline.go li:nth-child(4) {
+    transition-delay: 2.1s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .timeline li {
+      opacity: 1;
+      transition: none;
+    }
+  }
+  .who {
+    display: block;
+    font: 0.75rem var(--font-pixel);
+    letter-spacing: 0.04em;
+  }
+  .who.o {
+    color: var(--teal);
+  }
+  .who.p {
+    color: var(--glow);
+  }
+  .timeline code {
+    font-size: 0.8rem;
+    word-break: break-word;
+  }
+  .timeline p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .play {
+    padding: 14px;
+  }
+  .ground {
+    background-color: #1d2f27;
+    background-image: radial-gradient(#2c4636 1px, transparent 1px);
+    background-size: 12px 12px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+  .play p {
+    margin: 10px 2px 0;
+    font: 0.75rem var(--font-pixel);
+    color: var(--muted);
+  }
+  .play p span {
+    color: var(--glow);
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

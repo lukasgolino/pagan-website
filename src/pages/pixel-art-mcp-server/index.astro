@@ -1,0 +1,26 @@
+---
+import Landing from "../../layouts/Landing.astro";
+---
+
+<Landing
+  title="Pixel art MCP server · PAGAN"
+  description="PAGAN's MCP server gives any AI agent tools to write, lint, preview and build game art: sprites, tiles, 3D-rendered headings, animations. Free, open source, local."
+  heading="A pixel art MCP server that checks its own work"
+  points={[
+    "Tools: <code>write_asset</code> (writes, lints and returns a preview image), <code>preview</code>, <code>lint</code>, <code>fit</code>, <code>palette_adjust</code>, <code>build</code>, <code>manifest</code> and more.",
+    "Previews come back as images, so the model looks at what it made and fixes it.",
+    "Resources: the full workflow and notation reference, the project's brief, style guide and manifest.",
+    "The same JSON as the CLI's <code>--json</code>: one contract for agents and scripts.",
+    "Works with Claude Desktop, Claude Code, Cursor or your own agent. Runs locally over stdio; no cloud, no key.",
+  ]}
+  code={`pip install "pagan[mcp] @ git+https://github.com/lukasgolino/PAGAN"
+claude mcp add pagan -- pagan mcp --project ./art
+
+# any other client: command "pagan", args ["mcp", "--project", "./art"]`}
+>
+  <p>
+    Most pixel-art MCP servers let a model set pixels one call at a time. PAGAN's tools work on source
+    files instead: the agent writes a sprite grid or a 3D voxel model, PAGAN lints it and renders it, and
+    every heading and frame comes out consistent.
+  </p>
+</Landing>

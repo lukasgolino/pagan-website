@@ -1,0 +1,48 @@
+name: grave
+# Moonlit graveyard: cold night ground, sickly flesh, faded clothes, one bloody accent. 36 colors.
+colors:
+  "0": { hex: "#0b0a10", name: ink }
+  "1": { hex: "#1a1a24", name: night }
+  "2": { hex: "#2c2d3a", name: slate_dark }
+  "3": { hex: "#474a5a", name: slate }
+  "4": { hex: "#6c7183", name: stone }
+  "5": { hex: "#9da3b2", name: stone_light }
+  "6": { hex: "#d6dae2", name: moon }
+  "7": { hex: "#1f2a1f", name: rot_deep }
+  "8": { hex: "#3a4d33", name: rot }
+  "9": { hex: "#5f7748", name: flesh }
+  "a": { hex: "#8fa35f", name: flesh_light }
+  "b": { hex: "#c3cc86", name: flesh_pale }
+  "c": { hex: "#1b2133", name: denim_deep }
+  "d": { hex: "#2d3a57", name: denim }
+  "e": { hex: "#4a5d82", name: denim_light }
+  "f": { hex: "#7486a8", name: denim_faded }
+  "g": { hex: "#24171a", name: mud_deep }
+  "h": { hex: "#3e2a26", name: mud }
+  "i": { hex: "#5e4434", name: earth }
+  "j": { hex: "#836446", name: earth_light }
+  "k": { hex: "#121c19", name: grass_deep }
+  "l": { hex: "#1d2f27", name: grass_dark }
+  "m": { hex: "#2c4636", name: grass }
+  "n": { hex: "#43614a", name: grass_light }
+  "o": { hex: "#3d1018", name: blood_deep }
+  "p": { hex: "#6e1c26", name: blood }
+  "q": { hex: "#a8333a", name: blood_light }
+  "r": { hex: "#d9e88a", name: eye_glow }
+  "s": { hex: "#2e2620", name: rag_deep }
+  "t": { hex: "#4d4035", name: rag }
+  "u": { hex: "#71604f", name: rag_light }
+  "v": { hex: "#998470", name: rag_pale }
+  "w": { hex: "#2b2a17", name: decay_deep }
+  "x": { hex: "#4f4b26", name: decay }
+  "y": { hex: "#7d7537", name: decay_light }
+  "z": { hex: "#ab9f5a", name: decay_pale }
+ramps:
+  stone: ["1", "2", "3", "4", "5", "6"]
+  flesh: ["7", "8", "9", "a", "b"]
+  denim: ["c", "d", "e", "f"]
+  earth: ["g", "h", "i", "j"]
+  grass: ["k", "l", "m", "n"]
+  blood: ["o", "p", "q"]
+  rag:   ["s", "t", "u", "v"]
+  decay: ["w", "x", "y", "z"]

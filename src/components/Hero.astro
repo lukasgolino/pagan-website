@@ -1,0 +1,200 @@
+---
+import { asset, readText, step } from "../lib/data";
+import { highlightSource } from "../scripts/highlight";
+
+const ship = step("ship", "03-sixteen");
+const source = readText("art/steps/ship/03-sixteen/models/ship.model.yaml").trimEnd();
+const lines = source.split("\n").length;
+---
+
+<section class="hero">
+  <div class="wrap grid">
+    <div class="copy">
+      <span class="eyebrow">Pixel Art Grammar And Notation</span>
+      <h1>You speak English.<br /><span>Your agent speaks PAGAN.</span></h1>
+      <p class="lede">
+        PAGAN is a language for game art: palettes, sprites, tiles, 3D models, animations and style rules,
+        written as plain text. Your AI agent writes it, PAGAN checks and renders it, and your game gets
+        engine-ready sprites.
+      </p>
+      <div class="cta">
+        <a class="btn" href="#demo">Try the demo</a>
+        <a class="btn ghost" href="#install">Install (1 line)</a>
+      </div>
+      <ul class="facts">
+        <li>MIT-licensed, free</li>
+        <li>Runs locally, offline</li>
+        <li>No account, no credits</li>
+        <li>The art is yours</li>
+      </ul>
+    </div>
+    <figure class="show panel">
+      <div
+        class="stage turnable"
+        id="hero-stage"
+        tabindex="0"
+        role="img"
+        aria-label="A two-masted ship turning through 16 headings. Drag or use the arrow keys to turn it."
+        data-entry={JSON.stringify(ship.manifest)}
+        data-sheet={asset(`demo/ship/${ship.sheet}`)}
+      >
+        <canvas class="px" width="384" height="264"></canvas>
+        <button class="play" type="button" aria-label="Pause">❚❚</button>
+        <span class="hint">drag to turn</span>
+      </div>
+      <figcaption>
+        <span>16 headings, one light, from this {lines}-line file</span>
+        <code>models/ship.model.yaml</code>
+      </figcaption>
+      <pre class="code src" tabindex="0" aria-label="The ship's PAGAN source"><code set:html={highlightSource(source)} /></pre>
+    </figure>
+  </div>
+</section>
+
+<script>
+  import { Sprite, loadImage, onTick, makeTurnable, reducedMotion, whenVisible, type Entry } from "../scripts/sprites";
+
+  const stage = document.getElementById("hero-stage") as HTMLElement;
+  const canvas = stage.querySelector("canvas")!;
+  const button = stage.querySelector(".play") as HTMLButtonElement;
+  const ctx = canvas.getContext("2d")!;
+  const entry: Entry = JSON.parse(stage.dataset.entry!);
+  let playing = !reducedMotion();
+  let spinning = playing;
+  let lastTurn = 0;
+  let stop: (() => void) | null = null;
+
+  loadImage(stage.dataset.sheet!).then((img) => {
+    const sprite = new Sprite(entry, img, "se", "sail");
+    const scale = 4;
+    const draw = (now: number) => {
+      if (spinning && now - lastTurn > 260) {
+        sprite.turn(-1);
+        lastTurn = now;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      sprite.draw(ctx, canvas.width / 2, canvas.height * 0.68, scale, now, playing);
+    };
+    const start = () => (stop ??= onTick(draw));
+    const halt = () => {
+      stop?.();
+      stop = null;
+    };
+    whenVisible(stage, start, halt);
+    draw(performance.now());
+    const sync = () => {
+      button.textContent = playing ? "❚❚" : "▶";
+      button.setAttribute("aria-label", playing ? "Pause" : "Play");
+    };
+    sync();
+    button.addEventListener("click", () => {
+      playing = !playing;
+      spinning = playing;
+      sync();
+      draw(performance.now());
+    });
+    makeTurnable(stage, () => sprite, () => {
+      spinning = false;
+      draw(performance.now());
+    });
+  });
+</script>
+
+<style>
+  .hero {
+    border-top: 0;
+    padding: 64px 0 88px;
+    background:
+      radial-gradient(ellipse at 80% 20%, rgba(31, 138, 134, 0.16), transparent 55%),
+      radial-gradient(ellipse at 10% 90%, rgba(232, 104, 58, 0.1), transparent 50%);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 48px;
+    align-items: center;
+  }
+  h1 {
+    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+  }
+  h1 span {
+    color: var(--glow);
+  }
+  .cta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin: 28px 0 22px;
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .facts li::before {
+    content: "■ ";
+    color: var(--teal);
+  }
+  .show {
+    margin: 0;
+    padding: 14px;
+  }
+  .stage {
+    position: relative;
+    background: #174a5e;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+  }
+  .stage canvas {
+    width: 100%;
+    max-width: 384px;
+    height: auto;
+  }
+  .play {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    font: 12px var(--font-pixel);
+    background: rgba(12, 11, 18, 0.6);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  .hint {
+    position: absolute;
+    left: 10px;
+    bottom: 8px;
+    font: 11px var(--font-pixel);
+    color: rgba(236, 233, 242, 0.6);
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 2px 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .src {
+    max-height: 260px;
+    font-size: 12px;
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

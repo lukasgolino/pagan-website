@@ -1,0 +1,369 @@
+---
+import { readJson, scenarios } from "../lib/data";
+
+const indices = scenarios().map((s) => readJson(`public/demo/${s.id}/index.json`));
+---
+
+<section id="demo">
+  <div class="wrap">
+    <span class="eyebrow">Interactive demo</span>
+    <h2>Watch an agent make game art</h2>
+    <p class="lede">
+      Pick what to ask for next. Each reply shows the art, what the agent wrote, and the files your game
+      gets.
+    </p>
+    <p class="honest">
+      A scripted conversation. The art, source files, diffs, lint results and build output are real PAGAN
+      output, rebuilt from the source files in this site's repo.
+    </p>
+    <div class="demo panel" id="demo-root" data-indices={JSON.stringify(indices)}>
+      <div class="tabs" role="tablist" aria-label="Scenario">
+        {
+          indices.map((s, i) => (
+            <button type="button" role="tab" data-id={s.id} aria-selected={i === 0 ? "true" : "false"}>
+              {s.title}
+              <small>{s.pitch}</small>
+            </button>
+          ))
+        }
+      </div>
+      <div class="log" aria-live="polite"></div>
+      <div class="choices" aria-label="Your reply"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountDemo } from "../scripts/demo";
+  mountDemo(document.getElementById("demo-root")!);
+</script>
+
+<style is:global>
+  #demo .honest {
+    display: inline-block;
+    font-size: 0.88rem;
+    color: var(--spark);
+    border: 1px dashed rgba(255, 224, 138, 0.4);
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    margin: 4px 0 24px;
+  }
+  .demo {
+    padding: 0;
+    overflow: hidden;
+  }
+  .demo .tabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    border-bottom: 1px solid var(--line);
+  }
+  .demo .tabs button {
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: var(--muted);
+    padding: 14px 18px;
+    font: 1rem var(--font-pixel);
+    cursor: pointer;
+  }
+  .demo .tabs button small {
+    display: block;
+    font: 0.82rem var(--font-body);
+    margin-top: 2px;
+  }
+  .demo .tabs button[aria-selected="true"] {
+    color: var(--text);
+    border-bottom-color: var(--ember);
+    background: var(--panel-2);
+  }
+  .demo .log {
+    padding: 22px 22px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 320px;
+  }
+  .msg {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
+    scroll-margin-top: 80px;
+  }
+  .msg .who {
+    font: 0.8rem var(--font-pixel);
+    color: var(--muted);
+    padding-top: 10px;
+  }
+  .msg .body {
+    min-width: 0;
+  }
+  .msg.you .body {
+    justify-self: start;
+    background: var(--ember);
+    color: var(--ink);
+    border-radius: 2px 12px 12px 12px;
+    padding: 10px 16px;
+    font-weight: 550;
+  }
+  .msg.agent .who {
+    color: var(--teal);
+  }
+  .msg.agent .body > p {
+    margin: 8px 0 14px;
+    max-width: 60rem;
+  }
+  .viewer .stage {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    line-height: 0;
+    border: 1px solid var(--line);
+  }
+  .viewer .stage canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  .viewer .stage.turnable {
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  .viewer .stage.dragging {
+    cursor: grabbing;
+  }
+  .viewer .stage .before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .viewer .stage .before::after {
+    content: "";
+  }
+  .viewer .tag {
+    position: absolute;
+    top: 8px;
+    font: 11px var(--font-pixel);
+    line-height: 1;
+    background: rgba(12, 11, 18, 0.7);
+    padding: 5px 7px;
+    border-radius: 3px;
+  }
+  .viewer .tag.left {
+    left: 8px;
+  }
+  .viewer .tag.right {
+    right: 8px;
+  }
+  .viewer .slider {
+    position: absolute;
+    left: 0;
+    bottom: 10px;
+    width: 100%;
+    margin: 0;
+    accent-color: var(--glow);
+  }
+  .viewer .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 4px;
+    font-size: 0.85rem;
+  }
+  .viewer .controls button {
+    font: 0.8rem var(--font-pixel);
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 5px 9px;
+    cursor: pointer;
+  }
+  .viewer .controls button:hover {
+    border-color: var(--teal);
+  }
+  .viewer .controls button[aria-pressed="true"] {
+    background: var(--teal-deep);
+    border-color: var(--teal);
+  }
+  .viewer .heading {
+    font: 0.8rem var(--font-pixel);
+    min-width: 7.5em;
+    text-align: center;
+    color: var(--muted);
+  }
+  .viewer .anims {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+  }
+  .viewer .playbtn {
+    margin-left: auto;
+  }
+  .viewer .teams,
+  .viewer .horde {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .viewer .teams figure,
+  .viewer .horde figure {
+    margin: 0;
+    background: #174a5e;
+    border-radius: 4px;
+    text-align: center;
+    font: 11px var(--font-pixel);
+    color: var(--text);
+    padding-bottom: 4px;
+  }
+  .viewer .horde figure {
+    background: #1d2f27;
+  }
+  .viewer .teams canvas {
+    width: 138px;
+    height: auto;
+    display: block;
+  }
+  .viewer .horde canvas {
+    width: 66px;
+    height: auto;
+    display: block;
+  }
+  .viewer .note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 6px 0 0;
+  }
+  .viewer .changes {
+    margin: 14px 0 0;
+  }
+  .viewer .changes img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: block;
+  }
+  .viewer .changes figcaption {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  details.more {
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--night);
+  }
+  details.more > summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    font: 0.9rem var(--font-pixel);
+    list-style: none;
+  }
+  details.more > summary::before {
+    content: "▸ ";
+    color: var(--glow);
+  }
+  details.more[open] > summary::before {
+    content: "▾ ";
+  }
+  details.more > summary span {
+    font: 0.8rem var(--font-body);
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .more-body {
+    padding: 0 14px 14px;
+  }
+  .more-body h4 {
+    font: 0.78rem var(--font-pixel);
+    color: var(--muted);
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .more-body .code {
+    font-size: 12.5px;
+    max-height: 420px;
+  }
+  details.file {
+    margin-bottom: 8px;
+  }
+  details.file > summary {
+    cursor: pointer;
+    font-size: 0.88rem;
+    padding: 4px 0;
+  }
+  details.file .st {
+    font: 0.72rem var(--font-pixel);
+    color: var(--muted);
+  }
+  details.file .st.added {
+    color: var(--add);
+  }
+  details.file .st.modified {
+    color: var(--glow);
+  }
+  details.file .n b {
+    font-weight: 500;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+  details.file .n .a {
+    color: var(--add);
+  }
+  details.file .n .r {
+    color: var(--del);
+  }
+  .demo .choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 22px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--panel-2);
+    min-height: 70px;
+    align-items: center;
+  }
+  .choice {
+    font: 0.95rem var(--font-body);
+    font-weight: 550;
+    background: transparent;
+    color: var(--glow);
+    border: 2px solid var(--ember);
+    border-radius: 18px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .choice:hover {
+    background: var(--ember);
+    color: var(--ink);
+  }
+  .typing {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-right: auto;
+  }
+  @media (max-width: 640px) {
+    .msg {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+    .msg .who {
+      padding-top: 0;
+    }
+    .demo .log {
+      padding: 16px 12px 4px;
+    }
+    .demo .choices {
+      padding: 12px;
+    }
+  }
+</style>

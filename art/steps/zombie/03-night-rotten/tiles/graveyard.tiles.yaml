@@ -1,0 +1,76 @@
+name: graveyard
+columns: 4
+description: 'Night graveyard ground: three seamless grass tiles and bare grave dirt.'
+status: draft
+style_version: 1
+tags: [terrain]
+tile_size: [16, 16]
+tiles:
+  grass: |
+    lllllkllllllllll
+    llllllllllklllll
+    lkllllllllllllll
+    kklnllllllllllll
+    lllkllllnllllkkl
+    klllllllkllllkkl
+    lllkklnlllllllkk
+    llllklkmmllnlkkk
+    lllllllmlllkllll
+    llllllllllllllll
+    lkllllllllllllll
+    lllllllkklllllll
+    lllllllkklllllll
+    llnllnlkllllllll
+    llklnkllllllllll
+    lmllkkllllllllll
+  grass_b: |
+    llllllllllllllll
+    llllllllkllllkll
+    lnllllllllllllkl
+    lkmllllllllllkkl
+    lnllllllllllllll
+    lkllllllllkkklll
+    lllllnlllllkllll
+    nllllkllllllllll
+    klnlllllklllllll
+    llkllllkklllllll
+    lllklllllllmllll
+    lllllkllllllnlll
+    llllklllllllklll
+    llkkknllllllllll
+    llkllkllllllllml
+    llllllllllllllll
+  grass_c: |
+    lllllkllllllllll
+    llllklklllnlllll
+    llllllllllklllll
+    lllllllllnlllllm
+    lllllllllkllllml
+    lllllllkklllllll
+    llllllllllllllkl
+    llllllllllllllkk
+    lnllllllllllllkk
+    lkllllllnllllkll
+    nllllllmkllkllll
+    klllllllllllllll
+    lkllllllllllllll
+    lklllnllllllllnl
+    lllllkllllllllkl
+    lllllllkllllllll
+  dirt: |
+    hhgghhhhhhhhhhhh
+    hhghhhjjhhhhhhhh
+    hhhhhhggghhhhhhh
+    hhjjhhhhhhjjhhhh
+    hhgghhhhhhgghhgg
+    hhhhhhhhhhghhhhh
+    hhhhhhhhhhggghgh
+    hhhhhhhhhhhgghhh
+    jjhhhhhhhghhgghh
+    gghhhhhhhgghhhhh
+    hhhhhhhghghhhhhh
+    hhhhhhhhhhhhhhhg
+    hhhhhhhhhhhhhhgh
+    hhhhgghhhhhhhhhh
+    ghghgghhhhhhhhhh
+    hghhghhhhhhhhhhh

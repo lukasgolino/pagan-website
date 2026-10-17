@@ -1,0 +1,1152 @@
+{
+ "scenario": "ship",
+ "id": "04-teams",
+ "agent": "Red, blue, green and gold on the pennants, gunwales and hull stripe. The other colours stay put. Each team is a palette swap; the page recolours the red sheet in your browser from the manifest's swap table, the same thing a game shader does.",
+ "ran": [
+  "pagan lint",
+  "pagan preview ship --bg \"#174a5e\""
+ ],
+ "show": {
+  "asset": "ship",
+  "animation": "sail",
+  "heading": "se",
+  "rotate": true,
+  "teams": true
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 9,
+  "warnings": 0
+ },
+ "diffs": {
+  "03-sixteen": [
+   {
+    "path": "models/ship.model.yaml",
+    "status": "modified",
+    "added": 17,
+    "removed": 9,
+    "diff": "@@ -3,7 +3,8 @@\n   Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns),\n   forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit,\n   red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 16 headings so it turns\n-  smoothly; the pennants flutter in the \"sail\" animation.\n+  smoothly; the pennants flutter in the \"sail\" animation. Team colours for 4 players (red, blue,\n+  green, gold) on the pennants, gunwales and the hull stripe.\n size: [92, 70]\n pivot: [46, 46]\n origin: [32, 0, 0]          # the hull's centre at the waterline lands on the pivot\n@@ -16,26 +17,27 @@\n materials:\n   hull: { keys: [\"3\", \"4\", \"5\", \"7\"] }\n   deck: { keys: [\"4\", \"5\", \"6\"] }\n-  rail: { keys: [\"1\", \"2\"] }\n+  rail: { keys: [\"g\", \"h\"] }                 # team colour: painted gunwales\n+  tar:  { keys: [\"1\", \"2\"] }                 # gun ports, hatch\n   mast: { keys: [\"1\", \"2\", \"4\"] }\n   lamp: { keys: [\"e\"] }                       # one key = unshaded: lanterns glow\n-  trim: { ramp: gold }\n+  trim: { ramp: red }                        # team colour\n   sail: { keys: [\"8\", \"9\", \"a\", \"b\"], two_sided: true }\n-  flag: { ramp: red }\n+  flag: { ramp: red }                        # team colour\n \n parts:\n   - hull: { from: [0, 0, 0], length: 64, beam: 19, height: 7, bow: 0.4, stern: 0.1, material: hull, top: deck, rim: rail }\n   - box: { from: [0, -6, 7], to: [12, 6, 10], material: hull, top: deck, rim: rail }      # stern castle\n   - box: { from: [51, -5, 7], to: [56, 5, 8], material: hull, top: deck, rim: rail }       # forecastle\n-  - box: { from: [1, -9, 3], to: [50, -9, 3], material: trim }                             # gold stripe\n+  - box: { from: [1, -9, 3], to: [50, -9, 3], material: trim }                             # team stripe\n     mirror: true\n-  - box: { from: [16, -9, 5], to: [17, -9, 6], material: rail }                            # gun ports\n+  - box: { from: [16, -9, 5], to: [17, -9, 6], material: tar }                             # gun ports\n     mirror: true\n-  - box: { from: [26, -9, 5], to: [27, -9, 6], material: rail }\n+  - box: { from: [26, -9, 5], to: [27, -9, 6], material: tar }\n     mirror: true\n-  - box: { from: [36, -9, 5], to: [37, -9, 6], material: rail }\n+  - box: { from: [36, -9, 5], to: [37, -9, 6], material: tar }\n     mirror: true\n-  - box: { from: [30, -2, 7], to: [35, 2, 7], material: rail }                              # cargo hatch\n+  - box: { from: [30, -2, 7], to: [35, 2, 7], material: tar }                               # cargo hatch\n   - box: { from: [-1, 2, 8], to: [-1, 3, 9], material: lamp }                             # stern lanterns\n     mirror: true\n   - cylinder: { base: [24, 0, 7], height: 36, material: mast }                             # main mast\n@@ -59,3 +61,9 @@\n       - { pennant: { offset: [0, 1, 0] }, fore_pennant: { offset: [0, 1, 0] } }\n       - {}\n       - { pennant: { offset: [0, -1, 0] }, fore_pennant: { offset: [0, -1, 0] } }\n+\n+base_variant: red             # the base colours are team red; the manifest lists all four the same way\n+variants:\n+  blue:  { ramp_swap: { red: blue } }\n+  green: { ramp_swap: { red: green } }\n+  gold:  { ramp_swap: { red: gold } }"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "modified",
+    "added": 1,
+    "removed": 0,
+    "diff": "@@ -37,3 +37,4 @@\n   palette `harbor`, 8 headings.\n - 2026-10-17: \"Give it sails\" -> square sails on both masts, a jib, pennants with a `sail` animation.\n - 2026-10-17: \"16 headings so it turns smoothly\" -> `directions: 16`.\n+- 2026-10-17: \"Team colours for 4 players\" -> red base (`base_variant`), blue/green/gold `ramp_swap`s on pennants, gunwales, stripe."
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "ene": {
+    "fps": 1.0,
+    "frames": [
+     "ene"
+    ],
+    "loop": true
+   },
+   "ese": {
+    "fps": 1.0,
+    "frames": [
+     "ese"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nne": {
+    "fps": 1.0,
+    "frames": [
+     "nne"
+    ],
+    "loop": true
+   },
+   "nnw": {
+    "fps": 1.0,
+    "frames": [
+     "nnw"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "sail_e": {
+    "fps": 6.0,
+    "frames": [
+     "sail_e_0",
+     "sail_e_1",
+     "sail_e_2",
+     "sail_e_3"
+    ],
+    "loop": true
+   },
+   "sail_ene": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ene_0",
+     "sail_ene_1",
+     "sail_ene_2",
+     "sail_ene_3"
+    ],
+    "loop": true
+   },
+   "sail_ese": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ese_0",
+     "sail_ese_1",
+     "sail_ese_2",
+     "sail_ese_3"
+    ],
+    "loop": true
+   },
+   "sail_n": {
+    "fps": 6.0,
+    "frames": [
+     "sail_n_0",
+     "sail_n_1",
+     "sail_n_2",
+     "sail_n_3"
+    ],
+    "loop": true
+   },
+   "sail_ne": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ne_0",
+     "sail_ne_1",
+     "sail_ne_2",
+     "sail_ne_3"
+    ],
+    "loop": true
+   },
+   "sail_nne": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nne_0",
+     "sail_nne_1",
+     "sail_nne_2",
+     "sail_nne_3"
+    ],
+    "loop": true
+   },
+   "sail_nnw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nnw_0",
+     "sail_nnw_1",
+     "sail_nnw_2",
+     "sail_nnw_3"
+    ],
+    "loop": true
+   },
+   "sail_nw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nw_0",
+     "sail_nw_1",
+     "sail_nw_2",
+     "sail_nw_3"
+    ],
+    "loop": true
+   },
+   "sail_s": {
+    "fps": 6.0,
+    "frames": [
+     "sail_s_0",
+     "sail_s_1",
+     "sail_s_2",
+     "sail_s_3"
+    ],
+    "loop": true
+   },
+   "sail_se": {
+    "fps": 6.0,
+    "frames": [
+     "sail_se_0",
+     "sail_se_1",
+     "sail_se_2",
+     "sail_se_3"
+    ],
+    "loop": true
+   },
+   "sail_sse": {
+    "fps": 6.0,
+    "frames": [
+     "sail_sse_0",
+     "sail_sse_1",
+     "sail_sse_2",
+     "sail_sse_3"
+    ],
+    "loop": true
+   },
+   "sail_ssw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ssw_0",
+     "sail_ssw_1",
+     "sail_ssw_2",
+     "sail_ssw_3"
+    ],
+    "loop": true
+   },
+   "sail_sw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_sw_0",
+     "sail_sw_1",
+     "sail_sw_2",
+     "sail_sw_3"
+    ],
+    "loop": true
+   },
+   "sail_w": {
+    "fps": 6.0,
+    "frames": [
+     "sail_w_0",
+     "sail_w_1",
+     "sail_w_2",
+     "sail_w_3"
+    ],
+    "loop": true
+   },
+   "sail_wnw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_wnw_0",
+     "sail_wnw_1",
+     "sail_wnw_2",
+     "sail_wnw_3"
+    ],
+    "loop": true
+   },
+   "sail_wsw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_wsw_0",
+     "sail_wsw_1",
+     "sail_wsw_2",
+     "sail_wsw_3"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sse": {
+    "fps": 1.0,
+    "frames": [
+     "sse"
+    ],
+    "loop": true
+   },
+   "ssw": {
+    "fps": 1.0,
+    "frames": [
+     "ssw"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   },
+   "wnw": {
+    "fps": 1.0,
+    "frames": [
+     "wnw"
+    ],
+    "loop": true
+   },
+   "wsw": {
+    "fps": 1.0,
+    "frames": [
+     "wsw"
+    ],
+    "loop": true
+   }
+  },
+  "base_variant": "red",
+  "description": "Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns), forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit, red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 16 headings so it turns smoothly; the pennants flutter in the \"sail\" animation. Team colours for 4 players (red, blue, green, gold) on the pennants, gunwales and the hull stripe.",
+  "frames": {
+   "e": [
+    0,
+    0,
+    92,
+    70
+   ],
+   "ene": [
+    460,
+    0,
+    92,
+    70
+   ],
+   "ese": [
+    276,
+    630,
+    92,
+    70
+   ],
+   "n": [
+    368,
+    140,
+    92,
+    70
+   ],
+   "ne": [
+    184,
+    70,
+    92,
+    70
+   ],
+   "nne": [
+    644,
+    70,
+    92,
+    70
+   ],
+   "nnw": [
+    92,
+    210,
+    92,
+    70
+   ],
+   "nw": [
+    552,
+    210,
+    92,
+    70
+   ],
+   "s": [
+    368,
+    490,
+    92,
+    70
+   ],
+   "sail_e_0": [
+    92,
+    0,
+    92,
+    70
+   ],
+   "sail_e_1": [
+    184,
+    0,
+    92,
+    70
+   ],
+   "sail_e_2": [
+    276,
+    0,
+    92,
+    70
+   ],
+   "sail_e_3": [
+    368,
+    0,
+    92,
+    70
+   ],
+   "sail_ene_0": [
+    552,
+    0,
+    92,
+    70
+   ],
+   "sail_ene_1": [
+    644,
+    0,
+    92,
+    70
+   ],
+   "sail_ene_2": [
+    0,
+    70,
+    92,
+    70
+   ],
+   "sail_ene_3": [
+    92,
+    70,
+    92,
+    70
+   ],
+   "sail_ese_0": [
+    368,
+    630,
+    92,
+    70
+   ],
+   "sail_ese_1": [
+    460,
+    630,
+    92,
+    70
+   ],
+   "sail_ese_2": [
+    552,
+    630,
+    92,
+    70
+   ],
+   "sail_ese_3": [
+    644,
+    630,
+    92,
+    70
+   ],
+   "sail_n_0": [
+    460,
+    140,
+    92,
+    70
+   ],
+   "sail_n_1": [
+    552,
+    140,
+    92,
+    70
+   ],
+   "sail_n_2": [
+    644,
+    140,
+    92,
+    70
+   ],
+   "sail_n_3": [
+    0,
+    210,
+    92,
+    70
+   ],
+   "sail_ne_0": [
+    276,
+    70,
+    92,
+    70
+   ],
+   "sail_ne_1": [
+    368,
+    70,
+    92,
+    70
+   ],
+   "sail_ne_2": [
+    460,
+    70,
+    92,
+    70
+   ],
+   "sail_ne_3": [
+    552,
+    70,
+    92,
+    70
+   ],
+   "sail_nne_0": [
+    0,
+    140,
+    92,
+    70
+   ],
+   "sail_nne_1": [
+    92,
+    140,
+    92,
+    70
+   ],
+   "sail_nne_2": [
+    184,
+    140,
+    92,
+    70
+   ],
+   "sail_nne_3": [
+    276,
+    140,
+    92,
+    70
+   ],
+   "sail_nnw_0": [
+    184,
+    210,
+    92,
+    70
+   ],
+   "sail_nnw_1": [
+    276,
+    210,
+    92,
+    70
+   ],
+   "sail_nnw_2": [
+    368,
+    210,
+    92,
+    70
+   ],
+   "sail_nnw_3": [
+    460,
+    210,
+    92,
+    70
+   ],
+   "sail_nw_0": [
+    644,
+    210,
+    92,
+    70
+   ],
+   "sail_nw_1": [
+    0,
+    280,
+    92,
+    70
+   ],
+   "sail_nw_2": [
+    92,
+    280,
+    92,
+    70
+   ],
+   "sail_nw_3": [
+    184,
+    280,
+    92,
+    70
+   ],
+   "sail_s_0": [
+    460,
+    490,
+    92,
+    70
+   ],
+   "sail_s_1": [
+    552,
+    490,
+    92,
+    70
+   ],
+   "sail_s_2": [
+    644,
+    490,
+    92,
+    70
+   ],
+   "sail_s_3": [
+    0,
+    560,
+    92,
+    70
+   ],
+   "sail_se_0": [
+    644,
+    560,
+    92,
+    70
+   ],
+   "sail_se_1": [
+    0,
+    630,
+    92,
+    70
+   ],
+   "sail_se_2": [
+    92,
+    630,
+    92,
+    70
+   ],
+   "sail_se_3": [
+    184,
+    630,
+    92,
+    70
+   ],
+   "sail_sse_0": [
+    184,
+    560,
+    92,
+    70
+   ],
+   "sail_sse_1": [
+    276,
+    560,
+    92,
+    70
+   ],
+   "sail_sse_2": [
+    368,
+    560,
+    92,
+    70
+   ],
+   "sail_sse_3": [
+    460,
+    560,
+    92,
+    70
+   ],
+   "sail_ssw_0": [
+    0,
+    490,
+    92,
+    70
+   ],
+   "sail_ssw_1": [
+    92,
+    490,
+    92,
+    70
+   ],
+   "sail_ssw_2": [
+    184,
+    490,
+    92,
+    70
+   ],
+   "sail_ssw_3": [
+    276,
+    490,
+    92,
+    70
+   ],
+   "sail_sw_0": [
+    276,
+    420,
+    92,
+    70
+   ],
+   "sail_sw_1": [
+    368,
+    420,
+    92,
+    70
+   ],
+   "sail_sw_2": [
+    460,
+    420,
+    92,
+    70
+   ],
+   "sail_sw_3": [
+    552,
+    420,
+    92,
+    70
+   ],
+   "sail_w_0": [
+    92,
+    350,
+    92,
+    70
+   ],
+   "sail_w_1": [
+    184,
+    350,
+    92,
+    70
+   ],
+   "sail_w_2": [
+    276,
+    350,
+    92,
+    70
+   ],
+   "sail_w_3": [
+    368,
+    350,
+    92,
+    70
+   ],
+   "sail_wnw_0": [
+    368,
+    280,
+    92,
+    70
+   ],
+   "sail_wnw_1": [
+    460,
+    280,
+    92,
+    70
+   ],
+   "sail_wnw_2": [
+    552,
+    280,
+    92,
+    70
+   ],
+   "sail_wnw_3": [
+    644,
+    280,
+    92,
+    70
+   ],
+   "sail_wsw_0": [
+    552,
+    350,
+    92,
+    70
+   ],
+   "sail_wsw_1": [
+    644,
+    350,
+    92,
+    70
+   ],
+   "sail_wsw_2": [
+    0,
+    420,
+    92,
+    70
+   ],
+   "sail_wsw_3": [
+    92,
+    420,
+    92,
+    70
+   ],
+   "se": [
+    552,
+    560,
+    92,
+    70
+   ],
+   "sse": [
+    92,
+    560,
+    92,
+    70
+   ],
+   "ssw": [
+    644,
+    420,
+    92,
+    70
+   ],
+   "sw": [
+    184,
+    420,
+    92,
+    70
+   ],
+   "w": [
+    0,
+    350,
+    92,
+    70
+   ],
+   "wnw": [
+    276,
+    280,
+    92,
+    70
+   ],
+   "wsw": [
+    460,
+    350,
+    92,
+    70
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -11.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/ship.tres",
+  "headings": [
+   "e",
+   "ene",
+   "ne",
+   "nne",
+   "n",
+   "nnw",
+   "nw",
+   "wnw",
+   "w",
+   "wsw",
+   "sw",
+   "ssw",
+   "s",
+   "sse",
+   "se",
+   "ese"
+  ],
+  "kind": "model",
+  "palette": "harbor",
+  "pivot": [
+   46,
+   46
+  ],
+  "sheet": "res://assets/generated/sprites/ship.png",
+  "size": [
+   92,
+   70
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "player",
+   "vehicle",
+   "ship"
+  ],
+  "variants": {
+   "blue": {
+    "godot_sprite_frames": "res://assets/generated/sprites/ship.blue.tres",
+    "sheet": "res://assets/generated/sprites/ship.blue.png",
+    "swap": {
+     "#4a1416": "#14284a",
+     "#8c2426": "#24508c",
+     "#d0463a": "#4a8ad0"
+    },
+    "swap_exact": true
+   },
+   "gold": {
+    "godot_sprite_frames": "res://assets/generated/sprites/ship.gold.tres",
+    "sheet": "res://assets/generated/sprites/ship.gold.png",
+    "swap": {
+     "#4a1416": "#4a3a0c",
+     "#8c2426": "#a07c18",
+     "#d0463a": "#e6c43a"
+    },
+    "swap_exact": true
+   },
+   "green": {
+    "godot_sprite_frames": "res://assets/generated/sprites/ship.green.tres",
+    "sheet": "res://assets/generated/sprites/ship.green.png",
+    "swap": {
+     "#4a1416": "#163a22",
+     "#8c2426": "#2a6e3a",
+     "#d0463a": "#58ad5c"
+    },
+    "swap_exact": true
+   },
+   "red": {
+    "godot_sprite_frames": "res://assets/generated/sprites/ship.tres",
+    "sheet": "res://assets/generated/sprites/ship.png",
+    "swap": {},
+    "swap_exact": true
+   }
+  }
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 15472
+  },
+  {
+   "path": "assets/generated/sprites/ship.blue.png",
+   "bytes": 46785
+  },
+  {
+   "path": "assets/generated/sprites/ship.blue.tres",
+   "bytes": 16869
+  },
+  {
+   "path": "assets/generated/sprites/ship.gold.png",
+   "bytes": 46905
+  },
+  {
+   "path": "assets/generated/sprites/ship.gold.tres",
+   "bytes": 16869
+  },
+  {
+   "path": "assets/generated/sprites/ship.green.png",
+   "bytes": 46867
+  },
+  {
+   "path": "assets/generated/sprites/ship.green.tres",
+   "bytes": 16870
+  },
+  {
+   "path": "assets/generated/sprites/ship.png",
+   "bytes": 47045
+  },
+  {
+   "path": "assets/generated/sprites/ship.tres",
+   "bytes": 16864
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/ship.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/ship.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 92, 70)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(726 lines in all)"
+ },
+ "palettes": {
+  "harbor": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#120d0c",
+     "name": "tar"
+    },
+    {
+     "key": "1",
+     "hex": "#2a1c17",
+     "name": "rope_dark"
+    },
+    {
+     "key": "2",
+     "hex": "#47302a",
+     "name": "rope"
+    },
+    {
+     "key": "3",
+     "hex": "#3a2117",
+     "name": "oak_deep"
+    },
+    {
+     "key": "4",
+     "hex": "#5c3521",
+     "name": "oak_dark"
+    },
+    {
+     "key": "5",
+     "hex": "#86502c",
+     "name": "oak"
+    },
+    {
+     "key": "6",
+     "hex": "#ad7140",
+     "name": "oak_light"
+    },
+    {
+     "key": "7",
+     "hex": "#d39a5c",
+     "name": "oak_pale"
+    },
+    {
+     "key": "8",
+     "hex": "#6e6252",
+     "name": "canvas_shadow"
+    },
+    {
+     "key": "9",
+     "hex": "#a2947c",
+     "name": "canvas_dark"
+    },
+    {
+     "key": "a",
+     "hex": "#cdbf9f",
+     "name": "canvas"
+    },
+    {
+     "key": "b",
+     "hex": "#efe5c8",
+     "name": "canvas_light"
+    },
+    {
+     "key": "c",
+     "hex": "#4a2c10",
+     "name": "brass_dark"
+    },
+    {
+     "key": "d",
+     "hex": "#a8772a",
+     "name": "brass"
+    },
+    {
+     "key": "e",
+     "hex": "#f0c860",
+     "name": "lamp"
+    },
+    {
+     "key": "f",
+     "hex": "#fff2b8",
+     "name": "lamp_glow"
+    },
+    {
+     "key": "g",
+     "hex": "#4a1416",
+     "name": "red_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#8c2426",
+     "name": "red"
+    },
+    {
+     "key": "i",
+     "hex": "#d0463a",
+     "name": "red_light"
+    },
+    {
+     "key": "j",
+     "hex": "#14284a",
+     "name": "blue_deep"
+    },
+    {
+     "key": "k",
+     "hex": "#24508c",
+     "name": "blue"
+    },
+    {
+     "key": "l",
+     "hex": "#4a8ad0",
+     "name": "blue_light"
+    },
+    {
+     "key": "m",
+     "hex": "#163a22",
+     "name": "green_deep"
+    },
+    {
+     "key": "n",
+     "hex": "#2a6e3a",
+     "name": "green"
+    },
+    {
+     "key": "o",
+     "hex": "#58ad5c",
+     "name": "green_light"
+    },
+    {
+     "key": "p",
+     "hex": "#4a3a0c",
+     "name": "gold_deep"
+    },
+    {
+     "key": "q",
+     "hex": "#a07c18",
+     "name": "gold"
+    },
+    {
+     "key": "r",
+     "hex": "#e6c43a",
+     "name": "gold_light"
+    },
+    {
+     "key": "s",
+     "hex": "#0e2a3a",
+     "name": "sea_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#174a5e",
+     "name": "sea"
+    },
+    {
+     "key": "u",
+     "hex": "#2a7286",
+     "name": "sea_light"
+    },
+    {
+     "key": "v",
+     "hex": "#5aa6b0",
+     "name": "foam"
+    }
+   ],
+   "ramps": {
+    "rope": [
+     "0",
+     "1",
+     "2"
+    ],
+    "oak": [
+     "3",
+     "4",
+     "5",
+     "6",
+     "7"
+    ],
+    "canvas": [
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "brass": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "red": [
+     "g",
+     "h",
+     "i"
+    ],
+    "blue": [
+     "j",
+     "k",
+     "l"
+    ],
+    "green": [
+     "m",
+     "n",
+     "o"
+    ],
+    "gold": [
+     "p",
+     "q",
+     "r"
+    ],
+    "sea": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ]
+   }
+  }
+ },
+ "sheet": "04-teams/ship.png",
+ "changes": null,
+ "ground": null,
+ "status": "draft",
+ "next": [
+  {
+   "to": "05-fleet",
+   "say": "Show it damaged."
+  }
+ ]
+}

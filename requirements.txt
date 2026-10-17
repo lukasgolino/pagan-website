@@ -1,0 +1,2 @@
+# The PAGAN release the demo art is built with. Bump the tag, rerun tools/build_site_assets.py, commit.
+pagan @ git+https://github.com/lukasgolino/PAGAN@v0.6.0

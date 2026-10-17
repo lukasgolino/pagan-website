@@ -1,0 +1,705 @@
+{
+ "scenario": "ship",
+ "id": "02-sails",
+ "agent": "Square sails on both masts, braced 30° so they read from every heading, a jib to the bowsprit, and red pennants that flutter in a 4-frame `sail` animation. Only the pennants move.",
+ "ran": [
+  "pagan lint",
+  "pagan preview ship --bg \"#174a5e\""
+ ],
+ "show": {
+  "asset": "ship",
+  "animation": "sail",
+  "heading": "se",
+  "changes": "sail"
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 3,
+  "warnings": 0
+ },
+ "diffs": {
+  "01-hull": [
+   {
+    "path": "models/ship.model.yaml",
+    "status": "modified",
+    "added": 23,
+    "removed": 6,
+    "diff": "@@ -1,8 +1,9 @@\n name: ship\n description: >\n   Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns),\n-  forecastle, bowsprit, bare masts with yards. Top-down 3/4 view, no water (it sits on a moving sea).\n-  8 headings.\n+  forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit,\n+  red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 8 headings; the pennants\n+  flutter in the \"sail\" animation.\n size: [92, 70]\n pivot: [46, 46]\n origin: [32, 0, 0]          # the hull's centre at the waterline lands on the pivot\n@@ -19,6 +20,8 @@\n   mast: { keys: [\"1\", \"2\", \"4\"] }\n   lamp: { keys: [\"e\"] }                       # one key = unshaded: lanterns glow\n   trim: { ramp: gold }\n+  sail: { keys: [\"8\", \"9\", \"a\", \"b\"], two_sided: true }\n+  flag: { ramp: red }\n \n parts:\n   - hull: { from: [0, 0, 0], length: 64, beam: 19, height: 7, bow: 0.4, stern: 0.1, material: hull, top: deck, rim: rail }\n@@ -38,7 +41,21 @@\n   - cylinder: { base: [24, 0, 7], height: 36, material: mast }                             # main mast\n   - cylinder: { base: [45, 0, 7], height: 30, material: mast }                             # fore mast\n   - line: { from: [60, 0, 8], to: [73, 0, 14], material: mast }                            # bowsprit\n-  - line: { from: [24, -9, 18], to: [24, 9, 18], material: mast }                          # yards\n-  - line: { from: [24, -7, 32], to: [24, 7, 32], material: mast }\n-  - line: { from: [45, -8, 16], to: [45, 8, 16], material: mast }\n-  - line: { from: [45, -6, 28], to: [45, 6, 28], material: mast }\n+  - sail: { at: [24, 0, 12], width: 20, height: 13, bulge: 2.2, brace: 30, material: sail, yard: mast }\n+  - sail: { at: [24, 0, 27], width: 15, height: 9, bulge: 1.8, brace: 30, material: sail, yard: mast }\n+  - sail: { at: [45, 0, 11], width: 17, height: 11, bulge: 2, brace: 30, material: sail, yard: mast }\n+  - sail: { at: [45, 0, 24], width: 12, height: 8, bulge: 1.6, brace: 30, material: sail, yard: mast }\n+  - triangle: { points: [[48, 0, 10], [70, 0, 13], [46, 0, 34]], material: sail }             # jib\n+  - box: { from: [20, 0, 41], to: [24, 0, 42], material: flag }                                # pennants\n+    id: pennant\n+  - box: { from: [42, 0, 35], to: [44, 0, 36], material: flag }\n+    id: fore_pennant\n+\n+animations:\n+  sail:\n+    fps: 6\n+    poses:\n+      - {}\n+      - { pennant: { offset: [0, 1, 0] }, fore_pennant: { offset: [0, 1, 0] } }\n+      - {}\n+      - { pennant: { offset: [0, -1, 0] }, fore_pennant: { offset: [0, -1, 0] } }"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "modified",
+    "added": 1,
+    "removed": 0,
+    "diff": "@@ -35,3 +35,4 @@\n \n - 2026-10-17: \"I'm making a sailing game, give me a ship.\" Defaults used: pixel art, top-down 3/4,\n   palette `harbor`, 8 headings.\n+- 2026-10-17: \"Give it sails\" -> square sails on both masts, a jib, pennants with a `sail` animation."
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "sail_e": {
+    "fps": 6.0,
+    "frames": [
+     "sail_e_0",
+     "sail_e_1",
+     "sail_e_2",
+     "sail_e_3"
+    ],
+    "loop": true
+   },
+   "sail_n": {
+    "fps": 6.0,
+    "frames": [
+     "sail_n_0",
+     "sail_n_1",
+     "sail_n_2",
+     "sail_n_3"
+    ],
+    "loop": true
+   },
+   "sail_ne": {
+    "fps": 6.0,
+    "frames": [
+     "sail_ne_0",
+     "sail_ne_1",
+     "sail_ne_2",
+     "sail_ne_3"
+    ],
+    "loop": true
+   },
+   "sail_nw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_nw_0",
+     "sail_nw_1",
+     "sail_nw_2",
+     "sail_nw_3"
+    ],
+    "loop": true
+   },
+   "sail_s": {
+    "fps": 6.0,
+    "frames": [
+     "sail_s_0",
+     "sail_s_1",
+     "sail_s_2",
+     "sail_s_3"
+    ],
+    "loop": true
+   },
+   "sail_se": {
+    "fps": 6.0,
+    "frames": [
+     "sail_se_0",
+     "sail_se_1",
+     "sail_se_2",
+     "sail_se_3"
+    ],
+    "loop": true
+   },
+   "sail_sw": {
+    "fps": 6.0,
+    "frames": [
+     "sail_sw_0",
+     "sail_sw_1",
+     "sail_sw_2",
+     "sail_sw_3"
+    ],
+    "loop": true
+   },
+   "sail_w": {
+    "fps": 6.0,
+    "frames": [
+     "sail_w_0",
+     "sail_w_1",
+     "sail_w_2",
+     "sail_w_3"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   }
+  },
+  "description": "Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns), forecastle, bowsprit. Square sails braced to catch the wind on both masts, a jib to the bowsprit, red pennants. Top-down 3/4 view, no water (it sits on a moving sea). 8 headings; the pennants flutter in the \"sail\" animation.",
+  "frames": {
+   "e": [
+    0,
+    0,
+    92,
+    70
+   ],
+   "n": [
+    184,
+    70,
+    92,
+    70
+   ],
+   "ne": [
+    460,
+    0,
+    92,
+    70
+   ],
+   "nw": [
+    644,
+    70,
+    92,
+    70
+   ],
+   "s": [
+    552,
+    210,
+    92,
+    70
+   ],
+   "sail_e_0": [
+    92,
+    0,
+    92,
+    70
+   ],
+   "sail_e_1": [
+    184,
+    0,
+    92,
+    70
+   ],
+   "sail_e_2": [
+    276,
+    0,
+    92,
+    70
+   ],
+   "sail_e_3": [
+    368,
+    0,
+    92,
+    70
+   ],
+   "sail_n_0": [
+    276,
+    70,
+    92,
+    70
+   ],
+   "sail_n_1": [
+    368,
+    70,
+    92,
+    70
+   ],
+   "sail_n_2": [
+    460,
+    70,
+    92,
+    70
+   ],
+   "sail_n_3": [
+    552,
+    70,
+    92,
+    70
+   ],
+   "sail_ne_0": [
+    552,
+    0,
+    92,
+    70
+   ],
+   "sail_ne_1": [
+    644,
+    0,
+    92,
+    70
+   ],
+   "sail_ne_2": [
+    0,
+    70,
+    92,
+    70
+   ],
+   "sail_ne_3": [
+    92,
+    70,
+    92,
+    70
+   ],
+   "sail_nw_0": [
+    0,
+    140,
+    92,
+    70
+   ],
+   "sail_nw_1": [
+    92,
+    140,
+    92,
+    70
+   ],
+   "sail_nw_2": [
+    184,
+    140,
+    92,
+    70
+   ],
+   "sail_nw_3": [
+    276,
+    140,
+    92,
+    70
+   ],
+   "sail_s_0": [
+    644,
+    210,
+    92,
+    70
+   ],
+   "sail_s_1": [
+    0,
+    280,
+    92,
+    70
+   ],
+   "sail_s_2": [
+    92,
+    280,
+    92,
+    70
+   ],
+   "sail_s_3": [
+    184,
+    280,
+    92,
+    70
+   ],
+   "sail_se_0": [
+    368,
+    280,
+    92,
+    70
+   ],
+   "sail_se_1": [
+    460,
+    280,
+    92,
+    70
+   ],
+   "sail_se_2": [
+    552,
+    280,
+    92,
+    70
+   ],
+   "sail_se_3": [
+    644,
+    280,
+    92,
+    70
+   ],
+   "sail_sw_0": [
+    184,
+    210,
+    92,
+    70
+   ],
+   "sail_sw_1": [
+    276,
+    210,
+    92,
+    70
+   ],
+   "sail_sw_2": [
+    368,
+    210,
+    92,
+    70
+   ],
+   "sail_sw_3": [
+    460,
+    210,
+    92,
+    70
+   ],
+   "sail_w_0": [
+    460,
+    140,
+    92,
+    70
+   ],
+   "sail_w_1": [
+    552,
+    140,
+    92,
+    70
+   ],
+   "sail_w_2": [
+    644,
+    140,
+    92,
+    70
+   ],
+   "sail_w_3": [
+    0,
+    210,
+    92,
+    70
+   ],
+   "se": [
+    276,
+    280,
+    92,
+    70
+   ],
+   "sw": [
+    92,
+    210,
+    92,
+    70
+   ],
+   "w": [
+    368,
+    140,
+    92,
+    70
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -11.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/ship.tres",
+  "headings": [
+   "e",
+   "ne",
+   "n",
+   "nw",
+   "w",
+   "sw",
+   "s",
+   "se"
+  ],
+  "kind": "model",
+  "palette": "harbor",
+  "pivot": [
+   46,
+   46
+  ],
+  "sheet": "res://assets/generated/sprites/ship.png",
+  "size": [
+   92,
+   70
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "player",
+   "vehicle",
+   "ship"
+  ],
+  "variants": {}
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 7428
+  },
+  {
+   "path": "assets/generated/sprites/ship.png",
+   "bytes": 23288
+  },
+  {
+   "path": "assets/generated/sprites/ship.tres",
+   "bytes": 8479
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/ship.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/ship.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 92, 70)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(366 lines in all)"
+ },
+ "palettes": {
+  "harbor": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#120d0c",
+     "name": "tar"
+    },
+    {
+     "key": "1",
+     "hex": "#2a1c17",
+     "name": "rope_dark"
+    },
+    {
+     "key": "2",
+     "hex": "#47302a",
+     "name": "rope"
+    },
+    {
+     "key": "3",
+     "hex": "#3a2117",
+     "name": "oak_deep"
+    },
+    {
+     "key": "4",
+     "hex": "#5c3521",
+     "name": "oak_dark"
+    },
+    {
+     "key": "5",
+     "hex": "#86502c",
+     "name": "oak"
+    },
+    {
+     "key": "6",
+     "hex": "#ad7140",
+     "name": "oak_light"
+    },
+    {
+     "key": "7",
+     "hex": "#d39a5c",
+     "name": "oak_pale"
+    },
+    {
+     "key": "8",
+     "hex": "#6e6252",
+     "name": "canvas_shadow"
+    },
+    {
+     "key": "9",
+     "hex": "#a2947c",
+     "name": "canvas_dark"
+    },
+    {
+     "key": "a",
+     "hex": "#cdbf9f",
+     "name": "canvas"
+    },
+    {
+     "key": "b",
+     "hex": "#efe5c8",
+     "name": "canvas_light"
+    },
+    {
+     "key": "c",
+     "hex": "#4a2c10",
+     "name": "brass_dark"
+    },
+    {
+     "key": "d",
+     "hex": "#a8772a",
+     "name": "brass"
+    },
+    {
+     "key": "e",
+     "hex": "#f0c860",
+     "name": "lamp"
+    },
+    {
+     "key": "f",
+     "hex": "#fff2b8",
+     "name": "lamp_glow"
+    },
+    {
+     "key": "g",
+     "hex": "#4a1416",
+     "name": "red_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#8c2426",
+     "name": "red"
+    },
+    {
+     "key": "i",
+     "hex": "#d0463a",
+     "name": "red_light"
+    },
+    {
+     "key": "j",
+     "hex": "#14284a",
+     "name": "blue_deep"
+    },
+    {
+     "key": "k",
+     "hex": "#24508c",
+     "name": "blue"
+    },
+    {
+     "key": "l",
+     "hex": "#4a8ad0",
+     "name": "blue_light"
+    },
+    {
+     "key": "m",
+     "hex": "#163a22",
+     "name": "green_deep"
+    },
+    {
+     "key": "n",
+     "hex": "#2a6e3a",
+     "name": "green"
+    },
+    {
+     "key": "o",
+     "hex": "#58ad5c",
+     "name": "green_light"
+    },
+    {
+     "key": "p",
+     "hex": "#4a3a0c",
+     "name": "gold_deep"
+    },
+    {
+     "key": "q",
+     "hex": "#a07c18",
+     "name": "gold"
+    },
+    {
+     "key": "r",
+     "hex": "#e6c43a",
+     "name": "gold_light"
+    },
+    {
+     "key": "s",
+     "hex": "#0e2a3a",
+     "name": "sea_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#174a5e",
+     "name": "sea"
+    },
+    {
+     "key": "u",
+     "hex": "#2a7286",
+     "name": "sea_light"
+    },
+    {
+     "key": "v",
+     "hex": "#5aa6b0",
+     "name": "foam"
+    }
+   ],
+   "ramps": {
+    "rope": [
+     "0",
+     "1",
+     "2"
+    ],
+    "oak": [
+     "3",
+     "4",
+     "5",
+     "6",
+     "7"
+    ],
+    "canvas": [
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "brass": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "red": [
+     "g",
+     "h",
+     "i"
+    ],
+    "blue": [
+     "j",
+     "k",
+     "l"
+    ],
+    "green": [
+     "m",
+     "n",
+     "o"
+    ],
+    "gold": [
+     "p",
+     "q",
+     "r"
+    ],
+    "sea": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ]
+   }
+  }
+ },
+ "sheet": "02-sails/ship.png",
+ "changes": "02-sails/changes.png",
+ "ground": null,
+ "status": "draft",
+ "next": [
+  {
+   "to": "03-sixteen",
+   "say": "16 headings, so it turns smoothly."
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+# Rebuild the demo art with the pinned PAGAN release and fail if the committed output differs, so the
+# site can never show art PAGAN doesn't produce.
+# Manual only while the PAGAN repo is private (pip can't fetch it); once it's public, add:
+#   push: { branches: [main] }
+#   pull_request:
+name: assets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: PAGAN checkout (for CHANGELOG.md)
+        run: |
+          tag=$(sed -n 's/.*@\(v[0-9.]*\)$/\1/p' requirements.txt)
+          git clone --depth 1 --branch "$tag" https://github.com/lukasgolino/PAGAN.git pagan-src
+      - run: python tools/build_site_assets.py --check --pagan-repo pagan-src

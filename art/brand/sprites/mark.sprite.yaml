@@ -1,0 +1,25 @@
+name: mark
+description: 'Site icon: a teal speech bubble holding warm pixels (you speak, your agent speaks PAGAN).'
+outline: auto
+status: draft
+style_version: 1
+tags: [brand]
+size: [16, 16]
+frames:
+  main: |
+    ................
+    ...aaaaaaaaaa...
+    ..999999999999..
+    .a9999999999998.
+    .a9966556655998.
+    .99966556655998.
+    .99955665566998.
+    .99955665566998.
+    .99966556655998.
+    .99966556655998.
+    ..999999999999..
+    ...8888888888...
+    ....888.........
+    ....8...........
+    ................
+    ................

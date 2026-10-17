@@ -1,0 +1,84 @@
+---
+import { asset } from "../lib/data";
+
+const faqs: [string, string][] = [
+  [
+    "Is PAGAN an AI image generator?",
+    "No. PAGAN doesn't paint: it compiles. Your AI agent writes PAGAN source files (palettes, grids, voxel models, animations); PAGAN checks them and renders them. The quality comes from the agent's modelling and PAGAN's renderer, not from a diffusion model, so results are exact, repeatable and editable.",
+  ],
+  [
+    "When should I use a diffusion tool instead?",
+    "For one-off, organic, illustration-heavy art (a painted portrait, a splash screen), an image model is faster. PAGAN wins when you need a whole game's worth of assets that match: consistent headings, animations that don't jitter, one palette, and changes that reach every asset at once.",
+  ],
+  [
+    "Which agents work with it?",
+    "Any agent that speaks MCP (Claude Desktop, Claude Code, Cursor, your own). The PAGAN skill, which teaches the full workflow, is for Claude. Without either, the CLI's --json output is easy for any program to drive.",
+  ],
+  [
+    "Is it only for pixel art?",
+    "No. Flat, vector-like arcade art works too: polygon shapes with rims, drawn at 2x and smoothed on build (supersample). Pixel art is the default.",
+  ],
+  [
+    "Which engines?",
+    "Any: manifest.json describes every sheet, frame, animation, pivot and colour swap. Godot 4 gets SpriteFrames and TileSet resources out of the box.",
+  ],
+  [
+    "Who owns the art?",
+    "You do. PAGAN is MIT-licensed and runs locally; nothing is uploaded and nothing is claimed.",
+  ],
+  [
+    "Is the demo a live AI?",
+    "No. It's a scripted conversation, so it can't make things up. But every image, source file, diff, lint result and file listing in it is real PAGAN output, rebuilt from the project files in this site's repository.",
+  ],
+];
+---
+
+<section id="faq">
+  <div class="wrap">
+    <span class="eyebrow">FAQ</span>
+    <h2>Straight answers</h2>
+    <div class="list">
+      {
+        faqs.map(([q, a]) => (
+          <details>
+            <summary>{q}</summary>
+            <p>{a}</p>
+          </details>
+        ))
+      }
+    </div>
+    <p class="more">More in the <a href={asset("docs/")}>docs</a>.</p>
+  </div>
+</section>
+
+<style>
+  .list {
+    margin-top: 24px;
+    max-width: 52rem;
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    cursor: pointer;
+    padding: 16px 0;
+    font-weight: 600;
+    list-style: none;
+  }
+  summary::before {
+    content: "+ ";
+    color: var(--glow);
+    font-family: var(--font-pixel);
+  }
+  details[open] summary::before {
+    content: "− ";
+  }
+  details p {
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  .more {
+    margin-top: 20px;
+    color: var(--muted);
+  }
+</style>

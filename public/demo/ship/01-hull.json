@@ -1,0 +1,456 @@
+{
+ "scenario": "ship",
+ "id": "01-hull",
+ "agent": "Here's the hull: a two-masted brig, oak with a gold stripe, stern castle with lit lanterns, bare masts. It's a 3D model, so all 8 headings share one camera and one light. Sails next?",
+ "ran": [
+  "pagan init art --perspective top-down-3/4",
+  "pagan palette show",
+  "pagan new model ship --size 92x70 --directions 8",
+  "pagan fit ship",
+  "pagan lint",
+  "pagan preview ship --bg \"#174a5e\""
+ ],
+ "show": {
+  "asset": "ship",
+  "heading": "se"
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 3,
+  "warnings": 0
+ },
+ "diffs": {
+  "": [
+   {
+    "path": "models/ship.model.yaml",
+    "status": "added",
+    "added": 44,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,44 @@\n+name: ship\n+description: >\n+  Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns),\n+  forecastle, bowsprit, bare masts with yards. Top-down 3/4 view, no water (it sits on a moving sea).\n+  8 headings.\n+size: [92, 70]\n+pivot: [46, 46]\n+origin: [32, 0, 0]          # the hull's centre at the waterline lands on the pivot\n+directions: 8\n+outline: auto\n+status: draft\n+style_version: 1\n+tags: [player, vehicle, ship]\n+\n+materials:\n+  hull: { keys: [\"3\", \"4\", \"5\", \"7\"] }\n+  deck: { keys: [\"4\", \"5\", \"6\"] }\n+  rail: { keys: [\"1\", \"2\"] }\n+  mast: { keys: [\"1\", \"2\", \"4\"] }\n+  lamp: { keys: [\"e\"] }                       # one key = unshaded: lanterns glow\n+  trim: { ramp: gold }\n+\n+parts:\n+  - hull: { from: [0, 0, 0], length: 64, beam: 19, height: 7, bow: 0.4, stern: 0.1, material: hull, top: deck, rim: rail }\n+  - box: { from: [0, -6, 7], to: [12, 6, 10], material: hull, top: deck, rim: rail }      # stern castle\n+  - box: { from: [51, -5, 7], to: [56, 5, 8], material: hull, top: deck, rim: rail }       # forecastle\n+  - box: { from: [1, -9, 3], to: [50, -9, 3], material: trim }                             # gold stripe\n+    mirror: true\n+  - box: { from: [16, -9, 5], to: [17, -9, 6], material: rail }                            # gun ports\n+    mirror: true\n+  - box: { from: [26, -9, 5], to: [27, -9, 6], material: rail }\n+    mirror: true\n+  - box: { from: [36, -9, 5], to: [37, -9, 6], material: rail }\n+    mirror: true\n+  - box: { from: [30, -2, 7], to: [35, 2, 7], material: rail }                              # cargo hatch\n+  - box: { from: [-1, 2, 8], to: [-1, 3, 9], material: lamp }                             # stern lanterns\n+    mirror: true\n+  - cylinder: { base: [24, 0, 7], height: 36, material: mast }                             # main mast\n+  - cylinder: { base: [45, 0, 7], height: 30, material: mast }                             # fore mast\n+  - line: { from: [60, 0, 8], to: [73, 0, 14], material: mast }                            # bowsprit\n+  - line: { from: [24, -9, 18], to: [24, 9, 18], material: mast }                          # yards\n+  - line: { from: [24, -7, 32], to: [24, 7, 32], material: mast }\n+  - line: { from: [45, -8, 16], to: [45, 8, 16], material: mast }\n+  - line: { from: [45, -6, 28], to: [45, 6, 28], material: mast }"
+   },
+   {
+    "path": "palettes/harbor.pal.yaml",
+    "status": "added",
+    "added": 45,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,45 @@\n+name: harbor\n+# Age-of-sail harbour: warm oak, sun-bleached canvas, tarred rope, brass, and four team colours. 32 colors.\n+colors:\n+  \"0\": { hex: \"#120d0c\", name: tar }\n+  \"1\": { hex: \"#2a1c17\", name: rope_dark }\n+  \"2\": { hex: \"#47302a\", name: rope }\n+  \"3\": { hex: \"#3a2117\", name: oak_deep }\n+  \"4\": { hex: \"#5c3521\", name: oak_dark }\n+  \"5\": { hex: \"#86502c\", name: oak }\n+  \"6\": { hex: \"#ad7140\", name: oak_light }\n+  \"7\": { hex: \"#d39a5c\", name: oak_pale }\n+  \"8\": { hex: \"#6e6252\", name: canvas_shadow }\n+  \"9\": { hex: \"#a2947c\", name: canvas_dark }\n+  \"a\": { hex: \"#cdbf9f\", name: canvas }\n+  \"b\": { hex: \"#efe5c8\", name: canvas_light }\n+  \"c\": { hex: \"#4a2c10\", name: brass_dark }\n+  \"d\": { hex: \"#a8772a\", name: brass }\n+  \"e\": { hex: \"#f0c860\", name: lamp }\n+  \"f\": { hex: \"#fff2b8\", name: lamp_glow }\n+  \"g\": { hex: \"#4a1416\", name: red_deep }\n+  \"h\": { hex: \"#8c2426\", name: red }\n+  \"i\": { hex: \"#d0463a\", name: red_light }\n+  \"j\": { hex: \"#14284a\", name: blue_deep }\n+  \"k\": { hex: \"#24508c\", name: blue }\n+  \"l\": { hex: \"#4a8ad0\", name: blue_light }\n+  \"m\": { hex: \"#163a22\", name: green_deep }\n+  \"n\": { hex: \"#2a6e3a\", name: green }\n+  \"o\": { hex: \"#58ad5c\", name: green_light }\n+  \"p\": { hex: \"#4a3a0c\", name: gold_deep }\n+  \"q\": { hex: \"#a07c18\", name: gold }\n+  \"r\": { hex: \"#e6c43a\", name: gold_light }\n+  \"s\": { hex: \"#0e2a3a\", name: sea_deep }\n+  \"t\": { hex: \"#174a5e\", name: sea }\n+  \"u\": { hex: \"#2a7286\", name: sea_light }\n+  \"v\": { hex: \"#5aa6b0\", name: foam }\n+ramps:\n+  rope:   [\"0\", \"1\", \"2\"]\n+  oak:    [\"3\", \"4\", \"5\", \"6\", \"7\"]\n+  canvas: [\"8\", \"9\", \"a\", \"b\"]\n+  brass:  [\"c\", \"d\", \"e\", \"f\"]\n+  red:    [\"g\", \"h\", \"i\"]\n+  blue:   [\"j\", \"k\", \"l\"]\n+  green:  [\"m\", \"n\", \"o\"]\n+  gold:   [\"p\", \"q\", \"r\"]\n+  sea:    [\"s\", \"t\", \"u\", \"v\"]"
+   },
+   {
+    "path": "pagan.toml",
+    "status": "added",
+    "added": 66,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,66 @@\n+# PAGAN project config. Paths are relative to this file.\n+\n+# \"strict\": every sprite uses a palette file from palettes/ (one cohesive look).\n+# \"open\":   sprites may also define their own palette inline.\n+palette_mode = \"strict\"\n+\n+# Palette for sprites that don't name one. Create one with `pagan new palette <name>`.\n+default_palette = \"harbor\"\n+\n+# Where `pagan build` writes final assets, e.g. your game engine's asset folder.\n+output_dir = \"../game/assets/generated\"\n+\n+# Scratch output from `pagan render` / `pagan preview`. Keep it out of version control.\n+preview_dir = \"previews\"\n+\n+# What `pagan build` produces: PNG sheets + manifest.json always (\"png\"); add \"godot\" (SpriteFrames/TileSet .tres),\n+# \"normals\" (normal-map sheets for 3D models, for engine lighting).\n+# Every setting here can also be viewed/changed with `pagan config show` / `pagan config set <key> <value>`.\n+export = [\"png\", \"godot\"]\n+\n+# Variants (recolours) get their own sheet (+ .tres). Set false when the game recolours in a shader\n+# from each variant's \"swap\" table (base colour -> variant colour) in manifest.json.\n+variant_sheets = true\n+\n+# Smooth (anti-aliased) output for art that isn't pixel art, e.g. sprites the game rotates freely: draw\n+# sources at N x the size the game gets, and `pagan build` box-filters them down. 1 = off (pixel-exact).\n+supersample = 1\n+\n+# Bump this when STYLE.md changes in a way that means existing art should be revisited (e.g. \"more\n+# shadows\"). Assets record the style_version they were made under; older ones get lint warning W006.\n+# Palette color changes don't need a bump: every asset picks them up automatically.\n+style_version = 1\n+\n+# 3D models (models/*.model.yaml) are rendered with this camera and light, shared by the whole project,\n+# so every 3D asset is projected and lit the same way.\n+[camera]\n+elevation = 42.0      # degrees above the horizon: 90 = straight down, ~30-50 = top-down 3/4 view\n+scale = 1           # pixels per voxel\n+\n+[light]\n+direction = [-0.5, 0.45, 0.75]   # towards the light: x right, y up the screen, z up (top-left by default)\n+ambient = 0.2                    # brightness of unlit surfaces (0-1); lower = darker shadows, more contrast\n+shadows = true                   # parts cast shadows on each other\n+shadow_strength = 0.65           # how dark cast shadows are (0-1)\n+wrap = 0.3                       # how far light wraps around curves (0-1, higher = softer)\n+baked = true                     # false: flat colors for engines with their own lighting (+ export \"normals\")\n+\n+# Only with export \"godot\".\n+[godot]\n+mipmaps = false                  # import the PNGs with mipmaps (sprites drawn scaled down or rotated)\n+filter = \"inherit\"               # SpriteFrames texture filter: inherit (node/project decides), nearest, linear\n+\n+[lint]\n+# W003: warn when a sprite uses colors from more than this many ramps.\n+max_ramps_per_sprite = 3\n+# W003 for 3D models, which mix more materials.\n+max_ramps_per_model = 6\n+# W007: warn when more than this share of pixels changes between consecutive animation frames,\n+# even after allowing the whole sprite to move by up to 2px. Keeps animations free of jumps.\n+max_frame_change = 0.4\n+# W008: most shades an asset may use from one ramp (0 = no limit), e.g. 3 for \"3 steps per material\".\n+max_ramp_steps = 0\n+# Warning rule ids to turn off, e.g. [\"W001\"].\n+disable = []\n+# Require `outline: auto` on every sprite.\n+require_outline = false"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "added",
+    "added": 37,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,37 @@\n+# Art brief\n+\n+The long-term memory for this project's art: what the game is, what it needs, and decisions made along\n+the way. Agents read this (with STYLE.md) before making or changing any asset, and keep it up to date.\n+`pagan status` lists what exists; this file says what's *wanted* and why.\n+\n+## The game\n+\n+- **Title / working name:** Broadside (working title)\n+- **Genre and core loop:** top-down age-of-sail battles for up to 4 players\n+- **Perspective:** top-down-3/4 (top-down 3/4, seeing fronts and tops; `[camera] elevation` in pagan.toml)\n+- **Rendering style:** pixel art — see STYLE.md\n+- **Mood / references:** warm oak and sunlit canvas on a teal sea\n+- **Target resolution:** 640x360 scaled x3\n+\n+## Characters and key assets\n+\n+For each: what it is, how it looks, sizes, required directions/animations. Example:\n+\n+- **Player ship** (`models/ship.model.yaml`): two-masted brig, 92x70.\n+\n+## Asset wishlist\n+\n+What's still needed, roughly in priority order. Move items to \"Done\" with the asset name when made.\n+\n+- [ ] Cannonball, splash, explosion effects\n+\n+## Done\n+\n+- (awaiting review) ship\n+\n+## Decisions and feedback log\n+\n+Dated notes on what the owner asked for and decided, so later assets stay consistent with it. Example:\n+\n+- 2026-10-17: \"I'm making a sailing game, give me a ship.\" Defaults used: pixel art, top-down 3/4,\n+  palette `harbor`, 8 headings."
+   },
+   {
+    "path": "STYLE.md",
+    "status": "added",
+    "added": 80,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,80 @@\n+# Style bible\n+\n+The rules that make this project's art look like itself. Agents read this before drawing anything\n+and check their previews against it. Replace every **TODO** with a decision; the suggested defaults\n+are a reasonable starting point.\n+\n+Rules that can be checked mechanically belong in `pagan.toml` too (see `[lint]`).\n+\n+These are **pixel-art** defaults (outline, painted light, shading ramps). For flat / vector-like arcade\n+art, they don't apply: start from the flat template instead (`pagan init --style flat`).\n+\n+## 1. Palette\n+\n+- Palette file: `palettes/harbor.pal.yaml` (32 colors)\n+- Ramp intent — what each ramp is for:\n+  - `oak`: hulls and decks; `canvas`: sails; `rope`: rigging, outlines; `red`/`blue`/`green`/`gold`: team colours only; `sea`: water\n+\n+## 2. Scale\n+\n+- Base sprite / tile size: 16×16 effects and items\n+- Ships: 3D models, 1 px per voxel, hull about 64 voxels long\n+- Target base resolution and integer scale: 640×360, ×3\n+\n+## 3. Outlines\n+\n+- Style: 1 px dark outline (`0`, tar)\n+- Selective outline: no\n+\n+## 4. Light\n+\n+- Light direction: top-left\n+- Highlights on edges facing the light; the darkest ramp step on the far side.\n+\n+## 5. Shading\n+\n+- Ramp steps per material: 3-4\n+- No pillow shading (shading that just follows the outline inward from all sides).\n+- Dithering: never\n+\n+## 6. Proportions\n+\n+- Crew (later): about 1:3\n+- Detail level: readable at 1× scale; if a detail is a single isolated pixel, drop it.\n+\n+## 7. Animation\n+\n+- Default fps: 6\n+- Frame counts: sail 4 (pennants only)\n+- Squash and stretch: no\n+\n+## 8. Do / Don't\n+\n+Do:\n+- Use `mirror: horizontal` for symmetric subjects.\n+- Keep silhouettes readable as a solid shape.\n+- Keep team colours to flags, gunwales and stripes, so ships stay readable as wood and canvas.\n+\n+Don't:\n+- Flip lit art vertically (`flip: vertical`): the highlights end up on the wrong side. Horizontal flips\n+  are fine for symmetric-ish lighting; for strict top-left light, draw or render each direction.\n+- Let anything jump between animation frames: the anchor (feet) and unchanged parts must stay on exactly\n+  the same pixels. Check the preview's \"changes\" rows; lint W007 flags large frame-to-frame churn.\n+- Use colors outside the palette.\n+- Leave orphan pixels (single pixels with no neighbours).\n+\n+## 9. Reference sprites\n+\n+The approved sprites that define the look. Compare every new asset against these in preview.\n+\n+- `models/ship.model.yaml`\n+\n+## Changelog\n+\n+Each look change that means existing art should be revisited gets a version (`pagan style bump \"note\"`\n+bumps `style_version` in pagan.toml and adds an entry here, newest first). Assets made under an older\n+version get lint warning W006 until they're reviewed and stamped (`pagan mark --current <asset>`).\n+Palette edits and `[light]`/`[camera]` changes need no bump for 3D models (they re-render automatically);\n+bump when 2D sprites need redrawing to match.\n+\n+- v1: initial style"
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   }
+  },
+  "description": "Player ship: a wooden two-masted brig. Oak hull with a raised stern castle (lit brass lanterns), forecastle, bowsprit, bare masts with yards. Top-down 3/4 view, no water (it sits on a moving sea). 8 headings.",
+  "frames": {
+   "e": [
+    0,
+    0,
+    92,
+    70
+   ],
+   "n": [
+    184,
+    0,
+    92,
+    70
+   ],
+   "ne": [
+    92,
+    0,
+    92,
+    70
+   ],
+   "nw": [
+    276,
+    0,
+    92,
+    70
+   ],
+   "s": [
+    552,
+    0,
+    92,
+    70
+   ],
+   "se": [
+    644,
+    0,
+    92,
+    70
+   ],
+   "sw": [
+    460,
+    0,
+    92,
+    70
+   ],
+   "w": [
+    368,
+    0,
+    92,
+    70
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -11.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/ship.tres",
+  "headings": [
+   "e",
+   "ne",
+   "n",
+   "nw",
+   "w",
+   "sw",
+   "s",
+   "se"
+  ],
+  "kind": "model",
+  "palette": "harbor",
+  "pivot": [
+   46,
+   46
+  ],
+  "sheet": "res://assets/generated/sprites/ship.png",
+  "size": [
+   92,
+   70
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "player",
+   "vehicle",
+   "ship"
+  ],
+  "variants": {}
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 2769
+  },
+  {
+   "path": "assets/generated/sprites/ship.png",
+   "bytes": 7791
+  },
+  {
+   "path": "assets/generated/sprites/ship.tres",
+   "bytes": 2075
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/ship.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/ship.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 92, 70)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(102 lines in all)"
+ },
+ "palettes": {
+  "harbor": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#120d0c",
+     "name": "tar"
+    },
+    {
+     "key": "1",
+     "hex": "#2a1c17",
+     "name": "rope_dark"
+    },
+    {
+     "key": "2",
+     "hex": "#47302a",
+     "name": "rope"
+    },
+    {
+     "key": "3",
+     "hex": "#3a2117",
+     "name": "oak_deep"
+    },
+    {
+     "key": "4",
+     "hex": "#5c3521",
+     "name": "oak_dark"
+    },
+    {
+     "key": "5",
+     "hex": "#86502c",
+     "name": "oak"
+    },
+    {
+     "key": "6",
+     "hex": "#ad7140",
+     "name": "oak_light"
+    },
+    {
+     "key": "7",
+     "hex": "#d39a5c",
+     "name": "oak_pale"
+    },
+    {
+     "key": "8",
+     "hex": "#6e6252",
+     "name": "canvas_shadow"
+    },
+    {
+     "key": "9",
+     "hex": "#a2947c",
+     "name": "canvas_dark"
+    },
+    {
+     "key": "a",
+     "hex": "#cdbf9f",
+     "name": "canvas"
+    },
+    {
+     "key": "b",
+     "hex": "#efe5c8",
+     "name": "canvas_light"
+    },
+    {
+     "key": "c",
+     "hex": "#4a2c10",
+     "name": "brass_dark"
+    },
+    {
+     "key": "d",
+     "hex": "#a8772a",
+     "name": "brass"
+    },
+    {
+     "key": "e",
+     "hex": "#f0c860",
+     "name": "lamp"
+    },
+    {
+     "key": "f",
+     "hex": "#fff2b8",
+     "name": "lamp_glow"
+    },
+    {
+     "key": "g",
+     "hex": "#4a1416",
+     "name": "red_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#8c2426",
+     "name": "red"
+    },
+    {
+     "key": "i",
+     "hex": "#d0463a",
+     "name": "red_light"
+    },
+    {
+     "key": "j",
+     "hex": "#14284a",
+     "name": "blue_deep"
+    },
+    {
+     "key": "k",
+     "hex": "#24508c",
+     "name": "blue"
+    },
+    {
+     "key": "l",
+     "hex": "#4a8ad0",
+     "name": "blue_light"
+    },
+    {
+     "key": "m",
+     "hex": "#163a22",
+     "name": "green_deep"
+    },
+    {
+     "key": "n",
+     "hex": "#2a6e3a",
+     "name": "green"
+    },
+    {
+     "key": "o",
+     "hex": "#58ad5c",
+     "name": "green_light"
+    },
+    {
+     "key": "p",
+     "hex": "#4a3a0c",
+     "name": "gold_deep"
+    },
+    {
+     "key": "q",
+     "hex": "#a07c18",
+     "name": "gold"
+    },
+    {
+     "key": "r",
+     "hex": "#e6c43a",
+     "name": "gold_light"
+    },
+    {
+     "key": "s",
+     "hex": "#0e2a3a",
+     "name": "sea_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#174a5e",
+     "name": "sea"
+    },
+    {
+     "key": "u",
+     "hex": "#2a7286",
+     "name": "sea_light"
+    },
+    {
+     "key": "v",
+     "hex": "#5aa6b0",
+     "name": "foam"
+    }
+   ],
+   "ramps": {
+    "rope": [
+     "0",
+     "1",
+     "2"
+    ],
+    "oak": [
+     "3",
+     "4",
+     "5",
+     "6",
+     "7"
+    ],
+    "canvas": [
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "brass": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "red": [
+     "g",
+     "h",
+     "i"
+    ],
+    "blue": [
+     "j",
+     "k",
+     "l"
+    ],
+    "green": [
+     "m",
+     "n",
+     "o"
+    ],
+    "gold": [
+     "p",
+     "q",
+     "r"
+    ],
+    "sea": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ]
+   }
+  }
+ },
+ "sheet": "01-hull/ship.png",
+ "changes": null,
+ "ground": null,
+ "status": "draft",
+ "next": [
+  {
+   "to": "02-sails",
+   "say": "Give it sails."
+  }
+ ]
+}

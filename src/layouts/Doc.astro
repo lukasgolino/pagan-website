@@ -1,0 +1,119 @@
+---
+import Base from "./Base.astro";
+import { asset, readJson } from "../lib/data";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const { pagan } = readJson("src/content/docs/meta.json");
+const pages = [
+  ["docs/", "Overview"],
+  ["docs/workflow/", "Workflow (the skill)"],
+  ["docs/reference/", "Notation reference"],
+  ["docs/changelog/", "Changelog"],
+];
+const here = Astro.url.pathname;
+---
+
+<Base title={`${title} · PAGAN docs`} description={description}>
+  <div class="wrap doc">
+    <aside>
+      <nav aria-label="Docs">
+        {pages.map(([href, label]) => <a href={asset(href)} aria-current={here.endsWith(href) ? "page" : undefined}>{label}</a>)}
+      </nav>
+      <p class="ver">Generated from PAGAN v{pagan}</p>
+    </aside>
+    <article class="prose">
+      <slot />
+    </article>
+  </div>
+</Base>
+
+<style is:global>
+  .doc {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    padding-top: 48px;
+    padding-bottom: 80px;
+  }
+  .doc aside nav {
+    position: sticky;
+    top: 84px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font: 0.85rem var(--font-pixel);
+  }
+  .doc aside a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .doc aside a[aria-current="page"] {
+    color: var(--glow);
+  }
+  .doc .ver {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 24px;
+  }
+  .prose {
+    max-width: 52rem;
+  }
+  .prose h1 {
+    font-size: 2rem;
+  }
+  .prose h2 {
+    font-size: 1.4rem;
+    margin-top: 2.2em;
+    color: var(--glow);
+  }
+  .prose h3 {
+    margin-top: 1.8em;
+  }
+  .prose p,
+  .prose li {
+    color: #cfccd9;
+  }
+  .prose pre {
+    background: var(--ink) !important;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    margin: 0 0 1.2em;
+  }
+  .prose table {
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    margin: 0 0 1.2em;
+  }
+  .prose th,
+  .prose td {
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose th {
+    background: var(--panel);
+  }
+  @media (max-width: 820px) {
+    .doc {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+    .doc aside nav {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    .doc .ver {
+      margin-top: 8px;
+    }
+  }
+</style>

@@ -1,0 +1,328 @@
+---
+import { asset, readJson, step } from "../lib/data";
+import { escapeHtml, highlightDiff, highlightSource } from "../scripts/highlight";
+
+const sixteen = step("ship", "03-sixteen");
+const sixteenDiff = sixteen.diffs["02-sails"].find((d: any) => d.path === "models/ship.model.yaml");
+const lint = readJson("public/demo/features.json");
+const day = step("zombie", "02-horde");
+const night = step("zombie", "03-night-horde");
+const dayColors = day.palettes.grave.colors.slice(0, 32);
+const nightColors = night.palettes.grave.colors.slice(0, 32);
+const zombie = step("zombie", "02-attack");
+const m = zombie.manifest;
+const manifest = JSON.stringify(
+  {
+    zombie: {
+      kind: m.kind,
+      sheet: m.sheet,
+      size: m.size,
+      pivot: m.pivot,
+      godot_offset: m.godot_offset,
+      headings: m.headings,
+      frames: { e: m.frames.e, "…": `${Object.keys(m.frames).length - 1} more` },
+      animations: { walk_se: m.animations.walk_se, "…": `${Object.keys(m.animations).length - 1} more` },
+    },
+  },
+  null,
+  1,
+).replace(/\[\n\s*([^\[\]{}]*?)\n\s*\]/g, (_, s: string) => `[${s.replace(/\s*\n\s*/g, " ")}]`);
+const gd = `var zombie := AnimatedSprite2D.new()
+zombie.sprite_frames = load("res://assets/generated/sprites/zombie.tres")
+zombie.centered = true
+zombie.offset = Vector2(${m.godot_offset.join(", ")})   # manifest: godot_offset
+zombie.play("walk_" + heading)   # one animation per heading`;
+const short = (msg: string) => msg.replace(/; the project limit.*$/, "");
+---
+
+<section id="features">
+  <div class="wrap">
+    <span class="eyebrow">Why PAGAN</span>
+    <h2>Built for a whole game's worth of art</h2>
+    <p class="lede">
+      Everything below is real build output from the demo projects, drawn in your browser from the same
+      PNG sheets and manifest a game loads.
+    </p>
+
+    <div class="cards">
+      <article class="card wide">
+        <div class="text">
+          <h3><span>1</span> Art as source code</h3>
+          <p>
+            The agent writes text you can read, diff, review and keep in git. "16 headings so it turns
+            smoothly" is a one-line change, and the review is a normal pull request.
+          </p>
+        </div>
+        <pre class="code"><code set:html={`<span class="t-com">models/ship.model.yaml</span>\n` + highlightDiff(sixteenDiff.diff)} /></pre>
+      </article>
+
+      <article class="card wide">
+        <div class="text">
+          <h3><span>2</span> 3D in, perfect 2D out</h3>
+          <p>
+            One voxel model gives every heading and every animation frame, lit by one project-wide light
+            and seen through one camera. No drift between directions, ever. 1 to 32 headings.
+          </p>
+        </div>
+        <div class="sea">
+          <pagan-sprite step="ship/03-sixteen" all cols="8" scale="1" label="The ship from all 16 headings"></pagan-sprite>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3><span>3</span> One style, everywhere, forever</h3>
+        <p>
+          Palettes with ramps, a project light and style versions. "Make the night darker" is
+          <code>pagan palette adjust grave --lightness -0.07 --saturation 0.85</code>, and every asset follows.
+        </p>
+        <div class="style" id="style-toggle">
+          <div class="swatches" aria-hidden="true">
+            {
+              dayColors.map((c: any, i: number) => (
+                <i style={`background:${c.hex}`} data-day={c.hex} data-night={nightColors[i].hex} />
+              ))
+            }
+          </div>
+          <img
+            class="px"
+            src={asset(`demo/zombie/${day.ground}`)}
+            data-day={asset(`demo/zombie/${day.ground}`)}
+            data-night={asset(`demo/zombie/${night.ground}`)}
+            width="256"
+            height="160"
+            alt="The graveyard ground and headstones, built from the palette"
+          />
+          <button type="button" class="btn ghost small" aria-pressed="false">Make the night darker</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3><span>4</span> It checks its own work</h3>
+        <p>
+          The linter catches orphan pixels, ramp misuse, clipped outlines and animations that pop. The
+          agent reads the findings and fixes them. A real one, from the zombie's first attack:
+        </p>
+        <div class="lint">
+          <p class="find"><b>W007</b> {short(lint.before.findings[0].message)}</p>
+          <img class="px checker" src={asset(`demo/${lint.before.changes}`)} alt="The 5-frame attack's changes row: most pixels change between frames" loading="lazy" />
+          <p class="ok">
+            Fixed: {lint.after.frames} smaller steps, <b>{lint.after.warnings} warnings</b>
+          </p>
+          <img class="px checker" src={asset(`demo/${lint.after.changes}`)} alt="The 9-frame attack's changes row: only the arms and head change" loading="lazy" />
+        </div>
+      </article>
+
+      <article class="card">
+        <h3><span>5</span> Animation that doesn't jitter</h3>
+        <p>
+          Poses move parts by whole voxels, so the torso stays on exactly the same pixels while the legs
+          drag. The changes row shows what moved; lint W007 measures it.
+        </p>
+        <div class="anim">
+          <pagan-sprite step="zombie/01-shamble" heading="se" anim="walk" scale="3"></pagan-sprite>
+          <pagan-sprite step="zombie/02-attack" heading="e" anim="attack" scale="3"></pagan-sprite>
+          <pagan-sprite step="ship/04-damaged" heading="sw" anim="damaged" scale="2"></pagan-sprite>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3><span>6</span> Variants and team colours</h3>
+        <p>
+          Recolours with identical geometry. The manifest carries a hex → hex swap table for each, so a
+          game can recolour one sheet in a shader. These are recoloured in your browser that way.
+        </p>
+        <div class="variants">
+          {["red", "blue", "green", "gold"].map((v) => <pagan-sprite step="ship/04-teams" heading="se" variant={v} scale="1" label={`The ship in team ${v}`} />)}
+        </div>
+        <div class="variants horde">
+          {
+            Object.keys(day.manifest.variants).map((v) => (
+              <pagan-sprite step="zombie/02-horde" heading="s" variant={v} scale="2" label={`Zombie variant ${v}`} />
+            ))
+          }
+        </div>
+      </article>
+
+      <article class="card">
+        <h3><span>7</span> Free, open, local</h3>
+        <p>
+          MIT-licensed. Runs on your machine, offline. No account, no credits, no API key, no cloud. Builds
+          are deterministic: the same sources give byte-identical files.
+        </p>
+      </article>
+
+      <article class="card">
+        <h3><span>8</span> Built for agents</h3>
+        <p>
+          A Claude skill that teaches the whole workflow, an MCP server for any agent, <code>--json</code> on
+          every command, and a long-term memory in the project: <code>BRIEF.md</code>, <code>STYLE.md</code>,
+          asset status and a style changelog.
+        </p>
+      </article>
+      <article class="card wide">
+        <div class="text">
+          <h3><span>9</span> Engine-ready</h3>
+          <p>
+            <code>manifest.json</code> describes every sheet: frame rects, animations, fps, pivots, headings,
+            tiles, variant swaps, normal maps. Any engine can read it. For Godot 4, PAGAN also writes
+            SpriteFrames and TileSet resources, verified by loading them in headless Godot.
+          </p>
+        </div>
+        <div class="two">
+          <pre class="code"><code set:html={`<span class="t-com">manifest.json (shortened)</span>\n` + highlightSource(manifest)} /></pre>
+          <pre class="code"><code set:html={`<span class="t-com"># Godot 4</span>\n` + escapeHtml(gd)} /></pre>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  import "../scripts/pagan-sprite";
+  const box = document.getElementById("style-toggle")!;
+  const button = box.querySelector("button")!;
+  const img = box.querySelector("img")!;
+  button.addEventListener("click", () => {
+    const night = button.getAttribute("aria-pressed") !== "true";
+    button.setAttribute("aria-pressed", String(night));
+    button.textContent = night ? "Back to the old night" : "Make the night darker";
+    img.src = night ? img.dataset.night! : img.dataset.day!;
+    box.querySelectorAll<HTMLElement>(".swatches i").forEach((i) => (i.style.background = night ? i.dataset.night! : i.dataset.day!));
+  });
+</script>
+
+<style>
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 36px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    min-width: 0;
+  }
+  .card.wide {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+    gap: 28px;
+    align-items: center;
+  }
+  .card h3 span {
+    display: inline-grid;
+    place-items: center;
+    width: 1.6em;
+    height: 1.6em;
+    background: var(--ember);
+    color: var(--ink);
+    margin-right: 6px;
+    font-size: 0.8em;
+  }
+  .card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .card .code {
+    font-size: 12.5px;
+    max-height: 340px;
+  }
+  .sea {
+    background: #174a5e;
+    border-radius: 4px;
+    padding: 8px;
+    overflow-x: auto;
+  }
+  .sea :global(canvas) {
+    display: block;
+    width: 100%;
+    min-width: 560px;
+    height: auto;
+  }
+  .style img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+    margin: 8px 0 12px;
+  }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 2px;
+  }
+  .swatches i {
+    aspect-ratio: 1;
+    transition: background 0.4s;
+  }
+  .btn.small {
+    font-size: 0.8rem;
+    padding: 0.55em 0.9em;
+  }
+  .lint img {
+    max-width: 100%;
+    display: block;
+    border-radius: 4px;
+  }
+  .lint p {
+    font-size: 0.85rem;
+    margin: 10px 0 6px;
+  }
+  .lint .find {
+    color: var(--del);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .lint .ok {
+    color: var(--add);
+  }
+  .anim {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+    background: #1d2f27;
+    border-radius: 4px;
+    padding: 8px;
+  }
+  .anim :global(canvas) {
+    display: block;
+    max-width: 100%;
+  }
+  .variants {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    background: #174a5e;
+    border-radius: 4px;
+    padding: 4px;
+  }
+  .variants :global(canvas) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .variants.horde {
+    grid-template-columns: repeat(9, 1fr);
+    background: #1d2f27;
+    margin-top: 6px;
+  }
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 960px) {
+    .cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .card.wide,
+    .two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

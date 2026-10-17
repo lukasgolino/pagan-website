@@ -1,0 +1,19 @@
+name: brand
+# The site's colours: night ink, a hot ember ramp for the wordmark, a teal accent. 12 colors.
+colors:
+  "0": { hex: "#0c0b12", name: ink }
+  "1": { hex: "#1b1a26", name: night }
+  "2": { hex: "#2d2b3d", name: dusk }
+  "3": { hex: "#5a2a3a", name: ember_deep }
+  "4": { hex: "#a8383a", name: ember }
+  "5": { hex: "#e8683a", name: flame }
+  "6": { hex: "#ffa94d", name: glow }
+  "7": { hex: "#ffe08a", name: spark }
+  "8": { hex: "#14444a", name: teal_deep }
+  "9": { hex: "#1f8a86", name: teal }
+  "a": { hex: "#4fd1c0", name: teal_light }
+  "b": { hex: "#f4f1ea", name: paper }
+ramps:
+  ember: ["3", "4", "5", "6", "7"]
+  teal:  ["8", "9", "a"]
+  ink:   ["0", "1", "2"]

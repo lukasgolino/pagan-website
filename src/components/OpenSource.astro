@@ -1,0 +1,68 @@
+---
+import { asset, readJson } from "../lib/data";
+
+const { pagan } = readJson("src/content/docs/meta.json");
+---
+
+<section id="open-source">
+  <div class="wrap grid">
+    <div>
+      <span class="eyebrow">Open source</span>
+      <h2>Free, for good</h2>
+      <p class="lede">
+        PAGAN is MIT-licensed. Every released version stays free to use, change and ship, commercially
+        or not. No account, no telemetry, no cloud: it runs on your machine.
+      </p>
+      <ul>
+        <li>Source, issues and releases on <a href="https://github.com/lukasgolino/PAGAN">GitHub</a></li>
+        <li>Current release: <b>v{pagan}</b>, see the <a href={asset("docs/changelog/")}>changelog</a></li>
+        <li>
+          Contributing: open an issue first for notation changes; every feature lands with tests, output
+          stays byte-identical, and anything that changes rendered pixels gets a version bump.
+        </li>
+        <li>Game repos pin a tag, so your art never changes under you.</li>
+      </ul>
+    </div>
+    <div class="badge panel">
+      <img class="px" src={asset("brand/mark@12x.png")} width="192" height="192" alt="The PAGAN icon, a speech bubble of pixels" />
+      <p>MIT · free forever · made with PAGAN</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+  }
+  ul {
+    color: var(--muted);
+    padding-left: 1.2em;
+  }
+  li {
+    margin-bottom: 6px;
+  }
+  li b {
+    color: var(--text);
+  }
+  .badge {
+    text-align: center;
+    padding: 32px;
+  }
+  .badge img {
+    max-width: 100%;
+    height: auto;
+  }
+  .badge p {
+    font: 0.8rem var(--font-pixel);
+    color: var(--muted);
+    margin: 14px 0 0;
+  }
+  @media (max-width: 800px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

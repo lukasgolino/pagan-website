@@ -1,0 +1,115 @@
+<section id="how">
+  <div class="wrap">
+    <span class="eyebrow">The translation layer</span>
+    <h2>You don't learn PAGAN. Your agent does.</h2>
+    <p class="lede">
+      With the PAGAN skill (Claude) or the MCP server (any agent), your AI agent becomes the translator
+      between what you want and the art your game loads.
+    </p>
+    <ol class="flow">
+      <li class="box">
+        <span class="who">You <small>English</small></span>
+        <p class="say">"A zombie that shambles towards the player."</p>
+      </li>
+      <li class="box">
+        <span class="who">Agent <small>Claude + PAGAN skill / MCP</small></span>
+        <ul>
+          <li>writes <code>zombie.model.yaml</code></li>
+          <li>runs <code>pagan lint</code></li>
+          <li>looks at the preview</li>
+          <li>fixes what's off</li>
+        </ul>
+      </li>
+      <li class="box">
+        <span class="who">PAGAN <small>the compiler</small></span>
+        <ul>
+          <li>renders 8 headings</li>
+          <li>6-frame walk cycle</li>
+          <li>one camera, one light</li>
+          <li>byte-identical builds</li>
+        </ul>
+      </li>
+      <li class="box game">
+        <span class="who">Your game <small>any engine</small></span>
+        <ul class="files">
+          <li>zombie.png</li>
+          <li>zombie.tres</li>
+          <li>manifest.json</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<style>
+  .flow {
+    list-style: none;
+    padding: 0;
+    margin: 40px 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 36px;
+    counter-reset: step;
+  }
+  .box {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 18px 14px;
+    font-size: 0.95rem;
+  }
+  .box:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    width: 22px;
+    height: 14px;
+    transform: translateY(-50%);
+    background: var(--glow);
+    clip-path: polygon(0 35%, 60% 35%, 60% 0, 100% 50%, 60% 100%, 60% 65%, 0 65%);
+    image-rendering: pixelated;
+  }
+  .who {
+    display: block;
+    font-family: var(--font-pixel);
+    color: var(--glow);
+    margin-bottom: 10px;
+  }
+  .who small {
+    display: block;
+    font-family: var(--font-body);
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .say {
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  ul {
+    margin: 0;
+    padding-left: 1.1em;
+    color: var(--text);
+  }
+  .files {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    list-style: "▸ ";
+  }
+  .game {
+    border-color: var(--teal-deep);
+  }
+  @media (max-width: 900px) {
+    .flow {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .box:not(:last-child)::after {
+      right: 50%;
+      top: auto;
+      bottom: -24px;
+      transform: translateX(50%) rotate(90deg);
+    }
+  }
+</style>

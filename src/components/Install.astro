@@ -1,0 +1,152 @@
+---
+import { readJson } from "../lib/data";
+import { escapeHtml } from "../scripts/highlight";
+
+const { pagan } = readJson("src/content/docs/meta.json");
+const tag = `v${pagan}`;
+const pkg = `git+https://github.com/lukasgolino/PAGAN@${tag}`;
+const tabs = [
+  {
+    id: "skill",
+    label: "Claude Code skill",
+    steps: [
+      [`pip install "pagan @ ${pkg}"`, "install PAGAN (Python 3.11+)"],
+      ["pagan skill install", "copy the skill into this repo's .claude/skills/"],
+    ],
+    then: `Then ask Claude: "I'm making a naval exploration game; make the player's ship, three masts, 8 headings."`,
+  },
+  {
+    id: "mcp",
+    label: "MCP (any agent)",
+    steps: [
+      [`pip install "pagan[mcp] @ ${pkg}"`, "PAGAN with the MCP server"],
+      ["claude mcp add pagan -- pagan mcp --project ./art", "or in any client: command `pagan mcp --project <dir>`"],
+    ],
+    then: `Works with Claude Desktop, Claude Code, Cursor or your own agent. Add --allow-godot to let it verify builds in headless Godot.`,
+  },
+  {
+    id: "cli",
+    label: "CLI",
+    steps: [
+      [`pip install "pagan @ ${pkg}"`, "install"],
+      ["pagan init my-art --perspective top-down-3/4", "a project: palettes/, sprites/, tiles/, models/"],
+      ["cd my-art && pagan new model ship --size 96x96 --directions 8", "write the art"],
+      ["pagan lint && pagan preview ship && pagan build", "check it, look at it, build it"],
+    ],
+    then: `Every command takes --json and exits non-zero on errors.`,
+  },
+];
+---
+
+<section id="install">
+  <div class="wrap">
+    <span class="eyebrow">Install</span>
+    <h2>One line, then ask</h2>
+    <p class="lede">Requires Python 3.11+. Pin a tag so your art builds the same way next year ({tag} is current).</p>
+    <div class="tabs panel" id="install-tabs">
+      <div role="tablist" aria-label="Install method">
+        {
+          tabs.map((t, i) => (
+            <button type="button" role="tab" id={`tab-${t.id}`} aria-controls={`pane-${t.id}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+              {t.label}
+            </button>
+          ))
+        }
+      </div>
+      {
+        tabs.map((t, i) => (
+          <div role="tabpanel" id={`pane-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0}>
+            <pre class="code"><code set:html={t.steps.map(([c, why]) => `<span class="t-punc">$</span> ${escapeHtml(c)}  <span class="t-com"># ${escapeHtml(why)}</span>`).join("\n")} /></pre>
+            <button type="button" class="copy" data-copy={t.steps.map(([c]) => c).join("\n")}>Copy</button>
+            <p>{t.then}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById("install-tabs")!;
+  const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+  const select = (tab: HTMLButtonElement) => {
+    for (const t of tabs) {
+      const on = t === tab;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")!)!.hidden = !on;
+    }
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => select(t));
+    t.addEventListener("keydown", (e) => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (d) {
+        const n = tabs[(i + d + tabs.length) % tabs.length];
+        select(n);
+        n.focus();
+      }
+    });
+  });
+  root.querySelectorAll<HTMLButtonElement>(".copy").forEach((b) =>
+    b.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy!);
+        b.textContent = "Copied";
+      } catch {
+        b.textContent = "Select and copy";
+      }
+      setTimeout(() => (b.textContent = "Copy"), 1600);
+    }),
+  );
+</script>
+
+<style>
+  .tabs {
+    margin-top: 28px;
+    overflow: hidden;
+  }
+  [role="tablist"] {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+  }
+  [role="tab"] {
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: var(--muted);
+    font: 0.9rem var(--font-pixel);
+    padding: 14px 18px;
+    cursor: pointer;
+  }
+  [role="tab"][aria-selected="true"] {
+    color: var(--text);
+    border-bottom-color: var(--ember);
+    background: var(--panel-2);
+  }
+  [role="tabpanel"] {
+    padding: 18px;
+    position: relative;
+  }
+  [role="tabpanel"] p {
+    color: var(--muted);
+    margin: 14px 0 0;
+    font-size: 0.95rem;
+  }
+  .code {
+    padding-right: 80px;
+  }
+  .copy {
+    position: absolute;
+    right: 28px;
+    top: 28px;
+    font: 0.75rem var(--font-pixel);
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 5px 9px;
+    cursor: pointer;
+  }
+</style>

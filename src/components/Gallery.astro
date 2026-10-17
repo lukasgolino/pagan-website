@@ -1,0 +1,147 @@
+---
+import { asset, step } from "../lib/data";
+
+// every asset the demo projects build, newest state of each
+type Item = { kind: "3d" | "2d" | "tiles"; name: string; note: string } & (
+  | { step: string; heading?: string; anim?: string; variant?: string; scale: number; bg: string }
+  | { img: string; w: number; h: number; bg: string }
+);
+const horde = Object.keys(step("zombie", "02-horde").manifest.variants);
+const items: Item[] = [
+  { kind: "3d", name: "zombie", note: "8 headings · walk, attack", step: "zombie/02-attack", heading: "se", anim: "walk", scale: 3, bg: "#1d2f27" },
+  { kind: "3d", name: "zombie (rotten)", note: "decay ramp", step: "zombie/02-rotten", heading: "sw", anim: "walk", scale: 3, bg: "#1d2f27" },
+  ...horde.slice(1, 5).map(
+    (v): Item => ({ kind: "3d", name: `zombie.${v}`, note: "variant_axes", step: "zombie/02-horde", heading: "s", anim: "walk", variant: v, scale: 3, bg: "#1d2f27" }),
+  ),
+  { kind: "3d", name: "ship", note: "16 headings · sail", step: "ship/03-sixteen", heading: "sse", anim: "sail", scale: 2, bg: "#174a5e" },
+  { kind: "3d", name: "ship.blue", note: "team colour", step: "ship/04-teams", heading: "wsw", anim: "sail", variant: "blue", scale: 2, bg: "#174a5e" },
+  { kind: "3d", name: "ship (damaged)", note: "hidden parts, roll", step: "ship/04-damaged", heading: "ene", anim: "damaged", scale: 2, bg: "#174a5e" },
+  { kind: "3d", name: "ship (hull)", note: "no sails yet", step: "ship/01-hull", heading: "e", scale: 2, bg: "#174a5e" },
+  { kind: "3d", name: "gravestone", note: "1 view", img: "demo/zombie/01-shamble/gravestone.png", w: 24, h: 26, bg: "#1d2f27" },
+  { kind: "tiles", name: "graveyard", note: "generated, seamless", img: "demo/zombie/01-shamble/graveyard.png", w: 64, h: 16, bg: "#13121b" },
+  { kind: "tiles", name: "graveyard (night)", note: "after palette adjust", img: "demo/zombie/03-night-horde/graveyard.png", w: 64, h: 16, bg: "#13121b" },
+  { kind: "2d", name: "logo", note: "generator script", img: "brand/logo@1x.png", w: 68, h: 16, bg: "#13121b" },
+  { kind: "2d", name: "mark", note: "16×16 icon", img: "brand/mark@1x.png", w: 16, h: 16, bg: "#13121b" },
+];
+const filters = [
+  ["all", "All"],
+  ["3d", "3D models"],
+  ["2d", "2D sprites"],
+  ["tiles", "Tiles"],
+];
+---
+
+<section id="gallery">
+  <div class="wrap">
+    <span class="eyebrow">Gallery</span>
+    <h2>Everything on this page</h2>
+    <p class="lede">
+      Every asset the demo projects build, at 1 pixel per pixel × 3. Status: <b>draft</b> (art review
+      pending).
+    </p>
+    <div class="filters" role="group" aria-label="Filter the gallery">
+      {filters.map(([id, label], i) => <button type="button" data-f={id} aria-pressed={i === 0 ? "true" : "false"}>{label}</button>)}
+    </div>
+    <ul class="items" id="gallery-items">
+      {
+        items.map((it) => (
+          <li data-kind={it.kind}>
+            <div class="art" style={`background:${it.bg}`}>
+              {"step" in it ? (
+                <pagan-sprite step={it.step} heading={it.heading} anim={it.anim} variant={it.variant} scale={String(it.scale)} />
+              ) : (
+                <img class="px" src={asset(it.img)} width={it.w * (it.w > 40 ? 3 : 6)} height={it.h * (it.w > 40 ? 3 : 6)} alt={it.name} loading="lazy" />
+              )}
+            </div>
+            <p>
+              <b>{it.name}</b>
+              <span>{it.note}</span>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  import "../scripts/pagan-sprite";
+  const buttons = document.querySelectorAll<HTMLButtonElement>("#gallery .filters button");
+  const items = document.querySelectorAll<HTMLElement>("#gallery-items li");
+  buttons.forEach((b) =>
+    b.addEventListener("click", () => {
+      buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      items.forEach((li) => (li.hidden = b.dataset.f !== "all" && li.dataset.kind !== b.dataset.f));
+    }),
+  );
+</script>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 18px;
+  }
+  .filters button {
+    font: 0.8rem var(--font-pixel);
+    background: var(--panel);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+  .filters button[aria-pressed="true"] {
+    color: var(--ink);
+    background: var(--glow);
+    border-color: var(--glow);
+  }
+  .items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .items li {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .art {
+    height: 200px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .art img {
+    max-width: 92%;
+    height: auto;
+    display: block;
+  }
+  .art :global(canvas) {
+    max-width: 100%;
+    max-height: 196px;
+    width: auto;
+    height: auto;
+    display: block;
+  }
+  .items p {
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .items p b {
+    font-family: var(--font-mono);
+    font-weight: 400;
+  }
+  .items p span {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+</style>

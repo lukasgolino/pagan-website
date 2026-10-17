@@ -1,0 +1,45 @@
+name: harbor
+# Age-of-sail harbour: warm oak, sun-bleached canvas, tarred rope, brass, and four team colours. 32 colors.
+colors:
+  "0": { hex: "#120d0c", name: tar }
+  "1": { hex: "#2a1c17", name: rope_dark }
+  "2": { hex: "#47302a", name: rope }
+  "3": { hex: "#3a2117", name: oak_deep }
+  "4": { hex: "#5c3521", name: oak_dark }
+  "5": { hex: "#86502c", name: oak }
+  "6": { hex: "#ad7140", name: oak_light }
+  "7": { hex: "#d39a5c", name: oak_pale }
+  "8": { hex: "#6e6252", name: canvas_shadow }
+  "9": { hex: "#a2947c", name: canvas_dark }
+  "a": { hex: "#cdbf9f", name: canvas }
+  "b": { hex: "#efe5c8", name: canvas_light }
+  "c": { hex: "#4a2c10", name: brass_dark }
+  "d": { hex: "#a8772a", name: brass }
+  "e": { hex: "#f0c860", name: lamp }
+  "f": { hex: "#fff2b8", name: lamp_glow }
+  "g": { hex: "#4a1416", name: red_deep }
+  "h": { hex: "#8c2426", name: red }
+  "i": { hex: "#d0463a", name: red_light }
+  "j": { hex: "#14284a", name: blue_deep }
+  "k": { hex: "#24508c", name: blue }
+  "l": { hex: "#4a8ad0", name: blue_light }
+  "m": { hex: "#163a22", name: green_deep }
+  "n": { hex: "#2a6e3a", name: green }
+  "o": { hex: "#58ad5c", name: green_light }
+  "p": { hex: "#4a3a0c", name: gold_deep }
+  "q": { hex: "#a07c18", name: gold }
+  "r": { hex: "#e6c43a", name: gold_light }
+  "s": { hex: "#0e2a3a", name: sea_deep }
+  "t": { hex: "#174a5e", name: sea }
+  "u": { hex: "#2a7286", name: sea_light }
+  "v": { hex: "#5aa6b0", name: foam }
+ramps:
+  rope:   ["0", "1", "2"]
+  oak:    ["3", "4", "5", "6", "7"]
+  canvas: ["8", "9", "a", "b"]
+  brass:  ["c", "d", "e", "f"]
+  red:    ["g", "h", "i"]
+  blue:   ["j", "k", "l"]
+  green:  ["m", "n", "o"]
+  gold:   ["p", "q", "r"]
+  sea:    ["s", "t", "u", "v"]

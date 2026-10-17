@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.venv/
+__pycache__/
+# PAGAN scratch output inside the art projects
+art/**/previews/
+art/**/.pagan-cache/
+art/**/build/

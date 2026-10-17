@@ -1,0 +1,75 @@
+# The sailing scenario of the website's scripted demo (see zombie.yaml).
+id: ship
+title: Sailing game
+order: 2
+pitch: "A brig from bare hull to 16 headings, team colours and battle damage."
+start: 01-hull
+sea: "#174a5e"
+steps:
+  01-hull:
+    user: "I'm making a sailing game. Give me a ship."
+    agent: >
+      Here's the hull: a two-masted brig, oak with a gold stripe, stern castle with lit lanterns,
+      bare masts. It's a 3D model, so all 8 headings share one camera and one light. Sails next?
+    ran:
+      - pagan init art --perspective top-down-3/4
+      - pagan palette show
+      - pagan new model ship --size 92x70 --directions 8
+      - pagan fit ship
+      - pagan lint
+      - pagan preview ship --bg "#174a5e"
+    show: { asset: ship, heading: se }
+    next: [02-sails]
+  02-sails:
+    user: "Give it sails."
+    agent: >
+      Square sails on both masts, braced 30° so they read from every heading, a jib to the bowsprit, and
+      red pennants that flutter in a 4-frame `sail` animation. Only the pennants move.
+    ran:
+      - pagan lint
+      - pagan preview ship --bg "#174a5e"
+    show: { asset: ship, animation: sail, heading: se, changes: sail }
+    next: [03-sixteen]
+  03-sixteen:
+    user: "16 headings, so it turns smoothly."
+    agent: >
+      One line: `directions: 16`. The model re-renders from 16 angles with the same light, so the
+      in-between headings match the others exactly. Drag the ship to turn it.
+    ran:
+      - pagan lint
+      - pagan preview ship --bg "#174a5e"
+    show: { asset: ship, animation: sail, heading: se, rotate: true }
+    next: [04-teams, 04-damaged]
+  04-teams:
+    user: "Team colours for 4 players."
+    agent: >
+      Red, blue, green and gold on the pennants, gunwales and hull stripe. The other colours stay put.
+      Each team is a palette swap; the page recolours the red sheet in your browser from the
+      manifest's swap table, the same thing a game shader does.
+    ran:
+      - pagan lint
+      - pagan preview ship --bg "#174a5e"
+    show: { asset: ship, animation: sail, heading: se, rotate: true, teams: true }
+    next: [{ to: 05-fleet, say: "Show it damaged." }]
+  04-damaged:
+    user: "Show it damaged."
+    agent: >
+      A `damaged` animation: she lists 14° to starboard, shot holes in the sails (hidden parts that cut
+      the cloth only in these poses), the fore topsail gone, fire and smoke on the stern castle. The
+      normal frames are untouched.
+    ran:
+      - pagan lint
+      - pagan fit ship
+      - pagan preview ship --bg "#174a5e"
+    show: { asset: ship, animation: damaged, heading: se, rotate: true }
+    next: [{ to: 05-fleet, say: "Team colours for 4 players." }]
+  05-fleet:
+    user: "Both: team colours and damage."
+    agent: >
+      They combine: damage is poses and team colours are palette swaps, so every team's ship can take
+      a beating. The source is the union of the two changes.
+    ran:
+      - pagan lint
+      - pagan preview ship --bg "#174a5e"
+    show: { asset: ship, animation: damaged, heading: se, rotate: true, teams: true }
+    next: []

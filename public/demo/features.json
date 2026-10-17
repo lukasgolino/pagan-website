@@ -1,0 +1,51 @@
+{
+ "before": {
+  "frames": 5,
+  "fps": 8.0,
+  "size": [
+   44,
+   48
+  ],
+  "strip": "features/attack-before.png",
+  "changes": "features/attack-before-changes.png",
+  "warnings": 15,
+  "findings": [
+   {
+    "rule": "W007",
+    "severity": "warning",
+    "message": "attack_se_1 -> attack_se_2: 63% of pixels change; the project limit is 40%. Keep unchanged parts on exactly the same pixels (see the preview's changes row)",
+    "path": "models/zombie.model.yaml",
+    "line": null,
+    "where": "animations.attack_se"
+   },
+   {
+    "rule": "W007",
+    "severity": "warning",
+    "message": "attack_se_2 -> attack_se_3: 49% of pixels change; the project limit is 40%. Keep unchanged parts on exactly the same pixels (see the preview's changes row)",
+    "path": "models/zombie.model.yaml",
+    "line": null,
+    "where": "animations.attack_se"
+   },
+   {
+    "rule": "W007",
+    "severity": "warning",
+    "message": "attack_se_3 -> attack_se_4: 54% of pixels change; the project limit is 40%. Keep unchanged parts on exactly the same pixels (see the preview's changes row)",
+    "path": "models/zombie.model.yaml",
+    "line": null,
+    "where": "animations.attack_se"
+   }
+  ]
+ },
+ "after": {
+  "frames": 9,
+  "fps": 12.0,
+  "size": [
+   44,
+   48
+  ],
+  "strip": "features/attack-after.png",
+  "changes": "features/attack-after-changes.png",
+  "warnings": 0,
+  "findings": []
+ }
+}

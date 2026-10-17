@@ -1,0 +1,881 @@
+{
+ "scenario": "zombie",
+ "id": "01-shamble",
+ "agent": "Done: a 3D zombie, 8 headings, a 6-frame shamble. I set up the art project first (top-down 3/4 camera, a moonlit palette called `grave`) and made a graveyard tileset and a headstone to judge him against. The torso stays planted while the legs drag, so the walk doesn't jitter.",
+ "ran": [
+  "pagan init art --perspective top-down-3/4",
+  "pagan palette show",
+  "pagan new model zombie --size 44x48 --directions 8",
+  "pagan fit zombie",
+  "python generators/ground.py",
+  "pagan lint",
+  "pagan preview zombie gravestone graveyard"
+ ],
+ "show": {
+  "asset": "zombie",
+  "animation": "walk",
+  "heading": "se",
+  "changes": "walk"
+ },
+ "lint": {
+  "errors": 0,
+  "warnings": 0,
+  "findings": []
+ },
+ "build": {
+  "written": 7,
+  "warnings": 0
+ },
+ "diffs": {
+  "": [
+   {
+    "path": "models/gravestone.model.yaml",
+    "status": "added",
+    "added": 25,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,25 @@\n+name: gravestone\n+description: >\n+  Weathered headstone with a rounded top and a mossy base, over a fresh dirt mound (the grave the\n+  zombie came out of). One view, facing the camera; same light and camera as the zombie.\n+size: [24, 26]\n+pivot: [12, 22]\n+origin: [0, 0, 0]\n+directions: 1\n+outline: auto\n+status: draft\n+style_version: 1\n+tags: [prop]\n+\n+materials:\n+  stone: { keys: [\"2\", \"3\", \"4\", \"5\"] }\n+  moss:  { keys: [\"l\", \"m\", \"n\"] }\n+  dirt:  { keys: [\"g\", \"h\", \"i\"] }\n+\n+parts:\n+  - ellipsoid: { center: [-11, 0, 0], radii: [10, 6, 3], material: dirt }  # mound behind the stone\n+  - box: { from: [-1, -6, 0], to: [1, 6, 14], material: stone }\n+  - cylinder: { base: [-1, 0, 14], height: 3, radius: 6, axis: x, material: stone }\n+  - box: { from: [-2, -7, 0], to: [2, 7, 1], material: moss }               # mossy plinth\n+  - box: { from: [2, 0, 6], to: [2, 0, 13], material: moss }                # carved cross, overgrown\n+  - box: { from: [2, -2, 11], to: [2, 2, 11], material: moss }"
+   },
+   {
+    "path": "models/zombie.model.yaml",
+    "status": "added",
+    "added": 79,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,79 @@\n+name: zombie\n+description: >\n+  Shambling zombie: hunched forward, arms reaching out, torn rag shirt with a blood stain, faded jeans,\n+  sickly green skin, sunken glowing eyes, patchy dark hair. Top-down 3/4 view, 8 headings, 6-frame\n+  shamble where the legs drag in turn and the arms sway (the torso stays planted, so nothing jumps).\n+size: [44, 48]\n+pivot: [22, 41]\n+origin: [0, 0, 0]            # between the feet, on the ground\n+directions: 8\n+outline: auto\n+status: draft\n+style_version: 1\n+tags: [enemy, character]\n+\n+materials:\n+  skin:  { keys: [\"8\", \"9\", \"a\", \"b\"] }\n+  shirt: { keys: [\"s\", \"t\", \"u\", \"v\"] }\n+  jeans: { keys: [\"c\", \"d\", \"e\", \"f\"] }\n+  shoe:  { keys: [\"g\", \"h\", \"i\"] }\n+  hair:  { keys: [\"1\", \"2\", \"3\"] }\n+  blood: { keys: [\"o\", \"p\", \"q\"] }\n+  eye:   { keys: [\"r\"] }\n+\n+parts:\n+  # legs: jeans over dark shoes; each leg moves as one part\n+  - box: { from: [-2, 2, 0], to: [3, 4, 2], material: shoe }\n+    id: left_leg\n+  - box: { from: [-1, 2, 3], to: [1, 4, 14], material: jeans }\n+    id: left_leg\n+  - box: { from: [-2, -4, 0], to: [3, -2, 2], material: shoe }\n+    id: right_leg\n+  - box: { from: [-1, -4, 3], to: [1, -2, 14], material: jeans }\n+    id: right_leg\n+  - box: { from: [-2, -5, 14], to: [2, 5, 16], material: jeans }      # hips\n+  # hunched torso: round belly, the chest leans forward\n+  - ellipsoid: { center: [0, 0, 20], radii: [3, 5, 5], material: shirt }\n+  - ellipsoid: { center: [2, 0, 25], radii: [3, 6, 4], material: shirt }\n+  - box: { from: [-2, 3, 16], to: [2, 5, 17], material: skin }         # torn hem shows skin\n+  - box: { from: [4, -3, 22], to: [5, 0, 26], material: blood }        # stain on the chest\n+  - box: { from: [3, 1, 18], to: [3, 2, 20], material: blood }\n+  # arms reaching forward, hands drooping\n+  - box: { from: [1, 6, 23], to: [5, 8, 26], material: shirt }\n+    id: left_arm\n+  - box: { from: [6, 6, 23], to: [12, 8, 25], material: skin }\n+    id: left_arm\n+  - box: { from: [12, 6, 21], to: [13, 8, 23], material: skin }\n+    id: left_arm\n+  - box: { from: [1, -8, 23], to: [5, -6, 26], material: shirt }\n+    id: right_arm\n+  - box: { from: [6, -8, 23], to: [12, -6, 25], material: skin }\n+    id: right_arm\n+  - box: { from: [12, -8, 21], to: [13, -6, 23], material: skin }\n+    id: right_arm\n+  # drooping head, pushed forward\n+  - box: { from: [3, -1, 28], to: [4, 1, 29], material: skin }         # neck\n+    id: head\n+  - ellipsoid: { center: [5, 0, 33], radii: [5, 5, 5], material: skin }\n+    id: head\n+  - ellipsoid: { center: [2, 1, 35], radii: [3, 4, 3], material: hair }  # patchy hair, back and top\n+    id: head\n+  - box: { from: [5, -3, 37], to: [6, -2, 38], material: hair }\n+    id: head\n+  - box: { from: [10, 1, 33], to: [10, 2, 34], material: eye }         # sunken glowing eyes\n+    id: head\n+  - box: { from: [10, -2, 33], to: [10, -1, 34], material: eye }\n+    id: head\n+  - box: { from: [10, -1, 30], to: [10, 1, 31], material: blood }      # open mouth\n+    id: head\n+\n+animations:\n+  walk:\n+    fps: 6\n+    poses:\n+      - { left_leg: { offset: [2, 0, 0] }, right_leg: { offset: [-1, 0, 0] }, left_arm: { offset: [0, 0, 1] } }\n+      - { left_leg: { offset: [1, 0, 0] }, right_leg: { offset: [0, 0, 0] }, head: { offset: [0, 0, -1] } }\n+      - { left_leg: { offset: [0, 0, 0] }, right_leg: { offset: [1, 0, 0] }, right_arm: { offset: [0, 0, -1] } }\n+      - { left_leg: { offset: [-1, 0, 0] }, right_leg: { offset: [2, 0, 0] }, right_arm: { offset: [0, 0, 1] } }\n+      - { left_leg: { offset: [0, 0, 0] }, right_leg: { offset: [1, 0, 0] }, head: { offset: [0, 0, -1] } }\n+      - { left_leg: { offset: [1, 0, 0] }, right_leg: { offset: [0, 0, 0] }, left_arm: { offset: [0, 0, -1] } }"
+   },
+   {
+    "path": "tiles/graveyard.tiles.yaml",
+    "status": "added",
+    "added": 76,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,76 @@\n+name: graveyard\n+columns: 4\n+description: 'Night graveyard ground: three seamless grass tiles and bare grave dirt.'\n+status: draft\n+style_version: 1\n+tags: [terrain]\n+tile_size: [16, 16]\n+tiles:\n+  grass: |\n+    lllllkllllllllll\n+    llllllllllklllll\n+    lkllllllllllllll\n+    kklnllllllllllll\n+    lllkllllnllllkkl\n+    klllllllkllllkkl\n+    lllkklnlllllllkk\n+    llllklkmmllnlkkk\n+    lllllllmlllkllll\n+    llllllllllllllll\n+    lkllllllllllllll\n+    lllllllkklllllll\n+    lllllllkklllllll\n+    llnllnlkllllllll\n+    llklnkllllllllll\n+    lmllkkllllllllll\n+  grass_b: |\n+    llllllllllllllll\n+    llllllllkllllkll\n+    lnllllllllllllkl\n+    lkmllllllllllkkl\n+    lnllllllllllllll\n+    lkllllllllkkklll\n+    lllllnlllllkllll\n+    nllllkllllllllll\n+    klnlllllklllllll\n+    llkllllkklllllll\n+    lllklllllllmllll\n+    lllllkllllllnlll\n+    llllklllllllklll\n+    llkkknllllllllll\n+    llkllkllllllllml\n+    llllllllllllllll\n+  grass_c: |\n+    lllllkllllllllll\n+    llllklklllnlllll\n+    llllllllllklllll\n+    lllllllllnlllllm\n+    lllllllllkllllml\n+    lllllllkklllllll\n+    llllllllllllllkl\n+    llllllllllllllkk\n+    lnllllllllllllkk\n+    lkllllllnllllkll\n+    nllllllmkllkllll\n+    klllllllllllllll\n+    lkllllllllllllll\n+    lklllnllllllllnl\n+    lllllkllllllllkl\n+    lllllllkllllllll\n+  dirt: |\n+    hhgghhhhhhhhhhhh\n+    hhghhhjjhhhhhhhh\n+    hhhhhhggghhhhhhh\n+    hhjjhhhhhhjjhhhh\n+    hhgghhhhhhgghhgg\n+    hhhhhhhhhhghhhhh\n+    hhhhhhhhhhggghgh\n+    hhhhhhhhhhhgghhh\n+    jjhhhhhhhghhgghh\n+    gghhhhhhhgghhhhh\n+    hhhhhhhghghhhhhh\n+    hhhhhhhhhhhhhhhg\n+    hhhhhhhhhhhhhhgh\n+    hhhhgghhhhhhhhhh\n+    ghghgghhhhhhhhhh\n+    hghhghhhhhhhhhhh"
+   },
+   {
+    "path": "palettes/grave.pal.yaml",
+    "status": "added",
+    "added": 43,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,43 @@\n+name: grave\n+# Moonlit graveyard: cold night ground, sickly flesh, faded clothes, one bloody accent. 32 colors.\n+colors:\n+  \"0\": { hex: \"#0b0a10\", name: ink }\n+  \"1\": { hex: \"#1a1a24\", name: night }\n+  \"2\": { hex: \"#2c2d3a\", name: slate_dark }\n+  \"3\": { hex: \"#474a5a\", name: slate }\n+  \"4\": { hex: \"#6c7183\", name: stone }\n+  \"5\": { hex: \"#9da3b2\", name: stone_light }\n+  \"6\": { hex: \"#d6dae2\", name: moon }\n+  \"7\": { hex: \"#1f2a1f\", name: rot_deep }\n+  \"8\": { hex: \"#3a4d33\", name: rot }\n+  \"9\": { hex: \"#5f7748\", name: flesh }\n+  \"a\": { hex: \"#8fa35f\", name: flesh_light }\n+  \"b\": { hex: \"#c3cc86\", name: flesh_pale }\n+  \"c\": { hex: \"#1b2133\", name: denim_deep }\n+  \"d\": { hex: \"#2d3a57\", name: denim }\n+  \"e\": { hex: \"#4a5d82\", name: denim_light }\n+  \"f\": { hex: \"#7486a8\", name: denim_faded }\n+  \"g\": { hex: \"#24171a\", name: mud_deep }\n+  \"h\": { hex: \"#3e2a26\", name: mud }\n+  \"i\": { hex: \"#5e4434\", name: earth }\n+  \"j\": { hex: \"#836446\", name: earth_light }\n+  \"k\": { hex: \"#121c19\", name: grass_deep }\n+  \"l\": { hex: \"#1d2f27\", name: grass_dark }\n+  \"m\": { hex: \"#2c4636\", name: grass }\n+  \"n\": { hex: \"#43614a\", name: grass_light }\n+  \"o\": { hex: \"#3d1018\", name: blood_deep }\n+  \"p\": { hex: \"#6e1c26\", name: blood }\n+  \"q\": { hex: \"#a8333a\", name: blood_light }\n+  \"r\": { hex: \"#d9e88a\", name: eye_glow }\n+  \"s\": { hex: \"#2e2620\", name: rag_deep }\n+  \"t\": { hex: \"#4d4035\", name: rag }\n+  \"u\": { hex: \"#71604f\", name: rag_light }\n+  \"v\": { hex: \"#998470\", name: rag_pale }\n+ramps:\n+  stone: [\"1\", \"2\", \"3\", \"4\", \"5\", \"6\"]\n+  flesh: [\"7\", \"8\", \"9\", \"a\", \"b\"]\n+  denim: [\"c\", \"d\", \"e\", \"f\"]\n+  earth: [\"g\", \"h\", \"i\", \"j\"]\n+  grass: [\"k\", \"l\", \"m\", \"n\"]\n+  blood: [\"o\", \"p\", \"q\"]\n+  rag:   [\"s\", \"t\", \"u\", \"v\"]"
+   },
+   {
+    "path": "generators/ground.py",
+    "status": "added",
+    "added": 56,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,56 @@\n+\"\"\"Graveyard ground tiles: night grass in three seamless variations and a bare grave-dirt tile.\n+Run from the project folder: python generators/ground.py\"\"\"\n+\n+from pagan import api\n+\n+GRASS = [\"k\", \"l\", \"m\", \"n\"]\n+EARTH = [\"g\", \"h\", \"i\", \"j\"]\n+\n+\n+def grass(seed: int) -> api.Canvas:\n+    c = api.Canvas(16, 16)\n+    for y in range(16):\n+        for x in range(16):\n+            n = api.periodic_noise(x, y, 16, seed)\n+            t = 0.45 + 0.35 * n + 0.25 * (api.hash01(x, y, seed) - 0.5)\n+            c.put(x, y, api.ramp_pick(GRASS[:3], t))\n+    # blades: a light tip over a dark root, lit from the top-left\n+    for i in range(7):\n+        x, y = int(api.hash01(i, 1, seed) * 15), int(api.hash01(i, 2, seed) * 14) + 1\n+        c.put(x, y, \"n\")\n+        c.put(x, (y + 1) % 16, \"k\")\n+    return c\n+\n+\n+def dirt(seed: int) -> api.Canvas:\n+    c = api.Canvas(16, 16)\n+    for y in range(16):\n+        for x in range(16):\n+            n = api.periodic_noise(x, y, 16, seed)\n+            t = 0.4 + 0.3 * n + 0.3 * (api.hash01(x, y, seed) - 0.5)\n+            c.put(x, y, api.ramp_pick(EARTH[:3], t))\n+    for i in range(4):  # pebbles: a lit top over a shadow\n+        x, y = int(api.hash01(i, 5, seed) * 14), int(api.hash01(i, 6, seed) * 14) + 1\n+        c.put(x, y, \"j\")\n+        c.put(x + 1, y, \"j\")\n+        c.put(x, y + 1, \"g\")\n+        c.put(x + 1, y + 1, \"g\")\n+    return c\n+\n+\n+tiles = {\"grass\": grass(1), \"grass_b\": grass(2), \"grass_c\": grass(3), \"dirt\": dirt(4)}\n+for tile in tiles.values():\n+    tile.pair_orphans()\n+api.write(\n+    \"tiles/graveyard.tiles.yaml\",\n+    api.tileset_yaml(\n+        \"graveyard\",\n+        (16, 16),\n+        tiles,\n+        columns=4,\n+        description=\"Night graveyard ground: three seamless grass tiles and bare grave dirt.\",\n+        status=\"draft\",\n+        style_version=1,\n+        tags=[\"terrain\"],\n+    ),\n+)"
+   },
+   {
+    "path": "pagan.toml",
+    "status": "added",
+    "added": 66,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,66 @@\n+# PAGAN project config. Paths are relative to this file.\n+\n+# \"strict\": every sprite uses a palette file from palettes/ (one cohesive look).\n+# \"open\":   sprites may also define their own palette inline.\n+palette_mode = \"strict\"\n+\n+# Palette for sprites that don't name one. Create one with `pagan new palette <name>`.\n+default_palette = \"grave\"\n+\n+# Where `pagan build` writes final assets, e.g. your game engine's asset folder.\n+output_dir = \"../game/assets/generated\"\n+\n+# Scratch output from `pagan render` / `pagan preview`. Keep it out of version control.\n+preview_dir = \"previews\"\n+\n+# What `pagan build` produces: PNG sheets + manifest.json always (\"png\"); add \"godot\" (SpriteFrames/TileSet .tres),\n+# \"normals\" (normal-map sheets for 3D models, for engine lighting).\n+# Every setting here can also be viewed/changed with `pagan config show` / `pagan config set <key> <value>`.\n+export = [\"png\", \"godot\"]\n+\n+# Variants (recolours) get their own sheet (+ .tres). Set false when the game recolours in a shader\n+# from each variant's \"swap\" table (base colour -> variant colour) in manifest.json.\n+variant_sheets = true\n+\n+# Smooth (anti-aliased) output for art that isn't pixel art, e.g. sprites the game rotates freely: draw\n+# sources at N x the size the game gets, and `pagan build` box-filters them down. 1 = off (pixel-exact).\n+supersample = 1\n+\n+# Bump this when STYLE.md changes in a way that means existing art should be revisited (e.g. \"more\n+# shadows\"). Assets record the style_version they were made under; older ones get lint warning W006.\n+# Palette color changes don't need a bump: every asset picks them up automatically.\n+style_version = 1\n+\n+# 3D models (models/*.model.yaml) are rendered with this camera and light, shared by the whole project,\n+# so every 3D asset is projected and lit the same way.\n+[camera]\n+elevation = 42.0      # degrees above the horizon: 90 = straight down, ~30-50 = top-down 3/4 view\n+scale = 1           # pixels per voxel\n+\n+[light]\n+direction = [-0.5, 0.45, 0.75]   # towards the light: x right, y up the screen, z up (top-left by default)\n+ambient = 0.2                    # brightness of unlit surfaces (0-1); lower = darker shadows, more contrast\n+shadows = true                   # parts cast shadows on each other\n+shadow_strength = 0.65           # how dark cast shadows are (0-1)\n+wrap = 0.3                       # how far light wraps around curves (0-1, higher = softer)\n+baked = true                     # false: flat colors for engines with their own lighting (+ export \"normals\")\n+\n+# Only with export \"godot\".\n+[godot]\n+mipmaps = false                  # import the PNGs with mipmaps (sprites drawn scaled down or rotated)\n+filter = \"inherit\"               # SpriteFrames texture filter: inherit (node/project decides), nearest, linear\n+\n+[lint]\n+# W003: warn when a sprite uses colors from more than this many ramps.\n+max_ramps_per_sprite = 3\n+# W003 for 3D models, which mix more materials.\n+max_ramps_per_model = 6\n+# W007: warn when more than this share of pixels changes between consecutive animation frames,\n+# even after allowing the whole sprite to move by up to 2px. Keeps animations free of jumps.\n+max_frame_change = 0.4\n+# W008: most shades an asset may use from one ramp (0 = no limit), e.g. 3 for \"3 steps per material\".\n+max_ramp_steps = 0\n+# Warning rule ids to turn off, e.g. [\"W001\"].\n+disable = []\n+# Require `outline: auto` on every sprite.\n+require_outline = false"
+   },
+   {
+    "path": "BRIEF.md",
+    "status": "added",
+    "added": 39,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,39 @@\n+# Art brief\n+\n+The long-term memory for this project's art: what the game is, what it needs, and decisions made along\n+the way. Agents read this (with STYLE.md) before making or changing any asset, and keep it up to date.\n+`pagan status` lists what exists; this file says what's *wanted* and why.\n+\n+## The game\n+\n+- **Title / working name:** Dead of Night (working title)\n+- **Genre and core loop:** top-down zombie survival; hold out in a graveyard until dawn\n+- **Perspective:** top-down-3/4 (top-down 3/4, seeing fronts and tops; `[camera] elevation` in pagan.toml)\n+- **Rendering style:** pixel art — see STYLE.md\n+- **Mood / references:** moonlit, cold and green; classic shambling zombies, not gore\n+- **Target resolution:** 480x270 scaled x4\n+\n+## Characters and key assets\n+\n+For each: what it is, how it looks, sizes, required directions/animations. Example:\n+\n+- **Zombie** (`models/zombie.model.yaml`): hunched, arms reaching forward, 44x48, 8 headings, 6-frame shamble.\n+- **Graveyard ground** (`tiles/graveyard.tiles.yaml`, made by `generators/ground.py`) and a **gravestone** (`models/gravestone.model.yaml`).\n+\n+## Asset wishlist\n+\n+What's still needed, roughly in priority order. Move items to \"Done\" with the asset name when made.\n+\n+- [ ] Zombie: attack animation\n+- [ ] Player character\n+\n+## Done\n+\n+- (awaiting review) zombie, graveyard, gravestone\n+\n+## Decisions and feedback log\n+\n+Dated notes on what the owner asked for and decided, so later assets stay consistent with it. Example:\n+\n+- 2026-10-17: \"Top-down zombie game, a zombie that shambles towards the player.\" Defaults used: pixel art,\n+  top-down 3/4, palette `grave`, 8 headings."
+   },
+   {
+    "path": "STYLE.md",
+    "status": "added",
+    "added": 80,
+    "removed": 0,
+    "diff": "@@ -0,0 +1,80 @@\n+# Style bible\n+\n+The rules that make this project's art look like itself. Agents read this before drawing anything\n+and check their previews against it. Replace every **TODO** with a decision; the suggested defaults\n+are a reasonable starting point.\n+\n+Rules that can be checked mechanically belong in `pagan.toml` too (see `[lint]`).\n+\n+These are **pixel-art** defaults (outline, painted light, shading ramps). For flat / vector-like arcade\n+art, they don't apply: start from the flat template instead (`pagan init --style flat`).\n+\n+## 1. Palette\n+\n+- Palette file: `palettes/grave.pal.yaml` (32 colors)\n+- Ramp intent — what each ramp is for:\n+  - `stone`: outlines, headstones, hair; `flesh`: zombie skin; `denim`/`rag`: clothes; `earth`/`grass`: ground; `blood`: wounds, mouths (sparingly)\n+\n+## 2. Scale\n+\n+- Base sprite / tile size: 16×16 tiles\n+- Character height: about 40 px (3D models, 1 px per voxel)\n+- Target base resolution and integer scale: 480×270, ×4\n+\n+## 3. Outlines\n+\n+- Style: 1 px dark outline (`0`) on characters and props; none on tiles\n+- Selective outline: no\n+\n+## 4. Light\n+\n+- Light direction: top-left (the moon)\n+- Highlights on edges facing the light; the darkest ramp step on the far side.\n+\n+## 5. Shading\n+\n+- Ramp steps per material: 3-4\n+- No pillow shading (shading that just follows the outline inward from all sides).\n+- Dithering: never\n+\n+## 6. Proportions\n+\n+- Head-to-body ratio: about 1:3, heads slightly big so faces read\n+- Detail level: readable at 1× scale; if a detail is a single isolated pixel, drop it.\n+\n+## 7. Animation\n+\n+- Default fps: 6 (zombies are slow)\n+- Frame counts: walk 6, attack 4-5\n+- Squash and stretch: no; parts move by whole voxels\n+\n+## 8. Do / Don't\n+\n+Do:\n+- Use `mirror: horizontal` for symmetric subjects.\n+- Keep silhouettes readable as a solid shape.\n+- Keep the moon light cold; warm colours only for blood.\n+\n+Don't:\n+- Flip lit art vertically (`flip: vertical`): the highlights end up on the wrong side. Horizontal flips\n+  are fine for symmetric-ish lighting; for strict top-left light, draw or render each direction.\n+- Let anything jump between animation frames: the anchor (feet) and unchanged parts must stay on exactly\n+  the same pixels. Check the preview's \"changes\" rows; lint W007 flags large frame-to-frame churn.\n+- Use colors outside the palette.\n+- Leave orphan pixels (single pixels with no neighbours).\n+\n+## 9. Reference sprites\n+\n+The approved sprites that define the look. Compare every new asset against these in preview.\n+\n+- `models/zombie.model.yaml`\n+\n+## Changelog\n+\n+Each look change that means existing art should be revisited gets a version (`pagan style bump \"note\"`\n+bumps `style_version` in pagan.toml and adds an entry here, newest first). Assets made under an older\n+version get lint warning W006 until they're reviewed and stamped (`pagan mark --current <asset>`).\n+Palette edits and `[light]`/`[camera]` changes need no bump for 3D models (they re-render automatically);\n+bump when 2D sprites need redrawing to match.\n+\n+- v1: initial style"
+   }
+  ]
+ },
+ "manifest": {
+  "animations": {
+   "e": {
+    "fps": 1.0,
+    "frames": [
+     "e"
+    ],
+    "loop": true
+   },
+   "n": {
+    "fps": 1.0,
+    "frames": [
+     "n"
+    ],
+    "loop": true
+   },
+   "ne": {
+    "fps": 1.0,
+    "frames": [
+     "ne"
+    ],
+    "loop": true
+   },
+   "nw": {
+    "fps": 1.0,
+    "frames": [
+     "nw"
+    ],
+    "loop": true
+   },
+   "s": {
+    "fps": 1.0,
+    "frames": [
+     "s"
+    ],
+    "loop": true
+   },
+   "se": {
+    "fps": 1.0,
+    "frames": [
+     "se"
+    ],
+    "loop": true
+   },
+   "sw": {
+    "fps": 1.0,
+    "frames": [
+     "sw"
+    ],
+    "loop": true
+   },
+   "w": {
+    "fps": 1.0,
+    "frames": [
+     "w"
+    ],
+    "loop": true
+   },
+   "walk_e": {
+    "fps": 6.0,
+    "frames": [
+     "walk_e_0",
+     "walk_e_1",
+     "walk_e_2",
+     "walk_e_3",
+     "walk_e_4",
+     "walk_e_5"
+    ],
+    "loop": true
+   },
+   "walk_n": {
+    "fps": 6.0,
+    "frames": [
+     "walk_n_0",
+     "walk_n_1",
+     "walk_n_2",
+     "walk_n_3",
+     "walk_n_4",
+     "walk_n_5"
+    ],
+    "loop": true
+   },
+   "walk_ne": {
+    "fps": 6.0,
+    "frames": [
+     "walk_ne_0",
+     "walk_ne_1",
+     "walk_ne_2",
+     "walk_ne_3",
+     "walk_ne_4",
+     "walk_ne_5"
+    ],
+    "loop": true
+   },
+   "walk_nw": {
+    "fps": 6.0,
+    "frames": [
+     "walk_nw_0",
+     "walk_nw_1",
+     "walk_nw_2",
+     "walk_nw_3",
+     "walk_nw_4",
+     "walk_nw_5"
+    ],
+    "loop": true
+   },
+   "walk_s": {
+    "fps": 6.0,
+    "frames": [
+     "walk_s_0",
+     "walk_s_1",
+     "walk_s_2",
+     "walk_s_3",
+     "walk_s_4",
+     "walk_s_5"
+    ],
+    "loop": true
+   },
+   "walk_se": {
+    "fps": 6.0,
+    "frames": [
+     "walk_se_0",
+     "walk_se_1",
+     "walk_se_2",
+     "walk_se_3",
+     "walk_se_4",
+     "walk_se_5"
+    ],
+    "loop": true
+   },
+   "walk_sw": {
+    "fps": 6.0,
+    "frames": [
+     "walk_sw_0",
+     "walk_sw_1",
+     "walk_sw_2",
+     "walk_sw_3",
+     "walk_sw_4",
+     "walk_sw_5"
+    ],
+    "loop": true
+   },
+   "walk_w": {
+    "fps": 6.0,
+    "frames": [
+     "walk_w_0",
+     "walk_w_1",
+     "walk_w_2",
+     "walk_w_3",
+     "walk_w_4",
+     "walk_w_5"
+    ],
+    "loop": true
+   }
+  },
+  "description": "Shambling zombie: hunched forward, arms reaching out, torn rag shirt with a blood stain, faded jeans, sickly green skin, sunken glowing eyes, patchy dark hair. Top-down 3/4 view, 8 headings, 6-frame shamble where the legs drag in turn and the arms sway (the torso stays planted, so nothing jumps).",
+  "frames": {
+   "e": [
+    0,
+    0,
+    44,
+    48
+   ],
+   "n": [
+    264,
+    48,
+    44,
+    48
+   ],
+   "ne": [
+    308,
+    0,
+    44,
+    48
+   ],
+   "nw": [
+    220,
+    96,
+    44,
+    48
+   ],
+   "s": [
+    88,
+    240,
+    44,
+    48
+   ],
+   "se": [
+    44,
+    288,
+    44,
+    48
+   ],
+   "sw": [
+    132,
+    192,
+    44,
+    48
+   ],
+   "w": [
+    176,
+    144,
+    44,
+    48
+   ],
+   "walk_e_0": [
+    44,
+    0,
+    44,
+    48
+   ],
+   "walk_e_1": [
+    88,
+    0,
+    44,
+    48
+   ],
+   "walk_e_2": [
+    132,
+    0,
+    44,
+    48
+   ],
+   "walk_e_3": [
+    176,
+    0,
+    44,
+    48
+   ],
+   "walk_e_4": [
+    220,
+    0,
+    44,
+    48
+   ],
+   "walk_e_5": [
+    264,
+    0,
+    44,
+    48
+   ],
+   "walk_n_0": [
+    308,
+    48,
+    44,
+    48
+   ],
+   "walk_n_1": [
+    0,
+    96,
+    44,
+    48
+   ],
+   "walk_n_2": [
+    44,
+    96,
+    44,
+    48
+   ],
+   "walk_n_3": [
+    88,
+    96,
+    44,
+    48
+   ],
+   "walk_n_4": [
+    132,
+    96,
+    44,
+    48
+   ],
+   "walk_n_5": [
+    176,
+    96,
+    44,
+    48
+   ],
+   "walk_ne_0": [
+    0,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_1": [
+    44,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_2": [
+    88,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_3": [
+    132,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_4": [
+    176,
+    48,
+    44,
+    48
+   ],
+   "walk_ne_5": [
+    220,
+    48,
+    44,
+    48
+   ],
+   "walk_nw_0": [
+    264,
+    96,
+    44,
+    48
+   ],
+   "walk_nw_1": [
+    308,
+    96,
+    44,
+    48
+   ],
+   "walk_nw_2": [
+    0,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_3": [
+    44,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_4": [
+    88,
+    144,
+    44,
+    48
+   ],
+   "walk_nw_5": [
+    132,
+    144,
+    44,
+    48
+   ],
+   "walk_s_0": [
+    132,
+    240,
+    44,
+    48
+   ],
+   "walk_s_1": [
+    176,
+    240,
+    44,
+    48
+   ],
+   "walk_s_2": [
+    220,
+    240,
+    44,
+    48
+   ],
+   "walk_s_3": [
+    264,
+    240,
+    44,
+    48
+   ],
+   "walk_s_4": [
+    308,
+    240,
+    44,
+    48
+   ],
+   "walk_s_5": [
+    0,
+    288,
+    44,
+    48
+   ],
+   "walk_se_0": [
+    88,
+    288,
+    44,
+    48
+   ],
+   "walk_se_1": [
+    132,
+    288,
+    44,
+    48
+   ],
+   "walk_se_2": [
+    176,
+    288,
+    44,
+    48
+   ],
+   "walk_se_3": [
+    220,
+    288,
+    44,
+    48
+   ],
+   "walk_se_4": [
+    264,
+    288,
+    44,
+    48
+   ],
+   "walk_se_5": [
+    308,
+    288,
+    44,
+    48
+   ],
+   "walk_sw_0": [
+    176,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_1": [
+    220,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_2": [
+    264,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_3": [
+    308,
+    192,
+    44,
+    48
+   ],
+   "walk_sw_4": [
+    0,
+    240,
+    44,
+    48
+   ],
+   "walk_sw_5": [
+    44,
+    240,
+    44,
+    48
+   ],
+   "walk_w_0": [
+    220,
+    144,
+    44,
+    48
+   ],
+   "walk_w_1": [
+    264,
+    144,
+    44,
+    48
+   ],
+   "walk_w_2": [
+    308,
+    144,
+    44,
+    48
+   ],
+   "walk_w_3": [
+    0,
+    192,
+    44,
+    48
+   ],
+   "walk_w_4": [
+    44,
+    192,
+    44,
+    48
+   ],
+   "walk_w_5": [
+    88,
+    192,
+    44,
+    48
+   ]
+  },
+  "godot_offset": [
+   0.0,
+   -17.0
+  ],
+  "godot_sprite_frames": "res://assets/generated/sprites/zombie.tres",
+  "headings": [
+   "e",
+   "ne",
+   "n",
+   "nw",
+   "w",
+   "sw",
+   "s",
+   "se"
+  ],
+  "kind": "model",
+  "palette": "grave",
+  "pivot": [
+   22,
+   41
+  ],
+  "sheet": "res://assets/generated/sprites/zombie.png",
+  "size": [
+   44,
+   48
+  ],
+  "status": "draft",
+  "style_version": 1,
+  "tags": [
+   "enemy",
+   "character"
+  ],
+  "variants": {}
+ },
+ "files": [
+  {
+   "path": "assets/generated/manifest.json",
+   "bytes": 11434
+  },
+  {
+   "path": "assets/generated/sprites/gravestone.png",
+   "bytes": 325
+  },
+  {
+   "path": "assets/generated/sprites/gravestone.tres",
+   "bytes": 408
+  },
+  {
+   "path": "assets/generated/sprites/zombie.png",
+   "bytes": 16938
+  },
+  {
+   "path": "assets/generated/sprites/zombie.tres",
+   "bytes": 11420
+  },
+  {
+   "path": "assets/generated/tiles/graveyard.png",
+   "bytes": 508
+  },
+  {
+   "path": "assets/generated/tiles/graveyard.tres",
+   "bytes": 403
+  }
+ ],
+ "godot": {
+  "path": "assets/generated/sprites/zombie.tres",
+  "excerpt": "[gd_resource type=\"SpriteFrames\" format=3]\n\n[ext_resource type=\"Texture2D\" path=\"res://assets/generated/sprites/zombie.png\" id=\"1_sheet\"]\n\n[sub_resource type=\"AtlasTexture\" id=\"AtlasTexture_0\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(0, 0, 44, 48)\n\n...\n[resource]\nanimations = [{\n\"frames\": [{\n\"duration\": 1.0,\n\"texture\": SubResource(\"AtlasTexture_0\")\n}],\n\"loop\": true,\n\"name\": &\"e\",\n\"speed\": 1.0\n...\n(478 lines in all)"
+ },
+ "palettes": {
+  "grave": {
+   "colors": [
+    {
+     "key": "0",
+     "hex": "#0b0a10",
+     "name": "ink"
+    },
+    {
+     "key": "1",
+     "hex": "#1a1a24",
+     "name": "night"
+    },
+    {
+     "key": "2",
+     "hex": "#2c2d3a",
+     "name": "slate_dark"
+    },
+    {
+     "key": "3",
+     "hex": "#474a5a",
+     "name": "slate"
+    },
+    {
+     "key": "4",
+     "hex": "#6c7183",
+     "name": "stone"
+    },
+    {
+     "key": "5",
+     "hex": "#9da3b2",
+     "name": "stone_light"
+    },
+    {
+     "key": "6",
+     "hex": "#d6dae2",
+     "name": "moon"
+    },
+    {
+     "key": "7",
+     "hex": "#1f2a1f",
+     "name": "rot_deep"
+    },
+    {
+     "key": "8",
+     "hex": "#3a4d33",
+     "name": "rot"
+    },
+    {
+     "key": "9",
+     "hex": "#5f7748",
+     "name": "flesh"
+    },
+    {
+     "key": "a",
+     "hex": "#8fa35f",
+     "name": "flesh_light"
+    },
+    {
+     "key": "b",
+     "hex": "#c3cc86",
+     "name": "flesh_pale"
+    },
+    {
+     "key": "c",
+     "hex": "#1b2133",
+     "name": "denim_deep"
+    },
+    {
+     "key": "d",
+     "hex": "#2d3a57",
+     "name": "denim"
+    },
+    {
+     "key": "e",
+     "hex": "#4a5d82",
+     "name": "denim_light"
+    },
+    {
+     "key": "f",
+     "hex": "#7486a8",
+     "name": "denim_faded"
+    },
+    {
+     "key": "g",
+     "hex": "#24171a",
+     "name": "mud_deep"
+    },
+    {
+     "key": "h",
+     "hex": "#3e2a26",
+     "name": "mud"
+    },
+    {
+     "key": "i",
+     "hex": "#5e4434",
+     "name": "earth"
+    },
+    {
+     "key": "j",
+     "hex": "#836446",
+     "name": "earth_light"
+    },
+    {
+     "key": "k",
+     "hex": "#121c19",
+     "name": "grass_deep"
+    },
+    {
+     "key": "l",
+     "hex": "#1d2f27",
+     "name": "grass_dark"
+    },
+    {
+     "key": "m",
+     "hex": "#2c4636",
+     "name": "grass"
+    },
+    {
+     "key": "n",
+     "hex": "#43614a",
+     "name": "grass_light"
+    },
+    {
+     "key": "o",
+     "hex": "#3d1018",
+     "name": "blood_deep"
+    },
+    {
+     "key": "p",
+     "hex": "#6e1c26",
+     "name": "blood"
+    },
+    {
+     "key": "q",
+     "hex": "#a8333a",
+     "name": "blood_light"
+    },
+    {
+     "key": "r",
+     "hex": "#d9e88a",
+     "name": "eye_glow"
+    },
+    {
+     "key": "s",
+     "hex": "#2e2620",
+     "name": "rag_deep"
+    },
+    {
+     "key": "t",
+     "hex": "#4d4035",
+     "name": "rag"
+    },
+    {
+     "key": "u",
+     "hex": "#71604f",
+     "name": "rag_light"
+    },
+    {
+     "key": "v",
+     "hex": "#998470",
+     "name": "rag_pale"
+    }
+   ],
+   "ramps": {
+    "stone": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6"
+    ],
+    "flesh": [
+     "7",
+     "8",
+     "9",
+     "a",
+     "b"
+    ],
+    "denim": [
+     "c",
+     "d",
+     "e",
+     "f"
+    ],
+    "earth": [
+     "g",
+     "h",
+     "i",
+     "j"
+    ],
+    "grass": [
+     "k",
+     "l",
+     "m",
+     "n"
+    ],
+    "blood": [
+     "o",
+     "p",
+     "q"
+    ],
+    "rag": [
+     "s",
+     "t",
+     "u",
+     "v"
+    ]
+   }
+  }
+ },
+ "sheet": "01-shamble/zombie.png",
+ "changes": "01-shamble/changes.png",
+ "ground": "01-shamble/ground.png",
+ "status": "draft",
+ "next": [
+  {
+   "to": "02-attack",
+   "say": "Give him an attack animation."
+  },
+  {
+   "to": "02-rotten",
+   "say": "Make him more rotten."
+  },
+  {
+   "to": "02-horde",
+   "say": "Now a whole horde."
+  }
+ ]
+}

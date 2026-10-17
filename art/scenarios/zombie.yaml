@@ -1,0 +1,88 @@
+# The zombie scenario of the website's scripted demo. Each step is a real PAGAN project in
+# steps/zombie/<step>/; `next` lists the replies a visitor can pick. tools/build_site_assets.py builds it.
+id: zombie
+title: Zombie game
+order: 1
+pitch: "A shambling 3D zombie: 8 headings, attacks, a horde, a darker night."
+start: 01-shamble
+scene:                        # the graveyard the zombies are shown on (tiles + props drawn by PAGAN)
+  tileset: graveyard
+  layout: |
+    grass grass_b grass grass_c grass_b grass grass_c grass
+    grass_c dirt grass_b grass grass grass_b dirt grass_b
+    grass grass grass_c grass_b grass grass_c grass grass
+    grass_b grass grass grass_c grass_b grass grass_b grass_c
+    grass grass_c grass_b grass grass grass_b grass grass
+  props:
+    - { asset: gravestone, frame: main, at: [24, 26] }
+    - { asset: gravestone, frame: main, at: [106, 24] }
+    - { asset: gravestone, frame: main, at: [64, 22] }
+  actors: [[64, 62], [28, 72], [100, 66]]   # where the zombies stand (pivot positions)
+steps:
+  01-shamble:
+    user: "I'm making a top-down zombie game. Give me a zombie that shambles towards the player."
+    agent: >
+      Done: a 3D zombie, 8 headings, a 6-frame shamble. I set up the art project first (top-down 3/4
+      camera, a moonlit palette called `grave`) and made a graveyard tileset and a headstone to judge
+      him against. The torso stays planted while the legs drag, so the walk doesn't jitter.
+    ran:
+      - pagan init art --perspective top-down-3/4
+      - pagan palette show
+      - pagan new model zombie --size 44x48 --directions 8
+      - pagan fit zombie
+      - python generators/ground.py
+      - pagan lint
+      - pagan preview zombie gravestone graveyard
+    show: { asset: zombie, animation: walk, heading: se, changes: walk }
+    next: [02-attack, 02-rotten, 02-horde]
+  02-attack:
+    user: "Give him an attack animation."
+    agent: >
+      Added `attack`: he rears back, lunges with both arms and bites. My first version had 5 frames and
+      lint flagged it (W007: up to 63% of pixels changed between frames, so it would pop), so it's 9
+      smaller steps now. Feet stay planted.
+    ran:
+      - pagan lint models/zombie.model.yaml
+      - pagan fit zombie
+      - pagan preview zombie
+    show: { asset: zombie, animation: attack, heading: se, changes: attack }
+    next: [03-night-attack]
+  02-rotten:
+    user: "Make him more rotten."
+    agent: >
+      Swapped his skin to a new `decay` ramp (yellow-brown instead of green) and let bone show through
+      the forearm, cheek and ribs. Same model, same walk.
+    ran:
+      - pagan palette show
+      - pagan lint
+      - pagan preview zombie
+    show: { asset: zombie, animation: walk, heading: se }
+    next: [03-night-rotten]
+  02-horde:
+    user: "Now a whole horde."
+    agent: >
+      One model, 9 zombies: `variant_axes` combine 3 skin tones with 3 shirts. The manifest has a colour
+      swap table for each, so your game can recolour one sheet in a shader, or use the 9 sheets.
+    ran:
+      - pagan lint
+      - pagan preview zombie
+    show: { asset: zombie, animation: walk, heading: se, horde: true }
+    next: [03-night-horde]
+  03-night-attack: &night
+    user: "Make the night darker."
+    agent: >
+      One command for the whole game: `pagan palette adjust grave --lightness -0.07 --saturation 0.85`.
+      Every asset on the palette changed at once: zombie, ground and headstones. Drag the slider to
+      compare.
+    ran:
+      - pagan palette adjust grave --lightness -0.07 --saturation 0.85 --dry-run
+      - pagan palette adjust grave --lightness -0.07 --saturation 0.85
+      - pagan gallery
+    show: { asset: zombie, animation: attack, heading: se, compare: true }
+    next: []
+  03-night-rotten:
+    <<: *night
+    show: { asset: zombie, animation: walk, heading: se, compare: true }
+  03-night-horde:
+    <<: *night
+    show: { asset: zombie, animation: walk, heading: se, horde: true, compare: true }

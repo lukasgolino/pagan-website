@@ -1,11 +1,11 @@
 # Rebuild the demo art with the pinned PAGAN release and fail if the committed output differs, so the
 # site can never show art PAGAN doesn't produce.
-# Manual only while the PAGAN repo is private (pip can't fetch it); once it's public, add:
-#   push: { branches: [main] }
-#   pull_request:
 name: assets
 
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 jobs:

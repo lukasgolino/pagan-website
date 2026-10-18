@@ -55,3 +55,7 @@ All demo art is `status: draft` until the owner approves it. Approve a state wit
 with "Source: GitHub Actions"). The base path comes from the Pages settings, so it works as a project page
 (`/<repo>/`) or on a custom domain. `.github/workflows/assets.yml` rebuilds the art and fails if it's out of
 date; it's manual-only while the PAGAN repo is private.
+
+## License
+
+MIT, like PAGAN: see [LICENSE](LICENSE).

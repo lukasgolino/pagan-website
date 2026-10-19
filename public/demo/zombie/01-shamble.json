@@ -87,6 +87,24 @@
   ]
  },
  "manifest": {
+  "animation_order": [
+   "e",
+   "walk_e",
+   "ne",
+   "walk_ne",
+   "n",
+   "walk_n",
+   "nw",
+   "walk_nw",
+   "w",
+   "walk_w",
+   "sw",
+   "walk_sw",
+   "s",
+   "walk_s",
+   "se",
+   "walk_se"
+  ],
   "animations": {
    "e": {
     "fps": 1.0,
@@ -617,7 +635,7 @@
  "files": [
   {
    "path": "assets/generated/manifest.json",
-   "bytes": 11434
+   "bytes": 11776
   },
   {
    "path": "assets/generated/sprites/gravestone.png",

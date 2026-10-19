@@ -13,10 +13,11 @@ art/
   scenarios/<scenario>.yaml   the demo's conversation tree: user prompts, agent replies, commands, which replies lead where
   steps/<scenario>/<step>/    one real PAGAN project per agent turn (copied forward and edited, so each is a real diff)
   steps/features/attack-v1/   the zombie's first, lint-failing attack (shown in the "checks its own work" feature)
+  steps/features/mesh/        the zombie with a rig, exported as a mesh (the "3D games" feature: .glb, orbit views)
   brand/                      the logo and icon, themselves PAGAN sprites (generators/logo.py)
 tools/build_site_assets.py    builds every step with PAGAN -> public/demo, public/brand, public/og, src/content/docs
 public/demo/                  generated: step JSON (reply, diffs, lint, manifest, files) + built sheets
-src/                          the Astro site (components/, scripts/ for the in-browser sprite player and demo)
+src/                          the Astro site (components/, scripts/ for the in-browser sprite player, mesh viewer and demo)
 ```
 
 ## Commands

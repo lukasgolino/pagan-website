@@ -40,6 +40,24 @@
   ]
  },
  "manifest": {
+  "animation_order": [
+   "e",
+   "sail_e",
+   "ne",
+   "sail_ne",
+   "n",
+   "sail_n",
+   "nw",
+   "sail_nw",
+   "w",
+   "sail_w",
+   "sw",
+   "sail_sw",
+   "s",
+   "sail_s",
+   "se",
+   "sail_se"
+  ],
   "animations": {
    "e": {
     "fps": 1.0,
@@ -459,7 +477,7 @@
  "files": [
   {
    "path": "assets/generated/manifest.json",
-   "bytes": 7428
+   "bytes": 7719
   },
   {
    "path": "assets/generated/sprites/ship.png",

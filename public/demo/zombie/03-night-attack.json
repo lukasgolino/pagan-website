@@ -41,6 +41,32 @@
   ]
  },
  "manifest": {
+  "animation_order": [
+   "e",
+   "walk_e",
+   "attack_e",
+   "ne",
+   "walk_ne",
+   "attack_ne",
+   "n",
+   "walk_n",
+   "attack_n",
+   "nw",
+   "walk_nw",
+   "attack_nw",
+   "w",
+   "walk_w",
+   "attack_w",
+   "sw",
+   "walk_sw",
+   "attack_sw",
+   "s",
+   "walk_s",
+   "attack_s",
+   "se",
+   "walk_se",
+   "attack_se"
+  ],
   "animations": {
    "attack_e": {
     "fps": 12.0,
@@ -1123,7 +1149,7 @@
  "files": [
   {
    "path": "assets/generated/manifest.json",
-   "bytes": 20882
+   "bytes": 21388
   },
   {
    "path": "assets/generated/sprites/gravestone.png",

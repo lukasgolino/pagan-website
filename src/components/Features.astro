@@ -33,6 +33,17 @@ zombie.centered = true
 zombie.offset = Vector2(${m.godot_offset.join(", ")})   # manifest: godot_offset
 zombie.play("walk_" + heading)   # one animation per heading`;
 const short = (msg: string) => msg.replace(/; the project limit.*$/, "");
+const mesh = lint.mesh;
+const meshManifest = JSON.stringify(
+  { zombie: { mesh: { glb: "models/zombie.glb", voxel_size: mesh.manifest.voxel_size, triangles: mesh.manifest.triangles, parts: { head: mesh.manifest.parts.head, "…": "4 more" }, animations: { walk: mesh.manifest.animations.walk, "…": "1 more" } } } },
+  null,
+  1,
+).replace(/\[\n\s*([^\[\]{}]*?)\n\s*\]/g, (_, s: string) => `[${s.replace(/\s*\n\s*/g, " ")}]`);
+const meshGd = `var zombie := load("res://assets/generated/models/zombie.tscn").instantiate()
+zombie.look_at(player.global_position, Vector3.UP, true)   # its front is +Z
+zombie.get_node("AnimationPlayer").play("walk")
+# a hit: which part? the rig's meta is each node's metadata
+var zone = hit_node.get_meta("extras").get("hitzone")       # "head", "arm", "leg"`;
 ---
 
 <section id="features">
@@ -174,12 +185,41 @@ const short = (msg: string) => msg.replace(/; the project limit.*$/, "");
         </div>
       </article>
 
+      <article class="card wide mesh">
+        <div class="text">
+          <h3><span>10</span> 3D games, too</h3>
+          <p>
+            Free cameras, kill cams, undersides: the same model file also builds as a real mesh (glTF), one node
+            per part, with its animations and the hit zones, joints and "detachable" flags game code reads.
+            A ramp shader keeps engine lighting on the palette: the sun picks the shade exactly as PAGAN's
+            renderer does. This is the zombie's actual <code>.glb</code>, drawn in your browser by that rule.
+            Drag it, look from below.
+          </p>
+          <p class="note">
+            {mesh.manifest.triangles.toLocaleString("en")} triangles · {1 / mesh.manifest.voxel_size} voxels per metre ·
+            ground textures from tilesets · previews from any angle (<code>pagan preview --orbit</code>)
+          </p>
+        </div>
+        <div class="meshes">
+          <div class="viewer">
+            <pagan-mesh src={`demo/${mesh.glb}`} ramp={`demo/${mesh.ramp}`} anim="walk" ambient={String(mesh.light.ambient)} wrap={String(mesh.light.wrap)} size="128" label="The zombie as a 3D mesh, walking, lit by a moving sun; drag to turn it"></pagan-mesh>
+          </div>
+          <pre class="code"><code set:html={`<span class="t-com">models/zombie.model.yaml</span>\n` + highlightSource(mesh.rig)} /></pre>
+          <img class="px orbit" src={asset(`demo/${mesh.orbit}`)} width={mesh.orbit_size[0]} height={mesh.orbit_size[1]} alt="pagan preview --orbit: the zombie from 8 sides, at elevations from below the horizon to straight down" loading="lazy" />
+          <div class="two">
+            <pre class="code"><code set:html={`<span class="t-com">manifest.json (shortened)</span>\n` + highlightSource(meshManifest)} /></pre>
+            <pre class="code"><code set:html={`<span class="t-com"># Godot 4</span>\n` + escapeHtml(meshGd)} /></pre>
+          </div>
+        </div>
+      </article>
+
     </div>
   </div>
 </section>
 
 <script>
   import "../scripts/pagan-sprite";
+  import "../scripts/pagan-mesh";
   const box = document.getElementById("style-toggle")!;
   const button = box.querySelector("button")!;
   const img = box.querySelector("img")!;
@@ -316,12 +356,45 @@ const short = (msg: string) => msg.replace(/; the project limit.*$/, "");
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 12px;
   }
+  .meshes {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 12px;
+    align-items: start;
+  }
+  .meshes .two,
+  .meshes .orbit {
+    grid-column: 1 / -1;
+  }
+  .viewer {
+    background: #1d2f27;
+    border-radius: 4px;
+    padding: 6px;
+    cursor: grab;
+  }
+  .viewer :global(canvas) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .orbit {
+    width: 100%;
+    height: auto;
+    background: #1d2f27;
+    border-radius: 4px;
+    padding: 8px;
+  }
+  .mesh .note {
+    font-size: 0.82rem;
+  }
   @media (max-width: 960px) {
     .cards {
       grid-template-columns: minmax(0, 1fr);
     }
     .card.wide,
-    .two {
+    .two,
+    .meshes {
       grid-template-columns: minmax(0, 1fr);
     }
   }

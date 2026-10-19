@@ -47,5 +47,106 @@
   "changes": "features/attack-after-changes.png",
   "warnings": 0,
   "findings": []
+ },
+ "mesh": {
+  "glb": "features/zombie.glb",
+  "ramp": "features/zombie.ramp.png",
+  "orbit": "features/zombie-orbit.png",
+  "orbit_rows": [
+   "elevation -30° (below)",
+   "elevation +0° (level)",
+   "elevation +30° (above)",
+   "elevation +60° (above)",
+   "elevation +90° (from above)"
+  ],
+  "orbit_size": [
+   444,
+   276
+  ],
+  "rig": "rig:\n  head:      { pivot: [3, 0, 28], meta: { hitzone: head, damage: 3 } }\n  left_arm:  { pivot: [1, 7, 24], meta: { hitzone: arm, detachable: true } }\n  right_arm: { pivot: [1, -7, 24], meta: { hitzone: arm, detachable: true } }\n  left_leg:  { meta: { hitzone: leg } }\n  right_leg: { meta: { hitzone: leg } }",
+  "light": {
+   "ambient": 0.2,
+   "wrap": 0.3
+  },
+  "manifest": {
+   "voxel_size": 0.0625,
+   "shading": "ramp",
+   "triangles": 1724,
+   "bounds": {
+    "max": [
+     0.5625,
+     2.4375,
+     0.875
+    ],
+    "min": [
+     -0.5,
+     0.0,
+     -0.1875
+    ]
+   },
+   "root": "body",
+   "animation_order": [
+    "walk",
+    "attack"
+   ],
+   "parts": {
+    "head": {
+     "node": "body/head",
+     "meta": {
+      "damage": 3,
+      "hitzone": "head"
+     }
+    },
+    "left_arm": {
+     "node": "body/left_arm",
+     "meta": {
+      "detachable": true,
+      "hitzone": "arm"
+     }
+    },
+    "left_leg": {
+     "node": "body/left_leg",
+     "meta": {
+      "hitzone": "leg"
+     }
+    },
+    "right_arm": {
+     "node": "body/right_arm",
+     "meta": {
+      "detachable": true,
+      "hitzone": "arm"
+     }
+    },
+    "right_leg": {
+     "node": "body/right_leg",
+     "meta": {
+      "hitzone": "leg"
+     }
+    }
+   },
+   "animations": {
+    "attack": {
+     "fps": 12.0,
+     "loop": false,
+     "frames": 9
+    },
+    "walk": {
+     "fps": 6.0,
+     "loop": true,
+     "frames": 6
+    }
+   }
+  },
+  "files": [
+   "models/gravestone.glb",
+   "models/gravestone.material.tres",
+   "models/gravestone.ramp.png",
+   "models/gravestone.tscn",
+   "models/pagan_ramp.tres",
+   "models/zombie.glb",
+   "models/zombie.material.tres",
+   "models/zombie.ramp.png",
+   "models/zombie.tscn"
+  ]
  }
 }

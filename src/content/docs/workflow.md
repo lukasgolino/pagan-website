@@ -80,6 +80,8 @@ Ask once, in ONE compact message, each question with a recommended default so th
    Does the game rotate or scale sprites freely? (then: supersample, below)
 6. **Look rules** (pixel art) - dark 1px outline (default) or none; light from the top-left (default).
 7. **Engine** - Godot 4 (default; give the path to the Godot project) or plain PNGs.
+8. **2D or 3D game?** - a 2D game (incl. top-down 3/4) uses sprites (default). A game with a free 3D camera
+   (it flies, goes below things, gets close) needs meshes: see section 3b and settle `voxel_size` now.
 
 Recipes per rendering style:
 - **Pixel art** - the rest of this skill's defaults: outline, light from the top-left, ramps dark -> light,
@@ -132,6 +134,11 @@ size). Small means less detail; that's the deal, so say so if a request is small
 - **Tileset** (`pagan new tiles`) for terrain; tiles must be seamless. Animated terrain (water, lava)
   is a tileset `animations:` entry, not a separate sprite. Check transitions between different tiles
   with `pagan preview <tileset> --scene layout.txt`.
+- **UI and fonts:** a 9-slice panel/button gets `nine_slice: [l, t, r, b]` (the margins reach the manifest; a
+  hollow centre may need `lint: { disable: [W001] }`); a pixel font is a sprite with `font:` (glyph order,
+  cell, baseline, advance): the build writes its metrics to the manifest and a `.fnt` Godot loads as a FontFile.
+- **2D sprites that turn** (birds, arrows, flat arcade ships) when a model isn't right: draw the shape once
+  facing east and let `api.directional_frames` + `api.rotate_points` make every heading (same names as models).
 - **Many similar assets or procedural shapes** (effect bursts, 16-tile corner sets, a family of ships,
   polygon ships with rims):
   write a generator script on `pagan.api` (reference.md) - never copy PAGAN's geometry or lint rules into
@@ -147,6 +154,7 @@ size). Small means less detail; that's the deal, so say so if a request is small
    would hide real problems everywhere. Models: `pagan fit <model>` gives a size and pivot that fit
    every heading and pose (after adding animations, run it again).
 4. `pagan preview <name>` -> **open `previews/<name>/sheet.png` with the Read tool and look at it.**
+   (It also writes 1x frames to `previews/<name>/native/` for scripted montages.)
 5. Self-review against STYLE.md and the reference assets (`pagan gallery` shows the whole set):
    silhouette readable at 1x? light from the right side? ramps used dark->light? no pillow shading?
    (flat style: clean shapes, even rims, no stray pixels.) Supersampled: judge `built_1x.png`, not the source.
@@ -156,7 +164,9 @@ size). Small means less detail; that's the deal, so say so if a request is small
    If the owner isn't around, leave it `status: draft`, note it in BRIEF.md (wishlist: "awaiting review")
    with the choices and open questions, and move on.
 7. On approval: `pagan mark <name> --status approved`, add it to BRIEF.md "Done" (and log feedback),
-   `pagan build` (add `--verify-godot` if GODOT is set).
+   `pagan build` (add `--verify-godot` if GODOT is set). Uncached models and Godot print `pagan: ...`
+   progress on stderr; a first build of many big models can take minutes, so give the command a long
+   timeout rather than assuming it hung.
 8. **Report back** what the game side needs to use it (from `manifest.json`): the sheet / `.tres` paths,
    animation names, frame size, and:
    - **Pivot:** resources can't carry it. In Godot set `centered = true` and
@@ -164,6 +174,7 @@ size). Small means less detail; that's the deal, so say so if a request is small
      elsewhere, draw the frame with its `pivot` pixel at the object's position.
    - **3D models:** one animation per heading (`e`, `ne`, ...) plus `<anim>_<heading>`; the game picks
      the heading from its movement direction.
+   - **Animation order:** `animation_order` (manifest keys are sorted alphabetically).
    - **Tilesets:** a Godot `TileSet` `.tres` (`godot_tileset`) with every tile in atlas source 0 at the
      coordinates in the manifest's `tiles` (`name -> [column, row]`); no terrains/collision yet, set those
      up in the editor if needed.
@@ -191,13 +202,56 @@ in `pagan gallery`, then delete the losers and keep the winner under the real na
   `pagan preview` writes variants.png to compare them. When the base colours are one of the set (team
   cyan + red/orange/...), name them with `base_variant: cyan` so the manifest lists all of them uniformly. Many variants of big models multiply sheet sizes:
   if the game can recolour in a shader, set `variant_sheets = false` and point it at each variant's
-  `swap` table in manifest.json.
+  `swap` table in manifest.json. **A look for a whole set** ("everything on the map gets an arctic
+  version"): put the variant in the palette file (`variants: { arctic: { ramp_swap: ..., tags: [world] } }`),
+  not into every asset; tilesets compare variants on their first drawn tile (`--frame NAME` for another, and
+  `--scene` writes scene_variants.png).
 - **A family of related assets** (character classes, unit types, building tiers): put the shared body in a
   `template: true` model and `extends:` it per member (add parts, `remove: [ids]`, override materials),
   so a fix to the base reaches all of them. **Colours that combine** (player colour × rank, team × armour
   tint): `variant_axes`, not one variant per combination.
 - **Out of palette keys** (62 ASCII letters/digits used): keep going with Unicode letters (à, é, ß, α, Ω...);
   see reference.md. Don't alias existing keys or copy the palette.
+
+## 3b. 3D games (meshes)
+
+When the game's camera moves freely in 3D, pre-rendered headings can't serve it: models must also build as
+meshes (`.glb`). Same model files, no edits; sprites still build too unless a model is mesh-only
+(`directions: 0`). Notation and output: reference.md "Meshes".
+
+**Setup** (once, with the owner):
+- `pagan config set export png,godot,mesh` (drop godot if the engine isn't Godot).
+- **Pick `voxel_size` with the owner** (`pagan config set mesh.voxel_size <metres>`); it's the game's texel
+  density, the same for every model. Work it out from the **closest the camera gets** and the render
+  resolution: on-screen pixels per voxel ~ `screen_height_px * voxel_size / (2 * distance * tan(fov / 2))`.
+  At the closest distance a voxel should cover a few pixels (chunky, readable), and anything gameplay hits
+  at close range needs real voxels: an eye that is a hit zone is at least 2x2 voxels, a hand 2-3 thick.
+  Example: 270 px tall, 70 degrees, closest 0.5 m, 0.0625 m voxels -> ~24 px per voxel up close, ~1 px at
+  12 m. Default 0.0625 (16 voxels per metre: a 1.8 m soldier is ~29 voxels tall). Huge, distant structures
+  may override `voxel_size` per model (W009 reminds you they'll look coarser), or be split into modules.
+- `[mesh] shading`: `ramp` (default: palette-locked lighting from the game's sun, Godot shader), `baked`
+  (fixed-side props, no shader), `flat` (the game shades). Godot scenes: Linear tonemapper, a
+  DirectionalLight3D (the sun) with shadows.
+
+**Making a 3D asset** - the loop from section 2, plus:
+- **Rig for gameplay:** give an `id` to everything that moves, detaches or is hit (head, helmet, eyes,
+  shield, a trebuchet arm). In `rig:` set `parent` (children follow: helmet -> head -> torso), `pivot` at the
+  joint or hinge (shoulder, axle), `meta` for what game code reads (`hitzone: eye`, `detachable: true`,
+  `armour: 2`), `collision: box | convex` where the game needs a shape. The manifest gives each part's node
+  path, pivot and AABB (metres) for hitboxes. Only names and meanings the owner agreed; write them in BRIEF.md.
+- **Animations:** as poses; `interpolation: linear` for smooth mechanical motion (an arm swinging);
+  keep the default step for pixel-art timing. Show/hide parts per pose for props that appear.
+- **Review in 3D, not just the headings:** `pagan preview <model> --orbit` (undersides! a flying camera sees
+  them) and `--closeup <part>` for anything seen up close (faces, hit zones); `--engine` shows the real
+  shader in Godot when there's a display. Look at all of them before reporting.
+- **Triangle budget:** read `triangles` in `pagan build --json`'s manifest. Big flat areas of one material
+  merge into few triangles; noise (scattered single voxels, dithering, many materials) multiplies them.
+  Rough budgets unless the owner says otherwise: a prop < 2k, a character < 5k, a big structure < 30k.
+- **Models or textures?** Things with a silhouette and depth (characters, siege engines, towers) are models.
+  Big repeating flat surfaces (ground, wall faces, roofs) are tile textures: a tileset with
+  `export_textures` (seamless tiles, `groups` to break up repetition, `triplanar: true` in Godot).
+- **Report back:** `godot_scene` (or `glb`), the part node paths and `meta` keys, animation names, the
+  triangle count, `voxel_size`, and the preview paths.
 
 ## 4. Changing the look over time
 

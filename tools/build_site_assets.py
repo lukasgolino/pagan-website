@@ -8,7 +8,8 @@ the project), then writes what the page shows:
   public/demo/<scenario>/index.json          the conversation tree (who says what, which replies lead where)
   public/demo/<scenario>/<step>.json         one agent turn: reply, commands, source diffs, lint, manifest, files
   public/demo/<scenario>/<step>/*.png        the built sheets (the game's own files) and a few PAGAN previews
-  public/demo/features.json                  data for the feature sections (lint before/after, palettes)
+  public/demo/features.json                  data for the feature sections (lint before/after, the zombie as a mesh)
+  public/demo/features/zombie.glb (+ ramp)   the zombie as a 3D-game mesh, drawn in the browser with the ramp rule
   public/brand/                              the logo and icon (themselves PAGAN sprites, art/brand)
   src/content/docs/                          reference.md, SKILL.md and CHANGELOG.md from the PAGAN checkout
 
@@ -39,6 +40,7 @@ from PIL import Image
 from pagan import api
 from pagan.preview import change_image
 from pagan.render import frame_image, save_png
+from pagan.views import orbit_views
 
 ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / "art"
@@ -287,7 +289,52 @@ def features(out_root: Path, work: Path) -> None:
             "warnings": lint["warnings"],
             "findings": mine,
         }
+    data["mesh"] = mesh_feature(out_root, work)
     write_json(out_root / "features.json", data)
+
+
+def mesh_feature(out_root: Path, work: Path) -> dict[str, Any]:
+    """The zombie built as a mesh for a 3D game (art/steps/features/mesh): its .glb and ramp texture exactly as
+    the game gets them, PAGAN's orbit views (every heading, from below to straight down) and the manifest's
+    `mesh` entry. The browser draws the .glb with the same brightness -> ramp step rule as PAGAN's shader."""
+    step_dir = ART / "steps/features/mesh"
+    art, _, _, manifest = build_step(step_dir, work / "features" / "mesh")
+    generated = work / "features" / "mesh" / "game" / "assets" / "generated"
+    mesh = manifest["assets"]["zombie"]["mesh"]
+    images = out_root / "features"
+    images.mkdir(parents=True, exist_ok=True)
+    for key, name in (("glb", "zombie.glb"), ("ramp", "zombie.ramp.png")):
+        shutil.copyfile(generated / mesh[key].removeprefix("res://assets/generated/"), images / name)
+    project = api.open_project(art)
+    asset = api.load(art / "models/zombie.model.yaml", project)
+    rows = orbit_views(asset, project.config.camera.scale)
+    cell = max(max(v.image.size) for _, views in rows for v in views)
+    gap = 4
+    sheet = Image.new("RGBA", (8 * (cell + gap) - gap, len(rows) * (cell + gap) - gap), (0, 0, 0, 0))
+    for r, (_, views) in enumerate(rows):
+        for c, view in enumerate(views):
+            sheet.alpha_composite(view.image, (c * (cell + gap), r * (cell + gap)))
+    save_png(sheet, images / "zombie-orbit.png")
+    source = (step_dir / "models/zombie.model.yaml").read_text()
+    rig = source[source.index("rig:") : source.index("\nanimations:")].rstrip()
+    light = project.config.light
+    return {
+        "glb": "features/zombie.glb",
+        "ramp": "features/zombie.ramp.png",
+        "orbit": "features/zombie-orbit.png",
+        "orbit_rows": [label for label, _ in rows],
+        "orbit_size": [sheet.width, sheet.height],
+        "rig": rig,
+        "light": {"ambient": light.ambient, "wrap": light.wrap},
+        "manifest": {
+            k: mesh[k] for k in ("voxel_size", "shading", "triangles", "bounds", "root", "animation_order")
+        }
+        | {
+            "parts": {p: {"node": v["node"], "meta": v["meta"]} for p, v in mesh["parts"].items() if v["meta"]},
+            "animations": {a: {k: v[k] for k in ("fps", "loop", "frames")} for a, v in mesh["animations"].items()},
+        },
+        "files": sorted(p.relative_to(generated).as_posix() for p in (generated / "models").iterdir() if p.is_file()),
+    }
 
 
 def brand(public: Path, work: Path) -> None:

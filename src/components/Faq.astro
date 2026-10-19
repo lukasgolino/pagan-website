@@ -19,6 +19,10 @@ const faqs: [string, string][] = [
     "No. Flat, vector-like arcade art works too: polygon shapes with rims, drawn at 2x and smoothed on build (supersample). Pixel art is the default.",
   ],
   [
+    "Does it work for 3D games?",
+    "Yes. Besides sprites in 1-32 headings, every 3D model can build as a real mesh (binary glTF, .glb): one node per part with joints, hit-zone metadata and animations, a palette ramp texture, and for Godot a scene with a shader that keeps the engine's lighting on the palette. Tilesets can export repeatable ground and wall textures. You pick the voxel size (texel density) for your game once.",
+  ],
+  [
     "Which engines?",
     "Any: manifest.json describes every sheet, frame, animation, pivot and colour swap. Godot 4 gets SpriteFrames and TileSet resources out of the box.",
   ],

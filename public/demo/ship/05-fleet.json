@@ -57,6 +57,56 @@
   ]
  },
  "manifest": {
+  "animation_order": [
+   "e",
+   "sail_e",
+   "damaged_e",
+   "ene",
+   "sail_ene",
+   "damaged_ene",
+   "ne",
+   "sail_ne",
+   "damaged_ne",
+   "nne",
+   "sail_nne",
+   "damaged_nne",
+   "n",
+   "sail_n",
+   "damaged_n",
+   "nnw",
+   "sail_nnw",
+   "damaged_nnw",
+   "nw",
+   "sail_nw",
+   "damaged_nw",
+   "wnw",
+   "sail_wnw",
+   "damaged_wnw",
+   "w",
+   "sail_w",
+   "damaged_w",
+   "wsw",
+   "sail_wsw",
+   "damaged_wsw",
+   "sw",
+   "sail_sw",
+   "damaged_sw",
+   "ssw",
+   "sail_ssw",
+   "damaged_ssw",
+   "s",
+   "sail_s",
+   "damaged_s",
+   "sse",
+   "sail_sse",
+   "damaged_sse",
+   "se",
+   "sail_se",
+   "damaged_se",
+   "ese",
+   "sail_ese",
+   "damaged_ese"
+  ],
   "animations": {
    "damaged_e": {
     "fps": 6.0,
@@ -1442,7 +1492,7 @@
  "files": [
   {
    "path": "assets/generated/manifest.json",
-   "bytes": 25281
+   "bytes": 26208
   },
   {
    "path": "assets/generated/sprites/ship.blue.png",

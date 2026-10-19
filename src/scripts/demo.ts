@@ -446,8 +446,7 @@ export function mountDemo(root: HTMLElement): void {
   const indices: Index[] = JSON.parse(root.dataset.indices!);
   const log = root.querySelector(".log") as HTMLElement;
   const choices = root.querySelector(".choices") as HTMLElement;
-  const tabs = [...root.querySelectorAll<HTMLButtonElement>(".tabs button")];
-  let index = indices[0];
+  let index: Index | null = null;
   let run = 0;
 
   const bubble = (who: "you" | "agent", html: string) => {
@@ -459,16 +458,14 @@ export function mountDemo(root: HTMLElement): void {
     return b;
   };
 
+  const restart = el("button", "choice restart", "↺ Start over");
+  restart.type = "button";
+  restart.addEventListener("click", () => pick(true));
+  const setChoices = (...nodes: Node[]) => choices.replaceChildren(...(index ? [restart] : []), ...nodes);
+
   const showChoices = (step: Step) => {
-    choices.replaceChildren();
-    const list = step.next.length
-      ? step.next.map((c) => ({ label: c.say, act: () => say(c.say, c.to, step) }))
-      : [
-          ...indices
-            .filter((i) => i.id !== index.id)
-            .map((i) => ({ label: `Try the ${i.title.toLowerCase()} →`, act: () => start(i) })),
-          { label: "Start over", act: () => start(index) },
-        ];
+    setChoices();
+    const list = step.next.map((c) => ({ label: c.say, act: () => say(c.say, c.to, step) }));
     for (const c of list) {
       const b = el("button", "choice", escapeHtml(c.label));
       b.type = "button";
@@ -477,8 +474,8 @@ export function mountDemo(root: HTMLElement): void {
     }
   };
 
-  const agentTurn = async (id: string, parent: Step | null, my: number, scroll: boolean) => {
-    choices.replaceChildren(el("span", "typing", "Agent is working…"));
+  const agentTurn = async (index: Index, id: string, parent: Step | null, my: number, scroll: boolean) => {
+    setChoices(el("span", "typing", "Agent is working…"));
     const step = await loadStep(index.id, id);
     if (my !== run) return;
     const parentStep = parent && index.steps[id].parents.includes(parent.id) ? parent : null;
@@ -493,33 +490,37 @@ export function mountDemo(root: HTMLElement): void {
 
   const say = (text: string, to: string, from: Step) => {
     bubble("you", escapeHtml(text));
-    void agentTurn(to, from, run, true);
+    void agentTurn(index!, to, from, run, true);
   };
 
-  const start = (i: Index, scroll = true) => {
+  const start = (i: Index) => {
     index = i;
     run++;
-    tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.id === i.id)));
     log.replaceChildren();
     bubble("you", escapeHtml(i.steps[i.start].user));
-    void agentTurn(i.start, null, run, scroll);
+    void agentTurn(i, i.start, null, run, true);
   };
 
-  tabs.forEach((t) =>
-    t.addEventListener("click", () => {
-      const i = indices.find((x) => x.id === t.dataset.id);
-      if (i) start(i);
-    }),
-  );
-
-  // build the first turn once the demo scrolls near, so the page loads light
-  let started = false;
-  const kick = () => {
-    if (!started) {
-      started = true;
-      start(index, false);
-    }
+  // the opening: one speech bubble per scenario; "Start over" comes back here
+  const pick = (scroll = false) => {
+    index = null;
+    run++;
+    log.replaceChildren();
+    bubble("agent", "<p>What are you building? Pick one. You can start over at any point and take another path.</p>");
+    setChoices(
+      ...indices.map((i) => {
+        const b = el("button", "choice", escapeHtml(i.steps[i.start].user));
+        b.type = "button";
+        b.addEventListener("click", () => start(i));
+        return b;
+      }),
+    );
+    if (scroll) root.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" });
   };
+  pick();
+
+  // fetch the first turns once the demo scrolls near, so the page loads light
+  const kick = () => indices.forEach((i) => void loadStep(i.id, i.start).catch(() => {}));
   if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver(
       (es) => {

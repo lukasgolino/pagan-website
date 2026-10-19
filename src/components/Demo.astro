@@ -9,7 +9,8 @@ const indices = scenarios().map((s) => readJson(`public/demo/${s.id}/index.json`
     <span class="eyebrow">Interactive demo</span>
     <h2>Watch an agent make game art</h2>
     <p class="lede">
-      Pick what to ask for next. Each reply shows the art, what the agent wrote, and the files your game
+      Choose your own adventure: pick what you're building, then what to ask for next. Start over to take another path.
+      Each reply shows the art, what the agent wrote, and the files your game
       gets.
     </p>
     <p class="honest">
@@ -17,16 +18,6 @@ const indices = scenarios().map((s) => readJson(`public/demo/${s.id}/index.json`
       output, rebuilt from the source files in this site's repo.
     </p>
     <div class="demo panel" id="demo-root" data-indices={JSON.stringify(indices)}>
-      <div class="tabs" role="tablist" aria-label="Scenario">
-        {
-          indices.map((s, i) => (
-            <button type="button" role="tab" data-id={s.id} aria-selected={i === 0 ? "true" : "false"}>
-              {s.title}
-              <small>{s.pitch}</small>
-            </button>
-          ))
-        }
-      </div>
       <div class="log" aria-live="polite"></div>
       <div class="choices" aria-label="Your reply"></div>
     </div>
@@ -52,37 +43,12 @@ const indices = scenarios().map((s) => readJson(`public/demo/${s.id}/index.json`
     padding: 0;
     overflow: hidden;
   }
-  .demo .tabs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    border-bottom: 1px solid var(--line);
-  }
-  .demo .tabs button {
-    text-align: left;
-    background: transparent;
-    border: 0;
-    border-bottom: 3px solid transparent;
-    color: var(--muted);
-    padding: 14px 18px;
-    font: 1rem var(--font-pixel);
-    cursor: pointer;
-  }
-  .demo .tabs button small {
-    display: block;
-    font: 0.82rem var(--font-body);
-    margin-top: 2px;
-  }
-  .demo .tabs button[aria-selected="true"] {
-    color: var(--text);
-    border-bottom-color: var(--ember);
-    background: var(--panel-2);
-  }
   .demo .log {
     padding: 22px 22px 6px;
     display: flex;
     flex-direction: column;
     gap: 18px;
-    min-height: 320px;
+    min-height: 120px;
   }
   .msg {
     display: grid;
@@ -345,6 +311,15 @@ const indices = scenarios().map((s) => readJson(`public/demo/${s.id}/index.json`
   .choice:hover {
     background: var(--ember);
     color: var(--ink);
+  }
+  .choice.restart {
+    margin-right: auto;
+    border-color: var(--line);
+    color: var(--muted);
+  }
+  .choice.restart:hover {
+    background: var(--panel);
+    color: var(--text);
   }
   .typing {
     color: var(--muted);

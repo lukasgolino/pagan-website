@@ -27,6 +27,9 @@ const lines = source.split("\n").length;
         <li>No account, no credits</li>
         <li>The art is yours</li>
       </ul>
+      <p class="sister">
+        Looking for the same for audio? Try <a href="https://segan.top/">SEGAN</a>, PAGAN's sister library.
+      </p>
     </div>
     <figure class="show panel">
       <div
@@ -140,6 +143,11 @@ const lines = source.split("\n").length;
   .facts li::before {
     content: "■ ";
     color: var(--teal);
+  }
+  .sister {
+    margin: 18px 0 0;
+    font-size: 0.92rem;
+    color: var(--muted);
   }
   .show {
     margin: 0;

@@ -19,12 +19,181 @@ the manifest's `generator` (`"pagan X.Y.Z"`), so expect every manifest to change
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-28
+
+### Added
+
+- `skip_translucent: true` on an outline ring (`outline: { width: 1, skip_translucent: true }`): the ring goes around
+  opaque pixels only, so translucent glows and halos (`"#rrggbbaa"` colours) keep their soft edge and aren't
+  painted over. When every ring skips them, translucent pixels may touch the canvas edge (no E007) (#37).
+- `pagan fit <model> --write`: sets the file's `size` and `pivot` to the fit (in-place text edit, comments kept);
+  the `--json` result says whether it `written` anything (#35).
+- `pagan preview --variants all`: every `variant_axes` combination, as before (#32).
+- Font sprites: `font.advances: { "i": 4 }` (per-character advance over `advance`/auto), `font.offsets: { "j": -1,
+  "g": [0, 1] }` (per-character draw offset: manifest glyph `offset`, `.fnt` `xoffset`/`yoffset`, `Canvas.text`) and
+  `font.skip_blank: true` (blank cells of non-whitespace characters are left out of the glyph table and the `.fnt`, so
+  an engine falls back to another font). Fonts without them are unchanged (#34).
+- Tilesets: `tile_shape` (square, isometric, half_offset_square, hexagon), `tile_layout` (stacked, stacked_offset,
+  stairs_right, stairs_down, diamond_right, diamond_down) and `tile_offset_axis` (horizontal, vertical), Godot's
+  TileSet settings: the generated `.tres` is ready for an isometric `TileMapLayer`, and the manifest gets
+  `tile_shape: { shape, layout, offset_axis }`. Square tilesets are unchanged (#30).
+- Isometric tilesets are previewed where Godot places the tiles (positions measured on Godot 4.7.2): the 3x3 tiling
+  and `pagan preview --scene` show the seams between diamonds. `api.compose(..., square=True)` keeps a plain grid;
+  `export_textures` still uses one (#30).
+- `loop_from: N` on sprite animations: an intro (frames before N, played once), then a loop. Exported as two
+  animations, `<name>` (the intro, loop false) and `<name>_loop` (frames N.., looping), in the Godot SpriteFrames and
+  the manifest, whose `<name>` entry records `loop_from` and `next: "<name>_loop"` for game code to chain on
+  `animation_finished`. Preview GIFs play the intro once, then the loop; W007 checks the seam last -> frame N (#8).
+- Per-frame `durations` on tile animations (as on sprite animations), in the manifest and the Godot TileSet's
+  `animation_frame_N/duration` (#8).
+- Timeline previews: `scenes/<name>.timeline.yaml` composes sprites in time (`size`, `fps`, `duration`, optional
+  `background`; layers with `sprite`, `anim`, `at`, `start`, `duration`, `alpha`, `fade_in`/`fade_out`, `from`/`to`,
+  `then`, `variant`). `pagan preview scenes/<name>.timeline.yaml [--at 0.5,2.0]` writes `frames/f0000.png...`,
+  `timeline.gif` and an `at.png` contact sheet under `previews/<name>.timeline/`. `pagan lint` checks timelines
+  (E016); `pagan build` ignores them (preview only, no manifest change) (#16).
+- Exact pixel dimetric camera for 2:1 isometric tile games: `[camera] projection = "dimetric"` with `tile`
+  (pixels per grid cell, default `[64, 32]`), `cell` (voxels per cell side, default 16) and `z_step` (pixels
+  per voxel of height, default tile height / cell). Every voxel steps whole pixels, a one-cell floor renders to
+  the hand-drawn tile diamond and tiles at the grid pitch with no gaps or overlap, and 1-voxel pose offsets
+  move whole pixels (no re-rasterised bobs, W007 stays quiet). Only the 4 diagonal headings render in it
+  (`heading: 45`, `directions: 4`); others are E013. The default orthographic camera is unchanged (#29, #36).
+- `trim: true` on sprites (or `[build] trim = true` for every sprite without its own `trim:`): frames are cropped to
+  their content and packed into the sheet in source order (`sheet_columns` per row, 1 px gap, no rotation). The
+  manifest's `frames` keep the full logical `size` and gain `trim_rect` (in the sheet) and `offset` (in the frame);
+  Godot AtlasTextures get a `margin`, so frames keep their full size in SpriteFrames. A fully transparent frame
+  becomes a 1x1 transparent crop at offset [0, 0]. Fonts and nine_slice sprites can't be trimmed (E001). Sprites
+  without trim build exactly as before. The demo slime is trimmed (#1).
+- `pagan.api.pixel_font("3x5" | "5x7")`: built-in monospaced pixel fonts (printable ASCII; 3x5 letters lowercase
+  as uppercase) for generator lettering without a project or palette: `canvas.text(api.pixel_font("3x5"), "EXIT",
+  x, y, key="k")` (`key` is required for them) (#46).
+- Preview contact sheets over 4096 px on a side are split into pages: `sheet.png` becomes an overview (headings or
+  frames outside animations, variants, as-built/tiling rows, an index of the pages) and each animation gets
+  `sheet.<animation>.png` (models: one per pose, every heading on it), wrapped to 4096 px wide and continued in
+  `sheet.<animation>.2.png`, `.3`, ... when taller (the overview in `sheet.2.png`). Sheets within 4096 px are
+  unchanged. `pagan preview --json` lists the pages in `sheet_pages`; the MCP `preview` tool takes `page`
+  (an animation) to return a page's image. Preview output only: build output doesn't change (#32).
+- `ring` model part: a flat open annulus (no caps), `ring: { center: [x, y, z], outer: R, inner: r, height: h, axis: z,
+  material: m }` fills the cells whose centres lie `inner` to `outer` voxels from the axis, `height` layers along it
+  from the center's layer (gauges, handwheels, bolt circles, fan grilles, rotor ducts). `centre` is accepted for
+  `center`; `top`, `rim`, `id`, `mirror`, `carve` and `hidden` work as on `cylinder`; `pagan.api.shape_cells("ring", ...)`
+  gives its voxels (#35).
+- MCP `fit` tool: `write: true` sets the model file's `size` and `pivot` like `pagan fit --write`; the tool is now
+  annotated as writing (not read-only) (#35).
+
+### Changed
+
+- W003 for 3D models no longer counts flat one-key materials (`{ keys: ["a"] }` LEDs, screens) as ramps, unless a
+  shaded material uses the same key (#35).
+- Previews of assets with `variant_axes` show the plain variants plus each axis option on its own
+  (`<axis>.<option>`, as in the manifest's `variant_axes`), not every combination: frames/, native/, sheet.png,
+  variants.png, scene_variants.png and the gallery stay the size of the options, not their product (#32).
+- With `variant_sheets = false`, `variant_axes` may make more than 256 combinations (no E006): nothing is built per
+  combination, so over 256 none are made and the manifest lists the axes only (the game composes them). Under 256
+  nothing changes. With `variant_sheets = true` the limit stays, and E006 says how to lift it (#31).
+
+### Fixed
+
+- `--quiet` after a subcommand (`pagan preview <asset> --quiet`) no longer shares its attribute with the top-level
+  `--quiet`, so it turns progress lines off whatever argparse does with subcommand defaults (#38).
+- The skill reference showed lettering with a font sprite as `text(...)`; it is the `Canvas.text(...)` method
+  (`canvas.text(font_sprite, "THWACK!", x, y)`). A test checks every `pagan.api` call the reference shows (#33).
+
+## [0.17.0] - 2026-10-21
+
+### Added
+
+- `api.text_mask(text, font, cap_height=... | size=..., variation, anchor, rotate, scale, supersample)`: lettering
+  from a TTF/OTF as an anti-aliased coverage mask (`TextMask`: `coverage`, `mask()`, `origin`, `advance`, `bbox`),
+  sized by cap height, rotated/scaled about its anchor, variable-font axes by tag (#15).
+
+## [0.16.0] - 2026-10-21
+
+### Added
+
+- `sheet_columns: N` on sprites: frames per sheet row (default up to 8, as before) (#9, #1).
+- W014: the built sheet is over 16384 px on a side, which many engines (Godot included) can't load (#9, #1).
+
+### Changed
+
+- Sprite and tileset frames can be up to 4096x4096 (was 1024), e.g. a 1x 1920-wide splash or a parallax backdrop.
+  3D model frames stay at 1024 (#9).
+
+## [0.15.0] - 2026-10-21
+
+### Added
+
+- Per-frame `durations` on sprite animations (`durations: [1, 1, 3]`: how many 1/fps steps each frame shows), in
+  the manifest, the Godot SpriteFrames (frame `duration`) and preview GIFs; mirrored animations copy them.
+  Animations without `durations` are unchanged (#8).
+
+## [0.14.1] - 2026-10-21
+
+### Changed
+
+- W001 (orphan pixels) is vectorised: `pagan lint` and `pagan build` of big generated sprites are about 3x faster
+  (8 frames of 1024x1024: lint 5.3 s -> 1.6 s). Same findings (#7).
+
+## [0.14.0] - 2026-10-21
+
+### Added
+
+- `pagan.api` for big generated art (#6): `Canvas.from_array` / `to_array` / `mask` (numpy), `distance_field(mask)`
+  (exact signed Euclidean distance), `bevel(mask, width, light)` (0..1 brightness), `dither(keys, t, x, y)`
+  (ordered Bayer dithering between ramp steps, vectorised) and `Canvas.text(font_sprite, ...)`.
+
+### Fixed
+
+- `api.sprite_yaml` / `tileset_yaml` crashed on numpy numbers in `size`, `pivot` and other fields (#6).
+
+## [0.13.0] - 2026-10-21
+
+### Added
+
+- `points:` on sprites: named attachment points (sockets), one `[x, y]` for every frame or per frame, in the
+  manifest as `points: { name: { frame: [x, y] } }` (output pixels), so engines can attach effects, weapons and
+  hit boxes to animated sprites (#5).
+
+## [0.12.0] - 2026-10-21
+
+### Added
+
+- Derived frames can scale and rotate: `{ from: idle, scale: [1.2, 0.8], rotate: 6, about: pivot }` (nearest
+  neighbour; `about` is `pivot` (default), `center` or `[x, y]`). Order: flip, scale/rotate, shift; E010 if opaque
+  pixels would leave the canvas (#4).
+
+## [0.11.0] - 2026-10-21
+
+### Added
+
+- Wide and stacked outlines on sprites: `outline: { width: 3, color: "0" }` (a round ring up to 8 px) and a list of
+  rings, innermost first (ink + light rim). `outline: auto` is unchanged (#3).
+- `shadow: { offset: [dx, dy], color }` on sprites: a drop shadow of the outlined shape under every frame (#3).
+
+### Changed
+
+- E007 accounts for the total outline width and for shadows that would leave the canvas (#3).
+
+## [0.10.0] - 2026-10-21
+
+### Added
+
+- Translucent palette colours: `"#rrggbbaa"` (00 = clear, ff = opaque) for drop shadows, glows, light rays and
+  smoke; sprite and tileset pixels get that alpha in every PNG, and variant `swap` tables carry it (#2).
+- `[lint] require_opaque = true` (E015) forbids translucent colours in a project's sprites and tilesets (#2).
+
+### Changed
+
+- The default `outline_color` is the darkest *opaque* colour; `pagan import` snaps to opaque colours only;
+  palette swatches show translucent colours over a checker; `pagan palette adjust` keeps each colour's alpha.
+  Palettes without translucent colours behave exactly as before (#2).
+- `"#rrggbbff"` is read as `"#rrggbb"`. 3D model materials must be opaque (E013) (#2).
+
 ## [0.9.1] - 2026-10-21
 
 ### Added
 
 - The skill asks agents to report what got in their way (crashes, misleading messages, workarounds, missing
-  features) as GitHub issues: a minimal-repro draft, a duplicate check, and filing only with the user's OK.
+  features) as GitHub issues: a minimal-repro draft, a duplicate check, and filing only once approved.
   `.github/ISSUE_TEMPLATE/agent-report.md` and the `agent-report` label. Run `pagan skill install` to update a
   project's copy of the skill.
 
@@ -348,7 +517,17 @@ From orchestrator reports R1-R6 (ORCHESTRATOR_PLAN.md), the Age of Boom PAGAN lo
 - Lint: errors E000-E013, warnings W001-W008.
 - Claude skill (`pagan skill install`) with the workflow and a full notation reference.
 
-[Unreleased]: https://github.com/lukasgolino/pagan/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/lukasgolino/pagan/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/lukasgolino/pagan/compare/v0.17.0...v0.18.0
+[0.17.0]: https://github.com/lukasgolino/pagan/compare/v0.16.0...v0.17.0
+[0.16.0]: https://github.com/lukasgolino/pagan/compare/v0.15.0...v0.16.0
+[0.15.0]: https://github.com/lukasgolino/pagan/compare/v0.14.1...v0.15.0
+[0.14.1]: https://github.com/lukasgolino/pagan/compare/v0.14.0...v0.14.1
+[0.14.0]: https://github.com/lukasgolino/pagan/compare/v0.13.0...v0.14.0
+[0.13.0]: https://github.com/lukasgolino/pagan/compare/v0.12.0...v0.13.0
+[0.12.0]: https://github.com/lukasgolino/pagan/compare/v0.11.0...v0.12.0
+[0.11.0]: https://github.com/lukasgolino/pagan/compare/v0.10.0...v0.11.0
+[0.10.0]: https://github.com/lukasgolino/pagan/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/lukasgolino/pagan/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/lukasgolino/pagan/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/lukasgolino/pagan/compare/v0.7.0...v0.8.0

@@ -54,6 +54,7 @@ setting, its current value, its default and what it means. Every one can change 
 | `light.baked` + `export` "normals" | true / off | "the game has its own lighting" (flat colors + normal maps) |
 | `default_palette` | (chosen at setup) | "try a different palette" |
 | `camera.scale` | 1 | "everything 3D should be bigger/smaller" |
+| `camera.projection` + `tile` / `cell` / `z_step` | "orthographic" / [64, 32] / 16 / 0 | "models must match our 2:1 iso tiles exactly" -> "dimetric" (models: heading 45, directions 4) |
 | `supersample` | 1 (off) | "smooth edges", "sprites rotate freely", "not pixel art" (draw at 2x, build smooths) |
 | `godot.filter` / `godot.mipmaps` | inherit / false | "blurry/shimmering when rotated or scaled" (linear + mipmaps) |
 
@@ -113,8 +114,8 @@ Then:
 questions, with your defaults: what it looks like (colors, key features), size, 2D or 3D, how many
 directions, which animations. Start with ONE asset and get it approved before making related ones.
 
-**Size is the requester's choice.** PAGAN makes any size (sprites/tiles up to 1024x1024; models any frame
-size). Small means less detail; that's the deal, so say so if a request is small for what it describes
+**Size is the requester's choice.** PAGAN makes any size (sprites/tiles up to 4096x4096, e.g. a 1x 1920-wide
+splash; model frames up to 1024). Small means less detail; that's the deal, so say so if a request is small for what it describes
 (e.g. "a 16px knight with a visible crest" won't read). To go bigger:
 - the same model, chunkier: raise `camera: { scale: 2 }` in the model and double `size`/`pivot`;
 - more detail: model it with more voxels at scale 1. For characters keep real depth and chunky parts
@@ -152,9 +153,14 @@ size). Small means less detail; that's the deal, so say so if a request is small
    A warning that's wrong *by design* for one asset (an expanding burst trips W005/W007) goes in that
    file's `lint: { disable: [...] }` or `lint: { for: { <frame>: [...] } }` - never in pagan.toml, which
    would hide real problems everywhere. Models: `pagan fit <model>` gives a size and pivot that fit
-   every heading and pose (after adding animations, run it again).
+   every heading and pose; `--write` puts them in the file (after adding animations, run it again).
 4. `pagan preview <name>` -> **open `previews/<name>/sheet.png` with the Read tool and look at it.**
-   (It also writes 1x frames to `previews/<name>/native/` for scripted montages.)
+   (It also writes 1x frames to `previews/<name>/native/` for scripted montages.) A sheet over 4096 px is
+   split into pages: `sheet.png` is then an overview and each animation (models: each pose, every heading)
+   gets `sheet.<animation>.png` (continued in `sheet.<animation>.2.png`, ...): open the pages too.
+   Sprites meant to play together (a title, a hit and its sparks, a cutscene): put them in a
+   `scenes/<name>.timeline.yaml` (reference: Timeline preview) and `pagan preview scenes/<name>.timeline.yaml
+   --at 1.9,2.0` -> look at `previews/<name>.timeline/at.png` (and timeline.gif).
 5. Self-review against STYLE.md and the reference assets (`pagan gallery` shows the whole set):
    silhouette readable at 1x? light from the right side? ramps used dark->light? no pillow shading?
    (flat style: clean shapes, even rims, no stray pixels.) Supersampled: judge `built_1x.png`, not the source.
@@ -194,7 +200,7 @@ in `pagan gallery`, then delete the losers and keep the winner under the real na
   listing as it sinks; a part can rotate about a hinge, e.g. a falling mast). Damage and extras are
   `hidden: true` parts (overlays: they never alter the normal frames; with `carve: true` they cut holes)
   that poses `show`; 2D -> add frames (derive with `from`/`shift` where possible) and an
-  `animations` entry. Keep everything that shouldn't move on exactly the same pixels; check the changes
+  `animations` entry (squash/stretch, tipping and pulsing: `from` + `scale`/`rotate`). Keep everything that shouldn't move on exactly the same pixels; check the changes
   row and W007. Typical frame counts: idle 2-4, walk 4-6, attack 3-5.
 - **"Make an enemy / another character"**: new asset in the same style - same palette, outline, light,
   proportions; compare side by side with `pagan gallery`. Variants (`variants:` ramp_swap/key_swap/
@@ -210,6 +216,8 @@ in `pagan gallery`, then delete the losers and keep the winner under the real na
   `template: true` model and `extends:` it per member (add parts, `remove: [ids]`, override materials),
   so a fix to the base reaches all of them. **Colours that combine** (player colour × rank, team × armour
   tint): `variant_axes`, not one variant per combination.
+- **Shadows, glows, light rays, smoke**: give the palette translucent colours (`"#00000080"`, `"#rrggbbaa"`)
+  and draw them like any other key, instead of dithering or tinting in the game. Not for 3D models (opaque).
 - **Out of palette keys** (62 ASCII letters/digits used): keep going with Unicode letters (à, é, ß, α, Ω...);
   see reference.md. Don't alias existing keys or copy the palette.
 
@@ -288,7 +296,8 @@ set, and log the change in BRIEF.md's feedback log.
 ## 5. Rules of thumb
 
 - Never invent colors: everything comes from the palette (strict mode makes this an error anyway).
-- Keep 1px of transparent border when `outline: auto` (E007 otherwise).
+- Keep 1px of transparent border when `outline: auto` (E007 otherwise). Thick or double outlines and drop shadows
+  are `outline: { width: N }` / a list, and `shadow:` (reference.md): don't paint them into the frames.
 - Previews are for looking; `pagan build` output is what the game uses. Don't hand-edit build output.
 - Don't commit or push unless the owner asks.
 - If PAGAN itself seems wrong (a crash, a misleading error), say so instead of working around it silently,

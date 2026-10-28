@@ -9,6 +9,7 @@ values (`"0"`, `"#1a1c2c"`): an unquoted `#` starts a YAML comment.
 pagan.toml   BRIEF.md   STYLE.md
 palettes/<name>.pal.yaml     sprites/<name>.sprite.yaml
 tiles/<name>.tiles.yaml      models/<name>.model.yaml
+scenes/<name>.timeline.yaml  (previews of sprites together in time; never built)
 previews/  (scratch, gitignored)    .pagan-cache/ (model render cache, gitignored)
 ```
 
@@ -23,6 +24,7 @@ colors:                       # key = ONE letter or digit ("." is transparent)
   "0": { hex: "#140c1c", name: ink }
   "1": "#442434"              # short form: just the hex
   "α": "#2f6b9a"              # past 0-9 a-z A-Z: any other single Unicode letter
+  "s": { hex: "#00000080", name: shadow }   # "#rrggbbaa": translucent (00 clear .. ff opaque)
 ramps:                        # dark -> light; one ramp per material
   warm: ["1", "2", "3", "4"]
 variants:                     # optional: palette-wide recolours every asset using this palette gets
@@ -38,17 +40,24 @@ Keys: use 0-9, a-z, A-Z first (62), then Latin-1 letters (à-ÿ, À-Þ, ß) and 
 like Latin ones (α-ω, Γ Δ Θ Λ Ξ Π Σ Φ Ψ Ω); any single Unicode letter or digit is accepted. Quote keys in
 the palette file. Files are UTF-8; an accent typed as a separate combining mark is merged (NFC).
 
+Translucent colours (`"#rrggbbaa"`) are for drop shadows, glows, light rays and smoke in sprites and
+tilesets: the PNG pixel gets that alpha. The default `outline_color` is the darkest *opaque* colour, `pagan
+import` snaps to opaque colours only, and 3D model materials must be opaque (E013). `[lint] require_opaque
+= true` forbids them in a project (E015). `"#rrggbbff"` is the same as `"#rrggbb"`.
+
 ## Sprite - `sprites/<name>.sprite.yaml`
 
 ```yaml
 name: slime
 description: "Green slime enemy, front view."   # what it is / should look like (keep it current)
 palette: dusk                 # optional when pagan.toml has default_palette; open mode allows inline
-size: [16, 16]                # width, height of one frame (or "16x16")
+size: [16, 16]                # width, height of one frame (or "16x16"); up to 4096 each (models: 1024)
+sheet_columns: 8              # optional: frames per sheet row (default up to 8); W014 if the sheet passes 16384 px
+trim: true                    # optional: frames cropped to their content and packed (default: pagan.toml [build] trim)
 pivot: [8, 16]                # anchor in pixel-edge coords (0..w, 0..h); default [w//2, h]
 mirror: none                  # none | horizontal: author only the left ceil(w/2) columns
-outline: auto                 # none | auto: 1px outline added around opaque pixels
-outline_color: "0"            # default: the palette's darkest color
+outline: auto                 # none | auto: 1px outline added around opaque pixels (see "Outlines and shadows")
+outline_color: "0"            # default: the palette's darkest opaque color
 status: draft                 # draft | approved
 style_version: 1              # the project style version it was made/reviewed under
 tags: [enemy]
@@ -58,9 +67,13 @@ frames:
     ......0000......
   idle_1: { from: idle_0, shift: [0, 1] }        # derived frame: from + flip/shift
   left:   { from: idle_0, flip: horizontal }      # flip: horizontal | vertical | both
+  land:   { from: idle_0, scale: [1.2, 0.8] }     # squash/stretch about the pivot (number = both axes)
+  tip:    { from: idle_0, rotate: 6, about: [8, 16] }   # degrees, + = clockwise; about: pivot (default) | center | [x, y]
 animations:
   idle: { frames: [idle_0, idle_1], fps: 4, loop: true }
   blink: [idle_0, idle_1]                         # short form: fps 8, loop true
+  hit: { frames: [a, b, c], fps: 10, durations: [1, 1, 3] }   # holds: c shows 3/10 s (Godot frame duration)
+  rise: { frames: [r0, r1, r2, r3], loop_from: 2 }   # intro r0 r1 once, then r2 r3 loop (see below)
   walk_right: { from: walk_left, flip: horizontal }   # mirrored animation: frames generated as walk_right_0..
 variants:                     # recolors with identical geometry, built as <name>.<variant>; swaps apply
                               # to the final pixels, so every key is remapped wherever it's used
@@ -71,6 +84,8 @@ variant_axes:                 # recolours that combine (any asset kind): one opt
   team: { red: { ramp_swap: { cloth: red } }, blue: { ramp_swap: { cloth: blue } } }
   rank: { none: {}, elite: { key_swap: { "4": "a" } } }   # {} = leave this axis as it is
                               # axes must recolour different keys; builds red+none, red+elite, blue+none...
+                              # (up to 256 combinations; no limit with variant_sheets = false, where over 256
+                              # no combinations are made: the game composes the axes' swaps)
 base_variant: cyan            # optional (any asset kind): the base colours' name; the manifest lists the
                               # base sheet under variants.cyan too, so the game sees one uniform set
 supersample: 2                # optional (any asset kind): drawn at 2x the size the game gets; the build
@@ -81,6 +96,9 @@ lint:                         # optional: warnings off for this asset only (any 
   max_ramps: 9                # W003's limit for this asset (e.g. a sheet of unrelated pickups)
 nine_slice: [4, 4, 4, 4]      # optional: 9-slice margins left, top, right, bottom (px), or per frame:
                               # { frame: [4, 4, 4, 4] }; carried into the manifest (NinePatchRect patch margins)
+points:                       # optional: named attachment points (sockets) for particles, weapons, hit boxes
+  muzzle: [12, 7]             # [x, y] in pixel-edge coords like pivot: the same in every frame
+  fire: { wob00: [30, 12], wob01: [31, 10] }   # or per frame (only the frames listed; derived frames too)
 font:                         # optional: the frames are a font's glyphs (manifest metrics + <name>.fnt)
   glyphs: " !\"#ABC..."       # characters in glyph order (or a list of strings, joined)
   cell: [6, 8]                # glyph cell: frames are cut into cells row by row (default: one glyph per frame)
@@ -89,11 +107,36 @@ font:                         # optional: the frames are a font's glyphs (manife
   spacing: 1                  # auto advance: pixels after each glyph
   space: 3                    # auto advance of blank glyphs such as " " (default: half the cell)
   line_height: 9              # default: cell height
+  advances: { "i": 4, "1": 5 }  # optional: per-character advance (source metrics), over advance/auto
+  offsets: { "j": -1, "g": [0, 1] }  # optional: per-character draw offset x or [x, y] from the pen (.fnt xoffset/yoffset)
+  skip_blank: true            # optional: blank cells aren't glyphs (except " " etc.), so the engine falls back to another font
 ```
 
 Frame order in the file = order in the sprite sheet (generated frames of mirrored animations come
-after the written ones). Leave a 1px transparent border with `outline: auto`. Findings give `row`/`col`
+after the written ones). Derived frames apply flip, then scale/rotate (nearest neighbour, about the pivot
+unless `about` says otherwise), then shift; E010 if opaque pixels would leave the canvas. Leave a 1px transparent border with `outline: auto`. Findings give `row`/`col`
 1-based, counted in the grid as written (for `mirror: horizontal`, in the authored left half).
+
+**Intro, then a loop** (`loop_from: N`): frames before index N play once, then frames N.. loop. Engines such as
+Godot loop a whole animation only, so the build exports two: `<name>` = the intro (frames 0..N-1, loop false) and
+`<name>_loop` = the rest (loop true), each with its share of `durations`. The manifest's `<name>` entry carries
+`loop_from: N` and `next: "<name>_loop"`; game code plays `next` when the intro finishes (Godot:
+`animation_finished`). Preview GIFs play the intro once, then the loop three times. N runs from 1 to frames - 1,
+the animation must loop, and no other animation may be called `<name>_loop` (E001). Mirrored animations copy it.
+
+**Outlines and shadows** (sprites; PAGAN adds them to every frame, so frames stay plain shapes):
+
+```yaml
+outline: { width: 3, color: "0" }                            # a 3px ring (round corners); color default: outline_color
+outline: [{ width: 2, color: "0" }, { width: 1, color: "7" }]  # stacked, innermost first: ink + light rim
+outline: { width: 1, skip_translucent: true }                # ring only opaque pixels: glows/halos ("#rrggbbaa") stay soft
+shadow: { offset: [3, 4], color: "s" }                       # drop shadow of the outlined shape (+x right, +y down)
+```
+
+Width 1 is exactly `outline: auto`; wider rings take every transparent pixel within `width` pixels (centre to
+centre) of the shape, up to 8 per ring. The shadow goes under the sprite (only on transparent pixels); a
+translucent colour (`"#00000080"`) suits it. Leave a transparent border as wide as all rings together, and room
+for the shadow on its side (E007; with `skip_translucent` on every ring, translucent pixels may touch the edge). With `supersample`, widths and offsets are in source pixels.
 
 ## Tileset - `tiles/<name>.tiles.yaml`
 
@@ -101,6 +144,9 @@ after the written ones). Leave a 1px transparent border with `outline: auto`. Fi
 name: meadow
 tile_size: [16, 16]
 columns: 8                    # atlas width in tiles; tiles fill rows in file order (append-safe)
+tile_shape: isometric         # optional: square (default) | isometric | half_offset_square | hexagon (Godot's TileSet)
+tile_layout: diamond_down     # optional: stacked (default) | stacked_offset | stairs_right | stairs_down | diamond_right | diamond_down
+tile_offset_axis: horizontal  # optional: horizontal (default) | vertical
 tiles:
   grass: |
     ...16 rows of 16...
@@ -109,13 +155,17 @@ tiles:
     ...
 animations:                   # animated tiles: the animation's name is the tile's name
   water: { frames: [water_0, water_1, water_2, water_3], fps: 4 }   # always loops
+  lava: { frames: [lava_0, lava_1], fps: 4, durations: [3, 1] }    # per-frame holds, as for sprites
   surf: { frames: [surf_0, surf_1, surf_2, surf_3], new_row: true }  # from column 0 of a fresh row
 variants: ...                 # as for sprites
 lint: { for: { shore_0000: [W004] } }   # e.g. a corner set's fully transparent tile
 ```
 
 No mirror/outline. Tiles should be seamless (preview shows a 3x3 tiling; `pagan preview <tileset>
---scene layout.txt` draws a layout of different tiles to check the seams between them). An animated
+--scene layout.txt` draws a layout of different tiles to check the seams between them). With `tile_shape`
+the Godot TileSet gets that shape/layout and the manifest a `tile_shape` entry; isometric tiles are previewed
+(3x3 tiling, `--scene`) where Godot's TileMapLayer puts them (layout row r, column c = map cell (c, r)), so a 2:1
+diamond (rows 2, 6, ..., 6, 2 for 8x4) shows its seams; `api.compose(tileset, layout, square=True)` = a plain grid. An animated
 tile's frames sit side by side in the atlas (a new row if they don't fit, or always with `new_row: true`, so
 the layout doesn't depend on how many tiles come before; longer than `columns`: a block `columns` wide); each
 tile is a frame of at most one animation (the manifest's `tiles` gives every cell either way). Godot gets an animated atlas tile.
@@ -154,7 +204,7 @@ heading: 0                    # first heading in degrees; 1 direction defaults t
                               # Frames are named by where they actually face: heading 45 with 4 directions
                               # gives ne, nw, sw, se; off-compass angles are named d010, d100, ...
 outline: auto                 # default auto for models
-camera: { elevation: 42, scale: 1 }               # optional override of pagan.toml [camera]
+camera: { elevation: 42, scale: 1 }               # optional override of any pagan.toml [camera] key
 light: { direction: [-0.5, 0.45, 0.75], ambient: 0.2, shadows: true }   # optional override of any [light] key
 materials:                    # shade with a palette ramp (dark -> light)
   hull: { keys: ["6", "7", "8", "9"] }
@@ -164,6 +214,7 @@ parts:                        # applied in order; later parts overwrite earlier 
   - box: { from: [0, -7, 8], to: [14, 7, 11], material: hull, top: deck, rim: rail }
   - hull: { from: [0, 0, 0], length: 70, beam: 21, height: 8, bow: 0.38, stern: 0.08, material: hull, top: deck, rim: rail }
   - cylinder: { base: [36, 0, 8], height: 39, radius: 0, axis: z, material: mast }
+  - ring: { center: [10, 0, 20], outer: 4, inner: 3, height: 1, axis: x, material: steel }   # open annulus: gauges, wheels, ducts
   - ellipsoid: { center: [0, 0, 4], radii: [3, 3, 4], material: body }
   - line: { from: [66, 0, 9], to: [79, 0, 15], radius: 0, material: mast }
   - sail: { at: [36, 0, 13], width: 22, height: 14, bulge: 2.4, brace: 30, material: sail, yard: mast }
@@ -219,13 +270,27 @@ lint: { for: { sinking: [W005] } }   # a pose animation name covers all its head
 ```
 
 Coordinates: x = the model's front, y = its left, z = up; whole voxels (1 voxel = `camera.scale`
-pixels). Sizes count voxels: `cylinder` `height: 3` is 3 layers; `radius: 0` is 1 voxel wide, `radius: r` is
+pixels; with the dimetric camera, see below). Sizes count voxels: `cylinder` `height: 3` is 3 layers; `radius: 0` is 1 voxel wide, `radius: r` is
 about 2r+1 wide; `box` corners are inclusive (`from: [0,0,0], to: [0,0,0]` is one voxel).
 Pivot: from above at elevation e, the front of a round base sits about r·sin(e) pixels *below* the origin,
 so put the pivot a few pixels above the frame's bottom (E007 tells you if the outline would be clipped). Heading 0 shows the front pointing right ("e"), 90 away from the camera ("n"), 270 towards it.
+**Isometric tile games** (2:1 TileMap, e.g. 64x32 cells): `[camera] projection = "dimetric"`, `tile = [64, 32]`,
+`cell = 16`. Every voxel then steps whole pixels: tile width / (2 cell) across and tile height / (2 cell) down
+along x and y (2 and 1 here), `z_step` up (default tile height / cell = 2). A `cell` x `cell` floor is exactly
+the hand-drawn tile diamond (rows 2, 6, ... 62, 62, ... 6, 2) and tiles at the grid pitch with no gaps or
+overlap, so build floors, walls and furniture on whole cells (a 1-cell wall: 16 voxels wide). Use
+`heading: 45` + `directions: 4` (frames ne, nw, sw, se); other headings are E013. A 1-voxel pose offset moves
+whole pixels, so bobs and walk cycles don't shimmer (orthographic: one voxel of height is
+cos(elevation) x scale px, e.g. 0.87 px at 30 degrees, and re-rasterises). Shading, outlines, normal maps
+and meshes are as for the orthographic camera; `camera.scale` and `elevation` are unused.
 `top:` gives a shape's top layer another material; `rim:` adds a 1-voxel wall around its top edge.
 `shell: true` on a `box`, `cylinder` or `ellipsoid` keeps only its outer wall, 1 voxel thick (`shell: 2`: 2 thick):
 a helmet that covers a head without swallowing it, or a big tower that stays under the 2M-voxel cap.
+`ring` is a flat open annulus (no caps, unlike a `cylinder` shell): the cells whose centres lie `inner` to `outer`
+voxels from the axis through `center`, `height` layers (default 1) from the center's layer towards +axis.
+`center` (or `centre`) is a whole voxel along the axis; across it a half voxel (`[0.5, 0.5, 2]` with axis z)
+gives even widths. `outer: 4, inner: 3` is a ring 9 voxels across, about 1 thick (its diagonals touch only at
+corners; `outer - inner` of 1.5 or more closes them); `inner: 0` fills the disc.
 `box` is inclusive of both corners. `hull` and `cylinder` are symmetric about their centre voxel, so their
 widths are odd: `beam: 10` gives 9 voxels (use 11 for 11). `sail` `at` is where the sail's bottom edge
 meets the mast: `rig: square` (default) hangs across the hull just forward of the mast (`brace` turns it
@@ -252,7 +317,8 @@ the part's bottom centre); rotated parts are resampled, so keep rotations for th
 Sizing: `pagan fit <model>` renders every heading and pose and prints the smallest `size` and `pivot`
 that hold them all (origin stays on the pivot), plus the frames the current size clips. The frame always
 holds the pivot, so overlays whose origin is their parent's pivot get a lint-valid size. `--even` pads to
-even sizes so a centred Godot sprite's `godot_offset` is whole pixels.
+even sizes so a centred Godot sprite's `godot_offset` is whole pixels. `--write` puts the fit into the
+file (`size` and `pivot` edited in place, comments kept), so a generator can write -> `pagan fit --write` -> lint.
 
 ## Meshes (3D games) - `export` has "mesh"
 
@@ -298,6 +364,34 @@ For a free 3D camera (flying, below models, close up), models also build as real
   surface override material that is `godot_materials[i]` with the variant's `godot_materials[i]`.
 - **Review:** `pagan preview <model> --orbit` (every heading from -30 to 90 degrees elevation),
   `--closeup <part>`, `--engine` (the built .tscn rendered by Godot; needs a display).
+
+## Timeline preview - `scenes/<name>.timeline.yaml`
+
+Several sprites (or 3D models' frames) composed in time, to judge how they play together (does the flash
+line up with the hit, is the glint readable over the letters). A preview only: `pagan build` and the
+manifest never read it. `pagan lint` checks it with the project (E016; all problems, with lines and fixes).
+
+```yaml
+size: [640, 240]              # canvas, in output pixels (supersampled sprites are shown as built)
+fps: 30                       # timeline frames per second (frames/f0000.png at t = 0, 1/30, ...)
+duration: 6                   # seconds
+background: "#101018"         # optional; default transparent (previews then show --bg)
+layers:                       # drawn in list order (later on top), alpha-composited
+  - {sprite: bg_smoke, anim: smoke, at: [0, 0], alpha: 0.6}
+  - {sprite: letters, anim: a, at: [75, 200], start: 0.25, fade_in: 0.45}
+  - {sprite: arrow, anim: fly, from: [-400, -60], to: [583, 131], start: 1.87, duration: 0.12, then: shudder}
+  - {sprite: fx, anim: sparks, at: [583, 131], start: 1.99, variant: blue}
+```
+
+Layer fields (no others): `sprite` (asset name; sprites and 3D models, not tilesets), `anim` (an animation,
+or a frame name shown still), `at: [x, y]` (where the sprite's pivot goes), `start` (seconds, default 0),
+`duration`, `alpha` (0-1, default 1), `fade_in` / `fade_out` (seconds), `from` / `to` (instead of `at`:
+a straight move over `duration`, rounded to whole pixels; the layer then stays at `to`), `then` (the
+animation that follows when a one-shot `anim` (`loop: false`) ends; without it the last frame holds),
+`variant`. `duration` without `from`/`to` = how long the layer is shown (default: to the end); `fade_out`
+ends where the layer ends (with a move: the end of the timeline). Animations play from the layer's `start`
+with their own fps, loop and `durations`. No easing, rotation or scale: use derived frames for those.
+Times are exact (0.1 is 1/10 s), so output is identical on every machine.
 
 ## Recipes
 
@@ -348,6 +442,21 @@ on `from pagan import api` instead of copying PAGAN's maths; it's versioned with
   shapes fill pixels whose centres are strictly inside; `api.polygon_distance(points, x, y)` is the signed
   distance (+ inside). `fade(amount, seed)` dissolves from the edge,
   `scatter(n, key, seed, box, size)`, `orphans()` (exactly W001), `remove_orphans()`, `pair_orphans()`, `rows()`.
+- Big canvases (numpy): `Canvas.from_array(keys_array)` or `Canvas.from_array(index_array, "rstuv")` (negative =
+  transparent), `to_array()`, `mask()` (bool, opaque); `distance_field(mask)` (signed, exact Euclidean between
+  pixel centres: + inside, - outside), `bevel(mask, width, light)` -> 0..1 brightness of a bevelled shape,
+  `dither(keys, t, x, y, matrix=4)` (ordered Bayer dithering between ramp steps; scalars or arrays from `np.mgrid`).
+  Draw in numpy, hand PAGAN the keys.
+- Lettering with a project font sprite (`font:`): `canvas.text(api.load("sprites/font.sprite.yaml"), "THWACK!", x,
+  y, scale=1, key=None)` (a `Canvas` method; top-left at (x, y), the build's advances, `key` = one key for every pixel).
+- Built-in pixel fonts, no project or palette needed: `canvas.text(api.pixel_font("3x5"), "EXIT", x, y, key="k")`
+  (`key` required). `"3x5"` and `"5x7"`, printable ASCII, monospaced (advance 4 / 6 px, line height 6 / 8); the
+  3x5 font letters lowercase with its uppercase glyphs. Generators only: for in-game text, draw a `font:` sprite.
+- Lettering from a real typeface: `text_mask("A", font="fonts/Serif.ttf", cap_height=104, variation={"wght": 900},
+  anchor="baseline_centre", rotate=3, scale=(0.9, 1), supersample=4)` -> `.coverage` (0..1 floats), `.mask()`
+  (bool), `.origin` (the anchor in the mask), `.advance` (kerning included), `.bbox`. Rotate/scale turn about the
+  anchor, so a tilting letter's frames stay aligned; `variation` is axis values by tag or a named instance ("Bold").
+  Then `distance_field(text.mask())` / `bevel(...)` for bevels, outlines and extrusions.
 - Shading: `light_2d(project)` (the project's light for flat art), `sphere_light(dx, dy, light)`,
   `ramp_pick(keys, t)`, `hash01(x, y, seed)`, `periodic_noise(x, y, period, seed)` (seamless), `smoothstep`.
 - Terrain: `corner_tiles(prefix, size, paint, seed, amp)` -> the 16 Match-Corners tiles
@@ -359,7 +468,7 @@ on `from pagan import api` instead of copying PAGAN's maths; it's versioned with
 - 2D headings: `directional_frames(draw, size, directions=8)` -> one Canvas per heading, named like model
   headings (e, ne, n, ...; h00-h31); `draw(canvas, angle)` paints the shape turned to `angle` degrees,
   usually via `rotate_points(points, angle, about)` (a shape drawn facing east; counter-clockwise on screen).
-- Files: `sprite_yaml(name, size, frames, animations, **fields)`, `tileset_yaml(...)`, `write(path, text)`
+- Files (numpy numbers are fine in sizes and fields): `sprite_yaml(name, size, frames, animations, **fields)`, `tileset_yaml(...)`, `write(path, text)`
   (writes only on change), `load(path)` -> parsed asset, `open_project(path)`, `palette(name, project)`.
 
 ## `pagan.toml`
@@ -377,6 +486,10 @@ style_version = 1
 [camera]                           # used by every model
 elevation = 42                     # degrees above the horizon (90 = straight down)
 scale = 1                          # pixels per voxel
+projection = "orthographic"        # or "dimetric": exact pixel 2:1 tiles (elevation/scale unused; below)
+tile = [64, 32]                    # dimetric: pixels per grid cell (width = 2 x height)
+cell = 16                          # dimetric: voxels per grid cell side (must divide half the tile height)
+z_step = 0                         # dimetric: pixels per voxel of height (0 = tile height / cell)
 
 [light]
 direction = [-0.5, 0.45, 0.75]     # towards the light: x right, y up-screen, z up
@@ -391,17 +504,21 @@ voxel_size = 0.0625                # metres per voxel (0.0625 = 16 per metre); c
 shading = "ramp"                   # ramp (palette-locked engine lighting) | baked | flat
 collision_suffixes = false         # Godot -convcol / -colonly node names for collision parts
 
+[build]
+trim = false                       # sprites without their own `trim:` are trimmed (fonts / nine_slice sprites never are)
+
 [godot]                            # with export "godot"
 mipmaps = false                    # true: PAGAN sets mipmaps/generate in each PNG's .import (kept across builds)
 filter = "inherit"                 # SpriteFrames texture filter: inherit (node/project) | nearest | linear
 
 [lint]
 max_ramps_per_sprite = 3            # W003 for sprites/tilesets
-max_ramps_per_model = 6             # W003 for 3D models           # W003
+max_ramps_per_model = 6             # W003 for 3D models (flat one-key materials don't count)           # W003
 max_frame_change = 0.4             # W007
 max_ramp_steps = 0                 # W008: most shades per ramp/material (0 = no limit)
 disable = []                       # warning ids only
 require_outline = false            # E011
+require_opaque = false             # E015: no translucent "#rrggbbaa" colours in sprites/tilesets
 ```
 
 ## Commands (all accept `--json`; non-zero exit on errors)
@@ -421,14 +538,15 @@ checkouts of the same art (e.g. agents' git worktrees), so a fresh checkout does
 | `pagan new model <name> [--size 64x64] [--directions 8]` | starter model (`--directions 0`: a mesh-only model for 3D games) |
 | `pagan lint [paths] [--warnings-as-errors]` | errors + style warnings |
 | `pagan preview <model> --orbit \| --closeup PART \| --engine [--all-previews]` | 3D review: orbit.png (8 headings x elevations -30, 0, 30, 60, 90: undersides too), closeup_<PART>.png (one part filling the view, in place and alone), engine.png (the built .tscn through Godot: needs a display); only these unless `--all-previews` |
-| `pagan preview <asset...> [--scale N] [--grid] [--bg checker\|none\|#rrggbb] [--scene FILE] [--frame NAME]` | sheet.png (labelled), montage.png (frames/headings packed on the background, e.g. `--bg "#1d3b53"` sea), frames/ and GIFs, all at the printed scale, plus native/ (1x frames and sheet, as `pagan render`); variants.png + variants_1x.png (base and every variant side by side: the first frame with pixels, or `--frame`) when the asset has variants; `--scene` (tilesets): scene.png from a layout file (rows of tile names, `.` = empty) and scene_variants.png; supersampled assets also get an "as built" row and built_1x.png (what the game gets) |
+| `pagan preview <asset...> [--scale N] [--grid] [--bg checker\|none\|#rrggbb] [--scene FILE] [--frame NAME] [--variants options\|all]` | sheet.png (labelled; over 4096 px on a side it's split into pages: sheet.png = overview (headings or frames outside animations, variants, as-built/tiling rows, an index of pages) + one page per animation, `sheet.<animation>.png` (models: per pose, every heading), each wrapped to 4096 px wide and continued in `sheet.<animation>.2.png`, `.3`, ... (the overview in `sheet.2.png`) when taller; the `--json` result lists them in `sheet_pages`), montage.png (frames/headings packed on the background, e.g. `--bg "#1d3b53"` sea), frames/ and GIFs, all at the printed scale, plus native/ (1x frames and sheet, as `pagan render`); variants.png + variants_1x.png (base and every variant side by side: the first frame with pixels, or `--frame`) when the asset has variants (with `variant_axes`: each axis option on its own, named `<axis>.<option>`; `--variants all` = every combination); `--scene` (tilesets): scene.png from a layout file (rows of tile names, `.` = empty) and scene_variants.png; supersampled assets also get an "as built" row and built_1x.png (what the game gets) |
+| `pagan preview scenes/<name>.timeline.yaml [--at 0.5,2.0] [--scale N] [--grid] [--bg ...]` | timeline: `previews/<name>.timeline/` frames/f0000.png..., timeline.gif, and with `--at` at.png (a contact sheet of those times) |
 | `pagan gallery` | every asset in one image |
 | `pagan render <asset...>` | native-size PNGs |
 | `pagan palette show [palettes]` | swatches |
 | `pagan palette adjust <pal> [--lightness d] [--contrast k] [--saturation k] [--hue deg] [--warmth d] [--ramp r] [--keys ...] [--out new] [--dry-run]` | change the look globally |
 | `pagan import <png> [--palette P \| --open] [--scale N] [--name] [--out]` | PNG -> sprite (snaps colors, report) |
 | `pagan bake <model> [--name]` | model -> editable sprite (default name `<model>_baked`) |
-| `pagan fit <model> [--margin N] [--even]` | smallest size + pivot that fit every heading and pose |
+| `pagan fit <model> [--margin N] [--even] [--write]` | smallest size + pivot that fit every heading and pose |
 | `pagan status` | catalogue + what needs attention |
 | `pagan config show` / `get <key>` / `set <key> <value>` / `unset <key>` | project settings: value, default, meaning; validated edits; unset = back to default |
 | `pagan mark <asset...> [--status approved] [--current] [--outdated]` | record reviews |
@@ -440,7 +558,7 @@ checkouts of the same art (e.g. agents' git worktrees), so a fresh checkout does
 **MCP tools** (same JSON as the commands above): `status`, `read_docs`, `write_doc`, `log_feedback`,
 `config_show`/`config_set`/`config_unset`, `palette_list`, `palette_show` (image), `palette_write`,
 `palette_adjust` (dry run by default; image), `scaffold`, `read_asset`, `write_asset` (writes + lints +
-preview image), `lint`, `preview` (image: sheet, montage, variants, built, orbit, closeup with `part`, or engine), `gallery` (image), `fit`,
+preview image), `lint`, `preview` (image: sheet, montage, variants, built, orbit, closeup with `part`, or engine; `page: <animation>` = that page of a split sheet), `gallery` (image), `fit` (`write: true` edits the model's size and pivot),
 `mark`, `style_bump`, `import_png` (path or base64), `build` (`verify_godot` needs `--allow-godot`),
 `manifest`. Resources: `pagan://workflow`, `pagan://reference`, `pagan://brief`, `pagan://style`,
 `pagan://manifest`, `pagan://palette/{name}`, `pagan://asset/{name}`. Prompts: `setup_new_game`,
@@ -449,10 +567,10 @@ preview image), `lint`, `preview` (image: sheet, montage, variants, built, orbit
 ## Lint rules
 
 Errors: E000 command/usage, E001 YAML/field, E002 unknown pixel key, E003 grid size, E004 missing
-animation frame, E005 palette problem, E006 variant problem, E007 outline clipped at the edge, E008 pivot,
+animation frame, E005 palette problem, E006 variant problem, E007 outline or shadow clipped at the edge, E008 pivot,
 E009 inline palette in strict mode, E010 derived frame, E011 outline required, E012 duplicate asset name,
 E013 model problem, E014 rig / mesh problem (unknown rig id or parent, parent cycle, a hidden carving part when
-meshes are exported). E003 also: a size that isn't a multiple of `supersample`.
+meshes are exported), E015 translucent colour with `require_opaque`, E016 timeline problem (`scenes/*.timeline.yaml`). E003 also: a size that isn't a multiple of `supersample`.
 
 Warnings: W001 orphan pixel, W002 unused frame, W003 too many ramps, W004 empty frame, W005 visible area
 jumps between frames, W006 made under an older style version, W007 too much change between frames,
@@ -460,30 +578,44 @@ W008 too many shades from one ramp (sprites) / in one material (models), when `m
 Mesh export only (`export` has "mesh"): W009 a model overrides `[mesh] voxel_size`, W010 a part's voxels are
 separate pieces, W011 a rig pivot outside its part; W012 `directions: 0` (mesh only) without "mesh" in `export`.
 W013 (any model): a part id has no voxels left, because later parts cover (or carve) all of it.
+W014 (any asset): the built sheet is over 16384 px on a side (many engines, Godot too, won't load it): set
+`sheet_columns` (sprites) or `columns` (tilesets), `trim: true` (mostly transparent sprite frames), or split the asset.
 Turn warnings off project-wide with `[lint] disable`, or per asset/frame/animation with the file's `lint:`.
 W001 isn't checked on 3D models (a rendered orphan can't be fixed pixel by pixel).
 
 ## Build output (any engine)
 
 `manifest.json` in `output_dir` describes everything: per asset its kind, sheet, frame rects, animations
-(frames, fps, loop), pivot, `godot_offset`, headings (models), tiles (`name -> [column, row]` for
+(frames, fps, loop, and `durations` when set; `loop_from` animations are split as below), pivot, `godot_offset`, headings (models), tiles (`name -> [column, row]` for
 tilesets; an animated tile is listed by its animation name at its first frame's cell, and the tileset
 gets `animations`), variants (each with its sheet/.tres unless `variant_sheets = false`, plus `swap`:
-base colour -> variant colour as "#rrggbb" for every colour it changes, and `swap_exact`: false when two
+base colour -> variant colour as "#rrggbb" (or "#rrggbbaa" when translucent) for every colour it changes, and `swap_exact`: false when two
 keys share a base colour but not a variant colour, so a shader swap would be wrong; with
 `variant_sheets = false` that's error E006), `variant_axes` (per axis, per option: `swap`, `swap_exact`;
 apply one option's swap per axis together - with `variant_sheets = false` the combinations aren't listed
 in `variants`, the game composes them), and `normal_sheet` (when "normals" is exported: RGB = normal * 0.5 + 0.5, x right,
-y up, z towards the viewer), `animation_order` (animation names in file order: JSON keys are unordered),
+y up, z towards the viewer), `animation_order` (animation names in file order: JSON keys are unordered), `points` (sprites: point -> frame ->
+[x, y] in output pixels from the frame's top-left; minus `pivot` = offset from the node's origin),
 `nine_slice` (frame -> [left, top, right, bottom]), `mesh` (models with "mesh" exported: see Meshes),
 `textures` (tilesets with `export_textures`: per texture `png`, `size`, `metres`, `tiles`, `variants`,
 `godot_material`) and, for fonts, `font` (`glyph_order`, `glyphs`: char ->
-`rect` [x, y, w, h] in the sheet + `advance`, `cell`, `ascent`, `descent`, `line_height`) and `font_file`
+`rect` [x, y, w, h] in the sheet + `advance` (+ `offset` [x, y] when set), `cell`, `ascent`, `descent`, `line_height`) and `font_file`
 (an AngelCode BMFont `fonts/<name>.fnt` with its own copy of the sheet, `fonts/<name>.png`). Supersampled assets: `size`, frame rects and `pivot` are in output pixels
 (`pivot` may be fractional), plus `supersample` and `source_size`; their sheets blend colours at edges, so
 a shader swap by exact colour misses the blended pixels: use variant sheets for them. `base_variant` (when
 set) names the base, also listed under `variants` with its sheet and an empty swap. Pivots aren't stored
 in engine resources: apply them in the game.
+
+Trimmed sprites (`trim: true`, or `[build] trim = true`): each frame is cropped to its non-transparent pixels and
+the crops are packed in source order, `sheet_columns` per row (default up to 8), each row as tall as its tallest
+crop, 1 px transparent gap between cells, never rotated. The entry gets `trim: true`, and each `frames` value is an
+object instead of [x, y, w, h]: `size` (the full frame, unchanged), `trim_rect` ([x, y, w, h] of the crop in the
+sheet) and `offset` ([x, y] of the crop's top-left inside the full frame). Draw a frame by placing its `trim_rect`
+at `offset` within a `size` box: `pivot`, `godot_offset` and `points` stay in full-frame coordinates. A fully
+transparent frame keeps its top-left pixel (a 1x1 transparent crop at offset [0, 0]), so every frame has a
+region. The crop depends only on which source pixels are transparent, so variant sheets share the layout;
+supersampled sprites are cropped in output pixels (rounded outwards). Fonts and `nine_slice` sprites can't be
+trimmed (E001 with an explicit `trim: true`; the project default skips them); tilesets and models are never trimmed.
 
 ## Godot
 
@@ -494,6 +626,8 @@ the editor), plus `manifest.json`. Fonts: Godot imports `fonts/<name>.fnt` as a 
 (`load("res://.../fonts/font_small.fnt")`; use it as a Label's `theme_override_fonts/font`). 9-slice: set a
 NinePatchRect's `patch_margin_left/top/right/bottom` from the manifest's `nine_slice`.
 Apply the pivot in code: `sprite.centered = true; sprite.offset = Vector2(godot_offset[0], godot_offset[1])`.
+Trimmed sprites need nothing extra: each AtlasTexture's `margin` puts the crop back in place, so frames keep
+their full size (and the same pivot/`godot_offset`) in SpriteFrames.
 Project settings for crisp pixels: Default Texture Filter = Nearest, stretch mode `viewport`, scale mode
 `integer`, snap 2D transforms to pixel.
 Smooth, freely rotated or scaled sprites: `[godot] filter = "linear"` (the SpriteFrames' CanvasTexture

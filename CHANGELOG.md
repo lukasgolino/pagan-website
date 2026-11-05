@@ -8,7 +8,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- CI checks run on demand only (`workflow_dispatch`), once per PR just before merge, to save Actions minutes.
+- CI checks run once per PR, when it's marked ready for review just before merge (and on demand), to save Actions
+  minutes.
   Deploys skip pushes that only touch the changelog, README or CI-only workflows.
 
 ## [0.1.0] - 2026-11-05

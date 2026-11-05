@@ -1,8 +1,11 @@
 # Type-check and build the site, so a broken build never reaches main.
 name: check
 
-# Manual only (Actions minutes): run once per PR, just before merge, with `gh workflow run check --ref <branch>`.
+# Runs once per PR, as the final check before merge (Actions minutes): PRs stay drafts while in development and
+# review, and this fires when one is marked ready. Re-run by hand with `gh workflow run check --ref <branch>`.
 on:
+  pull_request:
+    types: [ready_for_review]
   workflow_dispatch:
 
 jobs:

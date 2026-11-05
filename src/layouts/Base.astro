@@ -79,8 +79,10 @@ const home = Astro.url.pathname.replace(/\/?$/, "/") === base;
         </nav>
       </div>
     </footer>
-    <!-- Cloudflare Web Analytics: cookieless, no consent banner needed. -->
-    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "75c1d9f249eb4579bcd782b10cf7a8f0"}'></script>
+    <!-- Cloudflare Web Analytics: cookieless, no consent banner needed. Production builds only, so dev/preview visits aren't counted. -->
+    {import.meta.env.PROD && (
+      <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "75c1d9f249eb4579bcd782b10cf7a8f0"}'></script>
+    )}
   </body>
 </html>
 

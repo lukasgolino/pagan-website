@@ -1,4 +1,4 @@
-# Type-check and build the site on every push and PR, so a broken build never reaches main.
+# Type-check and build the site, so a broken build never reaches main.
 name: check
 
 # Manual only (Actions minutes): run once per PR, just before merge, with `gh workflow run check --ref <branch>`.

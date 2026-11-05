@@ -1,0 +1,23 @@
+# Publish a GitHub release for every vX.Y.Z tag, with that version's CHANGELOG.md section as the notes.
+name: release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract notes
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} on && /^## \[/ {exit} on' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "No CHANGELOG.md section for $v"; exit 1; }
+      - run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}

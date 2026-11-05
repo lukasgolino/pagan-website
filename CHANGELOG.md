@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-05
+
 ### Added
 
 - Cloudflare Web Analytics beacon on every page (cookieless); CI checks it's on each built page
@@ -14,3 +16,6 @@ All notable changes to this project are documented here. The format follows
   ([#1](https://github.com/lukasgolino/pagan-website/issues/1)).
 - CHANGELOG.md, a check workflow (type-check + build on every push and PR), and a release workflow that publishes
   a GitHub release for each `vX.Y.Z` tag ([#3](https://github.com/lukasgolino/pagan-website/issues/3)).
+
+[Unreleased]: https://github.com/lukasgolino/pagan-website/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/lukasgolino/pagan-website/releases/tag/v0.1.0

@@ -4,6 +4,7 @@ name: deploy
 on:
   push:
     branches: [main]
+    paths-ignore: [CHANGELOG.md, README.md, ".github/workflows/check.yml", ".github/workflows/assets.yml", ".github/workflows/release.yml"]
   workflow_dispatch:
 
 permissions:

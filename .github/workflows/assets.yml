@@ -2,10 +2,8 @@
 # site can never show art PAGAN doesn't produce.
 name: assets
 
+# Manual only (Actions minutes): run once per PR, just before merge, with `gh workflow run assets --ref <branch>`.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 jobs:

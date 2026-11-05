@@ -1,5 +1,6 @@
 // Sanity checks on the built site (run after `npm run build`, with the same SITE_URL / SITE_BASE): the sitemap
-// lists exactly the built pages, and robots.txt points to the sitemap.
+// lists exactly the built pages, robots.txt points to the sitemap,
+// and every page loads the analytics beacon.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
@@ -27,5 +28,12 @@ for (const u of listed) if (!built.has(u)) fail(`${u} is in sitemap.xml but no p
 
 const want = `Sitemap: ${new URL("sitemap.xml", base).href}`;
 if (!readFileSync(join(dist, "robots.txt"), "utf8").split("\n").includes(want)) fail(`robots.txt lacks "${want}"`);
+
+// Every page carries the analytics beacon (a page built outside Base.astro would silently go uncounted).
+const beacon = /static\.cloudflareinsights\.com\/beacon\.min\.js"[^>]*data-cf-beacon="[^"]*75c1d9f249eb4579bcd782b10cf7a8f0/;
+for (const u of built) {
+  const file = join(dist, new URL(u).pathname.slice(base.pathname.length), "index.html");
+  if (!readFileSync(file, "utf8").match(beacon)) fail(`${u} has no analytics beacon`);
+}
 
 if (!process.exitCode) console.log(`check-dist: ${built.size} pages, sitemap.xml and robots.txt match`);

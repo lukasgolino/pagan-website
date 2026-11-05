@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Cloudflare Web Analytics beacon on every page (cookieless); CI checks it's on each built page
+  ([#2](https://github.com/lukasgolino/pagan-website/issues/2)).
 - `/sitemap.xml` listing every page, referenced from robots.txt; CI checks that every built page is in it
   ([#1](https://github.com/lukasgolino/pagan-website/issues/1)).
 - CHANGELOG.md, a check workflow (type-check + build on every push and PR), and a release workflow that publishes

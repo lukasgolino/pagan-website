@@ -29,9 +29,10 @@ const home = Astro.url.pathname.replace(/\/?$/, "/") === base;
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/png" sizes="32x32" href={url("brand/mark@2x.png")} />
-    <link rel="icon" type="image/png" sizes="16x16" href={url("brand/mark@1x.png")} />
-    <link rel="apple-touch-icon" href={url("brand/mark@12x.png")} />
+    <link rel="icon" type="image/png" sizes="96x96" href={url("favicon-96x96.png")} />
+    <link rel="shortcut icon" href={url("favicon.ico")} />
+    <link rel="apple-touch-icon" sizes="180x180" href={url("apple-touch-icon.png")} />
+    <link rel="manifest" href={url("site.webmanifest")} />
     <meta name="theme-color" content="#13121b" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />

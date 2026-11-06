@@ -19,6 +19,52 @@ const nav = [
   ["Docs", "docs/"],
 ];
 const home = Astro.url.pathname.replace(/\/?$/, "/") === base;
+// Structured data (schema.org) for search engines and AI assistants.
+const ld = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "PAGAN",
+      "url": "https://pagan.top/"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "PAGAN",
+      "alternateName": "Pixel Art Grammar And Notation",
+      "url": "https://pagan.top/",
+      "description": "Free, open-source language for game pixel art. An AI agent writes it; PAGAN lints and renders it into consistent sprites, animations, tilesets and Godot-ready assets.",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "Game development: pixel art, sprites and tilesets",
+      "operatingSystem": "Windows, macOS, Linux",
+      "softwareRequirements": "Python 3.11+",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "isAccessibleForFree": true,
+      "license": "https://opensource.org/licenses/MIT",
+      "downloadUrl": "https://github.com/lukasgolino/PAGAN",
+      "sameAs": [
+        "https://github.com/lukasgolino/PAGAN"
+      ],
+      "keywords": "pixel art, sprite generator, AI pixel art, Godot, Godot 4, game assets, MCP server, gamedev, indie game development",
+      "author": {
+        "@id": "https://lukasgolino.com/#me"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://lukasgolino.com/#me",
+      "name": "Lukas Golino",
+      "url": "https://lukasgolino.com/",
+      "sameAs": [
+        "https://github.com/lukasgolino"
+      ]
+    }
+  ]
+};
 ---
 
 <!doctype html>
@@ -40,6 +86,7 @@ const home = Astro.url.pathname.replace(/\/?$/, "/") === base;
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
+    {home && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
   </head>
   <body>
     <a class="skip sr-only" href="#main">Skip to content</a>

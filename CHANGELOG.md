@@ -8,8 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- CI checks run once per PR, when it's marked ready for review just before merge (and on demand), to save Actions
-  minutes.
+- CI checks are cheap, so they run on every push (and on demand).
   Deploys skip pushes that only touch the changelog, README or CI-only workflows.
 
 ## [0.1.0] - 2026-11-05

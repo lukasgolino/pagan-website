@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-06
+
 ### Changed
 
 - KILN links point at its own domain, https://kiln3d.dev/ ([#9](https://github.com/lukasgolino/pagan-website/issues/9)).
@@ -23,5 +25,6 @@ All notable changes to this project are documented here. The format follows
 - CHANGELOG.md, a check workflow (type-check + build on every push and PR), and a release workflow that publishes
   a GitHub release for each `vX.Y.Z` tag ([#3](https://github.com/lukasgolino/pagan-website/issues/3)).
 
-[Unreleased]: https://github.com/lukasgolino/pagan-website/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/lukasgolino/pagan-website/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/lukasgolino/pagan-website/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/lukasgolino/pagan-website/releases/tag/v0.1.0

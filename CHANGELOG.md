@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- KILN links point at its own domain, https://kiln3d.dev/ ([#9](https://github.com/lukasgolino/pagan-website/issues/9)).
 - CI checks are cheap, so they run on every push (and on demand).
   Deploys skip pushes that only touch the changelog, README or CI-only workflows.
 

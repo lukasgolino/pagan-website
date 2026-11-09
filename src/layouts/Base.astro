@@ -131,6 +131,10 @@ const ld = {
     {import.meta.env.PROD && (
       <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "75c1d9f249eb4579bcd782b10cf7a8f0"}'></script>
     )}
+    <!-- Umami: cookieless too; adds per-visit page journeys. One Umami website for all our sites (filter by Host). -->
+    {import.meta.env.PROD && (
+      <script is:inline defer src="https://cloud.umami.is/script.js" data-website-id="6c3ba9da-9af9-49a9-a575-90c9cace445c"></script>
+    )}
   </body>
 </html>
 

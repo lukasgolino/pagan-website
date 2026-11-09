@@ -19,6 +19,101 @@ the manifest's `generator` (`"pagan X.Y.Z"`), so expect every manifest to change
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-11-09
+
+PAGAN is on PyPI as `pagan-gen` and in the MCP Registry as `io.github.lukasgolino/pagan` (#85). Output is
+unchanged apart from the generator string in `manifest.json`.
+
+### Changed
+
+- **The distribution is `pagan-gen`** (`pagan` on PyPI is another project): `pip install pagan-gen`; the command and
+  the import stay `pagan`. Git pins must use the new name from this version on (`pagan-gen @ git+...@v0.22.0`).
+- **The MCP server is always installed** (`mcp` is a dependency; the `mcp` extra is kept, empty), so
+  `uvx pagan-gen mcp` runs it without an install.
+- **Upgrading from a git-pinned `pagan`:** `pip uninstall pagan` first, then install `pagan-gen`. Both own the same
+  `pagan/` files, so uninstalling `pagan` after installing `pagan-gen` deletes them.
+- CI: lint, types and tests on one Python run on every push. The full Python matrix and the Godot checks run on the
+  PR once it leaves draft, and again only if a commit lands after that, as the last gate before merge.
+
+### Added
+
+- Tags publish a GitHub release from the changelog, the package to PyPI (Trusted Publishing) and `server.json` to the
+  MCP Registry.
+
+## [0.21.0] - 2026-11-04
+
+### Changed
+
+- **The skill is split for agents that pay per token** (#59). `SKILL.md` is a 6 KB core (was 26 KB) that is loaded
+  whenever the skill triggers; the rest of the old SKILL.md and all of `reference.md` (52 KB) moved, unchanged, into
+  18 topic files (`skill/topics/*.md`). `pagan skill install` writes them and removes an installed `reference.md`.
+  The MCP resource `pagan://reference` became `pagan://docs/{topic}`.
+- **`--json` prints compact JSON** (one line, no indentation): about 30-60% fewer characters. Pipe through
+  `python -m json.tool` to read it by eye.
+- `pagan status` lists assets grouped by what they need (one line per group) instead of two lines per asset;
+  `-v` / `--verbose` (MCP: `verbose`) gives the old per-asset listing with descriptions. `--json` leaves out
+  descriptions unless `--verbose`. The demo: 1.4k -> 0.3k characters (text), 4.3k -> 1.7k (JSON).
+
+### Added
+
+- `pagan docs [topic...] [--search words]` (MCP tool `docs`): lists the topics with their size, prints one, or
+  prints the few paragraphs that match. Budget tests keep `SKILL.md`, its description and each topic under a size.
+- `ruff check` in CI (#78).
+
+## [0.20.0] - 2026-11-04
+
+### Changed
+
+- The outline width cap (8 per ring) is in output pixels: with `supersample: N` a ring may be up to 8N source pixels
+  wide, so supersampled art can get outlines up to 8 output pixels thick (#62).
+- `camera.elevation` (project `[camera]` or a model's `camera:` override) accepts 0-90 degrees instead of 10-90, so
+  the same model can be rendered level for side-on shots (0 = a true side elevation, no top faces) (#61).
+
+## [0.19.3] - 2026-11-02
+
+### Fixed
+
+- Parsing models and outlined sprites is several times faster when renders are cached (warm `pagan lint` on 40
+  16-heading models: 14.4 s -> 3.7 s): outlines, the frame-edge check and the used-keys scan no longer loop over
+  every pixel in Python. Output is unchanged (#72).
+
+### Changed
+
+- `pagan preview --engine` (and the MCP `preview` tool's engine view) renders Godot on a private offscreen display
+  (Xvfb with Mesa's CPU renderers, threads capped, one run at a time), never in a window on the desktop; without
+  Xvfb it fails with a message saying what to install (#68).
+
+## [0.19.2] - 2026-11-02
+
+### Fixed
+
+- `pagan build` and `pagan lint` no longer hold every parsed asset (frames, voxel models of any size) until the end:
+  assets stream through, each parsed, linted, written and let go before the next, so memory stays about that of the
+  biggest asset however many the project has (#67). Big sprites parsed or rendered in parallel go through the sprite
+  cache instead of piling up in the main process. Output is unchanged.
+- `pagan fit` no longer suggests or writes a `size` over the 1024 px model frame limit (which the next `build` then
+  rejected): it fails with E001 and writes nothing (#67).
+- The default worker count (no `PAGAN_JOBS`) is also capped at one per GiB of available memory, so a few commands at
+  once (e.g. two `pagan fit`s) don't run a small machine out of memory (#67).
+
+### Changed
+
+- A `pagan build` that fails may already have written the outputs of assets before the first error (in file order:
+  models/, sprites/, tiles/); assets after it are only linted, and the manifest is still only written, and stale
+  files only removed, by a build without errors (#67).
+
+## [0.19.1] - 2026-11-02
+
+### Fixed
+
+- `pagan build` no longer holds every voxel model in memory for the whole build: models of 250k voxels or more are
+  dropped after parsing and rebuilt from their source only when an exporter needs them (mesh, uncached normal maps),
+  then dropped again, so peak memory is about that of the largest model, not the sum. Output is unchanged (#64).
+- Normal maps (`export` "normals") are cached next to the model renders (`.pagan-cache/models/<name>-<key>.normals.npz`)
+  and come from the same render as the frames, instead of being rendered again on every build (#64).
+- Render workers (`PAGAN_JOBS`) exit when the build process dies (e.g. OOM-killed) instead of living on as orphans
+  that keep their memory, and are stopped after each big model, so their memory doesn't grow model after model (#64).
+
 ## [0.19.0] - 2026-10-28
 
 ### Added
@@ -542,7 +637,13 @@ From orchestrator reports R1-R6 (ORCHESTRATOR_PLAN.md), the Age of Boom PAGAN lo
 - Lint: errors E000-E013, warnings W001-W008.
 - Claude skill (`pagan skill install`) with the workflow and a full notation reference.
 
-[Unreleased]: https://github.com/lukasgolino/pagan/compare/v0.19.0...HEAD
+[Unreleased]: https://github.com/lukasgolino/pagan/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/lukasgolino/pagan/compare/v0.21.0...v0.22.0
+[0.21.0]: https://github.com/lukasgolino/pagan/compare/v0.20.0...v0.21.0
+[0.20.0]: https://github.com/lukasgolino/pagan/compare/v0.19.3...v0.20.0
+[0.19.3]: https://github.com/lukasgolino/pagan/compare/v0.19.2...v0.19.3
+[0.19.2]: https://github.com/lukasgolino/pagan/compare/v0.19.1...v0.19.2
+[0.19.1]: https://github.com/lukasgolino/pagan/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/lukasgolino/pagan/compare/v0.18.0...v0.19.0
 [0.18.0]: https://github.com/lukasgolino/pagan/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/lukasgolino/pagan/compare/v0.16.0...v0.17.0

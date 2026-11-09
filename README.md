@@ -43,7 +43,7 @@ The asset build is deterministic: rerunning it changes nothing unless the art or
 - `show:` in the scenario says what the turn displays: `asset`, `animation`, `heading`, `changes` (PAGAN's
   changes row), `rotate`, `teams` / `horde` (variants recoloured in the browser from the manifest's swap
   tables), `compare` (before/after slider against the previous turn).
-- Upgrading PAGAN: bump the tag in `requirements.txt`, rebuild, look at the diff of `public/demo`.
+- Upgrading PAGAN: bump the `pagan-gen` version in `requirements.txt`, rebuild, look at the diff of `public/demo`.
 
 ## Art review
 

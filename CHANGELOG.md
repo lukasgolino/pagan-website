@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-09
+
+### Changed
+
+- Install from PyPI: `pip install pagan-gen==0.22.0`, and the MCP server through `uvx pagan-gen@0.22.0 mcp` (listed in the MCP
+  Registry as `io.github.lukasgolino/pagan`). The old `pagan @ git+...` lines stop working from PAGAN 0.22.0, which
+  is published as `pagan-gen`.
+- The site is built with PAGAN 0.22.0 (was 0.19.0). The docs reference page is assembled from the skill's topics,
+  which replaced `reference.md` in PAGAN 0.21.0. The demo art is unchanged apart from the generator string.
+
 ## [0.3.1] - 2026-11-09
 
 ### Added
@@ -55,7 +65,8 @@ All notable changes to this project are documented here. The format follows
 - CHANGELOG.md, a check workflow (type-check + build on every push and PR), and a release workflow that publishes
   a GitHub release for each `vX.Y.Z` tag ([#3](https://github.com/lukasgolino/pagan-website/issues/3)).
 
-[Unreleased]: https://github.com/lukasgolino/pagan-website/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/lukasgolino/pagan-website/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/lukasgolino/pagan-website/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/lukasgolino/pagan-website/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/lukasgolino/pagan-website/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/lukasgolino/pagan-website/compare/v0.1.1...v0.2.0

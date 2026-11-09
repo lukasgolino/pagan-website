@@ -1,9 +1,87 @@
 # PAGAN reference
 
-Everything an agent needs to write PAGAN files. All source files are YAML. Quote palette keys and hex
-values (`"0"`, `"#1a1c2c"`): an unquoted `#` starts a YAML comment.
+Everything an agent needs to write PAGAN files, one section per `pagan docs` topic.
 
-## Project layout
+## Setup
+
+Setup check, who you work for, first-time setup, project layout.
+
+### Setup check
+
+1. `pagan --version` (it shows the exact build, e.g. `pagan 0.1.0 (v0.1.0, ce24ab4)`). If missing, install
+   it **the way the project specifies** (its requirements file / pinned tag, e.g.
+   `pip install -r requirements.txt`). Never replace a pinned install with an editable checkout
+   (`pip install -e`) unless you are developing PAGAN itself; if unsure, stop and ask.
+2. Find the art project: `pagan status` (it says so if there's no `pagan.toml` here or above), or look for one
+   (`find . -name pagan.toml -not -path '*/node_modules/*'`). That folder is the game's **art home**:
+   - `BRIEF.md` - what the game is, its key assets, the wishlist, and a dated feedback log
+   - `STYLE.md` - how the art must look, with a versioned changelog
+   - `pagan.toml` - palette, camera, light, lint rules, output dir
+   - `palettes/`, `sprites/`, `tiles/`, `models/` - the sources; every asset has a `description`
+3. **Always read BRIEF.md and STYLE.md before making or changing anything**, and run `pagan status`.
+   They are your memory between sessions: the chosen palette, sizes, perspective, references and
+   every decision the owner made live there, not in your head.
+4. No `pagan.toml` yet -> do **First-time setup** (below) before drawing anything.
+
+**PAGAN as MCP tools:** if you have PAGAN tools (`status`, `write_asset`, `preview`, ...), use them instead of
+the CLI; the workflow below is the same (`write_asset` lints, `preview` returns the image to look at).
+
+
+### 0b. Who you're working for
+
+You may be talking to a human, or (often) to an **orchestrator agent** that is building the game and
+comes to you for art. Either way:
+- Batch questions into ONE message, each with your recommended default, and say you'll use the defaults
+  if there's no answer. Never block: an orchestrator may answer later or not at all.
+- Report results so a program can use them: the asset name, its files (`pagan build --json` /
+  `manifest.json` entries: sheet, frame rects, animations, pivot), the preview sheet path, and any
+  decision you made. `manifest.json` in the output dir is the contract with the game (any engine).
+- Godot export (`.tres`) is a convenience when the game uses Godot; PAGAN is engine-agnostic.
+
+
+### First-time setup (a new game)
+
+Ask once, in ONE compact message, each question with a recommended default so the owner can just say
+"defaults":
+
+1. **The game** - name, genre, what the player does. (needed for BRIEF.md)
+2. **Rendering style** - traditional pixel art (default), or flat / vector-like arcade shapes (neon
+   triangles, glowing lines, no outlines or painted light), or painterly. Ask this; don't assume pixel art.
+3. **Perspective** - top-down 3/4 (default), straight top-down, side-on, or isometric. Sets `[camera]`.
+4. **Mood / references** - e.g. "warm and earthy", "neon", "Stardew-like", "Hyper Light Drifter".
+5. **Sizes** - small things 16x16 (default) or 32x32; big things (vehicles, bosses) e.g. 64-96px.
+   Does the game rotate or scale sprites freely? (then: supersample, below)
+6. **Look rules** (pixel art) - dark 1px outline (default) or none; light from the top-left (default).
+7. **Engine** - Godot 4 (default; give the path to the Godot project) or plain PNGs.
+8. **2D or 3D game?** - a 2D game (incl. top-down 3/4) uses sprites (default). A game with a free 3D camera
+   (it flies, goes below things, gets close) needs meshes: see `pagan docs meshes` and settle `voxel_size` now.
+
+Recipes per rendering style:
+- **Pixel art** - the rest of this skill's defaults: outline, light from the top-left, ramps dark -> light,
+  no pillow shading. These are pixel-art defaults, not PAGAN requirements.
+- **Flat / vector arcade** - `pagan init --style flat`: no outline, no painted light or shading ramps;
+  each object is a filled shape with a paler rim (`api.Canvas.polygon(points, lambda d: rim if d < 2 else
+  fill)`), lines/lasers with `line(..., width=)`; glow and lighting are done by the engine. If sprites rotate
+  freely: `pagan config set supersample 2` (draw at 2x, the build writes smooth anti-aliased PNGs) and in Godot
+  `godot.filter linear` + `godot.mipmaps true`. Show the owner one flat shape before detailing anything.
+- **Painterly** - pixel-art workflow with more ramp steps, soft dithering and no outline; consider
+  `supersample 2` for soft edges.
+
+Then:
+- `pagan init art --perspective <top-down|top-down-3/4|side|iso> --style <pixel|flat>` inside the game repo
+  (`--godot <godot project dir>` to build straight into it; `--open` only for throwaway prototypes). The
+  perspective sets `[camera] elevation` and is written into BRIEF.md. Inside a Godot project, init writes
+  `.gdignore` so Godot doesn't import the art sources.
+- Palette: propose 2-3 palettes (16-32 colors, grouped into ramps dark -> light; one ramp per material:
+  skin, wood, foliage, stone, metal, cloth...). Write them to `palettes/`, run `pagan palette show`,
+  **look at the swatches**, show the owner the paths, let them pick or tweak. Set `default_palette`.
+- `pagan.toml`: `output_dir` (e.g. `../game/assets/generated`), `export = ["png", "godot"]`,
+  `[camera] elevation` (top-down 3/4 ~ 40-45, straight down 90, side-on 10-15, level 0), `[light]`.
+- Fill in BRIEF.md (game, perspective, mood, key assets) and STYLE.md (ramp intent, scale, outline,
+  light, shading, animation rules). Log the owner's answers in BRIEF.md's feedback log.
+
+
+### Project layout
 
 ```
 pagan.toml   BRIEF.md   STYLE.md
@@ -16,7 +94,13 @@ previews/  (scratch, gitignored)    .pagan-cache/ (model render cache, gitignore
 Asset names: lowercase letters, digits, `_`, `-`; must match the file name and be unique across
 sprites, tiles and models.
 
-## Palette - `palettes/<name>.pal.yaml`
+## Palettes
+
+Palette notation: keys, ramps, translucent colours, palette variants.
+
+All source files are YAML. Quote palette keys and hex values (`"0"`, `"#1a1c2c"`): an unquoted `#` starts a YAML comment.
+
+### Palette - `palettes/<name>.pal.yaml`
 
 ```yaml
 name: dusk
@@ -45,7 +129,11 @@ tilesets: the PNG pixel gets that alpha. The default `outline_color` is the dark
 import` snaps to opaque colours only, and 3D model materials must be opaque (E013). `[lint] require_opaque
 = true` forbids them in a project (E015). `"#rrggbbff"` is the same as `"#rrggbb"`.
 
-## Sprite - `sprites/<name>.sprite.yaml`
+## Sprites
+
+Sprite notation: grids, derived frames, outline, shadow, animations, variants, fonts, 9-slice, trim.
+
+### Sprite - `sprites/<name>.sprite.yaml`
 
 ```yaml
 name: slime
@@ -151,11 +239,15 @@ shadow: { offset: [3, 4], color: "s" }                       # drop shadow of th
 ```
 
 Width 1 is exactly `outline: auto`; wider rings take every transparent pixel within `width` pixels (centre to
-centre) of the shape, up to 8 per ring. The shadow goes under the sprite (only on transparent pixels); a
+centre) of the shape, up to 8 output pixels per ring (8 x `supersample` source pixels). The shadow goes under the sprite (only on transparent pixels); a
 translucent colour (`"#00000080"`) suits it. Leave a transparent border as wide as all rings together, and room
 for the shadow on its side (E007; with `skip_translucent` on every ring, translucent pixels may touch the edge). With `supersample`, widths and offsets are in source pixels.
 
-## Tileset - `tiles/<name>.tiles.yaml`
+## Tilesets
+
+Tileset notation: tiles, layouts, animated tiles, textures.
+
+### Tileset - `tiles/<name>.tiles.yaml`
 
 ```yaml
 name: meadow
@@ -205,7 +297,11 @@ Each texture is a seamless PNG (plus one per variant when `variant_sheets` is on
 the texture's size in metres = pixels x `[mesh] voxel_size`, the same texel density as the meshes). The
 preview tiles every group 2x2 to check its seams.
 
-## 3D model - `models/<name>.model.yaml`
+## Models
+
+3D model notation: materials, parts, primitives, poses, rig, cameras.
+
+### 3D model - `models/<name>.model.yaml`
 
 ```yaml
 name: ship
@@ -337,7 +433,55 @@ holds the pivot, so overlays whose origin is their parent's pivot get a lint-val
 even sizes so a centred Godot sprite's `godot_offset` is whole pixels. `--write` puts the fit into the
 file (`size` and `pivot` edited in place, comments kept), so a generator can write -> `pagan fit --write` -> lint.
 
-## Meshes (3D games) - `export` has "mesh"
+## Meshes
+
+3D games: voxel_size, meshes (.glb), rigs, triangle budgets, mesh notation.
+
+### 3b. 3D games (meshes)
+
+When the game's camera moves freely in 3D, pre-rendered headings can't serve it: models must also build as
+meshes (`.glb`). Same model files, no edits; sprites still build too unless a model is mesh-only
+(`directions: 0`). Notation and output: below.
+
+**Setup** (once, with the owner):
+- `pagan config set export png,godot,mesh` (drop godot if the engine isn't Godot).
+- **Pick `voxel_size` with the owner** (`pagan config set mesh.voxel_size <metres>`); it's the game's texel
+  density, the same for every model. Work it out from the **closest the camera gets** and the render
+  resolution: on-screen pixels per voxel ~ `screen_height_px * voxel_size / (2 * distance * tan(fov / 2))`.
+  At the closest distance a voxel should cover a few pixels (chunky, readable), and anything gameplay hits
+  at close range needs real voxels: an eye that is a hit zone is at least 2x2 voxels, a hand 2-3 thick.
+  Example: 270 px tall, 70 degrees, closest 0.5 m, 0.0625 m voxels -> ~24 px per voxel up close, ~1 px at
+  12 m. Default 0.0625 (16 voxels per metre: a 1.8 m soldier is ~29 voxels tall). Huge, distant structures
+  may override `voxel_size` per model (W009 reminds you they'll look coarser), or be split into modules.
+- `[mesh] shading`: `ramp` (default: palette-locked lighting from the game's sun, Godot shader), `baked`
+  (fixed-side props, no shader), `flat` (the game shades). Godot scenes: Linear tonemapper, a
+  DirectionalLight3D (the sun) with shadows.
+
+**Making a 3D asset** - the loop in `pagan docs making`, plus:
+- **Rig for gameplay:** give an `id` to everything that moves, detaches or is hit (head, helmet, eyes,
+  shield, a trebuchet arm). In `rig:` set `parent` (children follow: helmet -> head -> torso), `pivot` at the
+  joint or hinge (shoulder, axle), `meta` for what game code reads (`hitzone: eye`, `detachable: true`,
+  `armour: 2`), `collision: box | convex` where the game needs a shape. The manifest gives each part's node
+  path, pivot and AABB (metres) for hitboxes. Only names and meanings the owner agreed; write them in BRIEF.md.
+- **Covering parts and big buildings:** a part drawn over another (a bucket helm over the head) replaces its
+  voxels, and an id left with none has no node (W013). Make the cover `shell: true` (hollow) instead; hollow
+  `shell` towers and walls also stay far under the 2M-voxel cap.
+- **Animations:** as poses; `interpolation: linear` for smooth mechanical motion (an arm swinging);
+  keep the default step for pixel-art timing. Show/hide parts per pose for props that appear.
+- **Review in 3D, not just the headings:** `pagan preview <model> --orbit` (undersides! a flying camera sees
+  them) and `--closeup <part>` for anything seen up close (faces, hit zones); `--engine` shows the real
+  shader in Godot (offscreen; needs Xvfb). Look at all of them before reporting.
+- **Triangle budget:** read `triangles` in `pagan build --json`'s manifest. Big flat areas of one material
+  merge into few triangles; noise (scattered single voxels, dithering, many materials) multiplies them.
+  Rough budgets unless the owner says otherwise: a prop < 2k, a character < 5k, a big structure < 30k.
+- **Models or textures?** Things with a silhouette and depth (characters, siege engines, towers) are models.
+  Big repeating flat surfaces (ground, wall faces, roofs) are tile textures: a tileset with
+  `export_textures` (seamless tiles, `groups` to break up repetition, `triplanar: true` in Godot).
+- **Report back:** `godot_scene` (or `glb`), the part node paths and `meta` keys, animation names, the
+  triangle count, `voxel_size`, and the preview paths.
+
+
+### Meshes (3D games) - `export` has "mesh"
 
 For a free 3D camera (flying, below models, close up), models also build as real meshes. Opt-in: without
 "mesh" nothing changes. Per model:
@@ -380,37 +524,100 @@ For a free 3D camera (flying, below models, close up), models also build as real
   `part.reparent(world)` (keeps its global transform). Swap a variant: on every MeshInstance3D, replace each
   surface override material that is `godot_materials[i]` with the variant's `godot_materials[i]`.
 - **Review:** `pagan preview <model> --orbit` (every heading from -30 to 90 degrees elevation),
-  `--closeup <part>`, `--engine` (the built .tscn rendered by Godot; needs a display).
+  `--closeup <part>`, `--engine` (the built .tscn rendered by Godot; renders offscreen, needs Xvfb).
 
-## Timeline preview - `scenes/<name>.timeline.yaml`
+## Making
 
-Several sprites (or 3D models' frames) composed in time, to judge how they play together (does the flash
-line up with the hit, is the glint readable over the letters). A preview only: `pagan build` and the
-manifest never read it. `pagan lint` checks it with the project (E016; all problems, with lines and fixes).
+Making an asset: 2D or 3D, sizes, the lint/preview/review loop, what to report.
 
-```yaml
-size: [640, 240]              # canvas, in output pixels (supersampled sprites are shown as built)
-fps: 30                       # timeline frames per second (frames/f0000.png at t = 0, 1/30, ...)
-duration: 6                   # seconds
-background: "#101018"         # optional; default transparent (previews then show --bg)
-layers:                       # drawn in list order (later on top), alpha-composited
-  - {sprite: bg_smoke, anim: smoke, at: [0, 0], alpha: 0.6}
-  - {sprite: letters, anim: a, at: [75, 200], start: 0.25, fade_in: 0.45}
-  - {sprite: arrow, anim: fly, from: [-400, -60], to: [583, 131], start: 1.87, duration: 0.12, then: shudder}
-  - {sprite: fx, anim: sparks, at: [583, 131], start: 1.99, variant: blue}
-```
+### Making an asset
 
-Layer fields (no others): `sprite` (asset name; sprites and 3D models, not tilesets), `anim` (an animation,
-or a frame name shown still), `at: [x, y]` (where the sprite's pivot goes), `start` (seconds, default 0),
-`duration`, `alpha` (0-1, default 1), `fade_in` / `fade_out` (seconds), `from` / `to` (instead of `at`:
-a straight move over `duration`, rounded to whole pixels; the layer then stays at `to`), `then` (the
-animation that follows when a one-shot `anim` (`loop: false`) ends; without it the last frame holds),
-`variant`. `duration` without `from`/`to` = how long the layer is shown (default: to the end); `fade_out`
-ends where the layer ends (with a move: the end of the timeline). Animations play from the layer's `start`
-with their own fps, loop and `durations`. No easing, rotation or scale: use derived frames for those.
-Times are exact (0.1 is 1/10 s), so output is identical on every machine.
+**Ask only what you can't infer** (BRIEF/STYLE usually answer size, palette, outline). Typical
+questions, with your defaults: what it looks like (colors, key features), size, 2D or 3D, how many
+directions, which animations. Start with ONE asset and get it approved before making related ones.
+
+**Size is the requester's choice.** PAGAN makes any size (sprites/tiles up to 4096x4096, e.g. a 1x 1920-wide
+splash; model frames up to 1024). Small means less detail; that's the deal, so say so if a request is small for what it describes
+(e.g. "a 16px knight with a visible crest" won't read). To go bigger:
+- the same model, chunkier: raise `camera: { scale: 2 }` in the model and double `size`/`pivot`;
+- more detail: model it with more voxels at scale 1. For characters keep real depth and chunky parts
+  (torso 4-6 voxels deep, limbs 2-3 voxels thick, head ~1/3 of the height), or the side views turn into sticks.
+
+**2D or 3D?**
+- **3D model** (`pagan new model`) for anything that needs several headings or rotations (ships,
+  vehicles, top-down characters that turn), props seen at angles, buildings. Headings come out
+  consistent automatically and share the project light. Animate with poses (parts move by whole voxels).
+- **2D sprite** (`pagan new sprite`) for icons, UI, items, front/side-view characters, effects, and
+  anything flat. Also for **small props that need one view** (a 16px barrel, crate, potion): at 1 voxel
+  per pixel a tiny model has too few voxels to read, so hand-draw it (or `pagan bake` a model and touch it up).
+- **Shortcuts only when they don't cost quality:** `mirror: horizontal` and derived frames
+  (`from`/`flip`/`shift`) save time, but mirroring lights both sides the same, which is wrong when the light
+  comes from one side. Use them for front-facing symmetric subjects or where the difference can't be seen;
+  never trade a worse sprite for less work.
+- **Tileset** (`pagan new tiles`) for terrain; tiles must be seamless. Animated terrain (water, lava)
+  is a tileset `animations:` entry, not a separate sprite. Check transitions between different tiles
+  with `pagan preview <tileset> --scene layout.txt`.
+- **UI and fonts:** a 9-slice panel/button gets `nine_slice: [l, t, r, b]` (the margins reach the manifest; a
+  hollow centre may need `lint: { disable: [W001] }`); a pixel font is a sprite with `font:` (glyph order,
+  cell, baseline, advance): the build writes its metrics to the manifest and a `.fnt` Godot loads as a FontFile.
+- **2D sprites that turn** (birds, arrows, flat arcade ships) when a model isn't right: draw the shape once
+  facing east and let `api.directional_frames` + `api.rotate_points` make every heading (same names as models).
+- **Many similar assets or procedural shapes** (effect bursts, 16-tile corner sets, a family of ships,
+  polygon ships with rims):
+  write a generator script on `pagan.api` (`pagan docs api`) - never copy PAGAN's geometry or lint rules into
+  your own code; they'd drift. Keep the script next to the art and regenerate rather than hand-edit.
+  Generated art of a megapixel or more (title logos, backdrops): write the frames with `api.frames_png`
+  (an indexed PNG + `frames_png:`) instead of text grids, so the source stays small.
+
+**The loop** (cap at ~4 rounds, then show the owner what you have):
+1. Scaffold: `pagan new sprite|model|tiles <name> --size WxH --description "..."` (description = what it
+   is and what it should look like; future you will rely on it).
+2. Author the grid / parts. Write rows carefully: every row exactly the frame width.
+3. `pagan lint <file>` -> fix every error; read warnings (orphans, ramps, jitter) and fix real ones.
+   A warning that's wrong *by design* for one asset (an expanding burst trips W005/W007) goes in that
+   file's `lint: { disable: [...] }` or `lint: { for: { <frame>: [...] } }` - never in pagan.toml, which
+   would hide real problems everywhere. Models: `pagan fit <model>` gives a size and pivot that fit
+   every heading and pose; `--write` puts them in the file (after adding animations, run it again).
+4. `pagan preview <name>` -> **open `previews/<name>/sheet.png` with the Read tool and look at it.**
+   (It also writes 1x frames to `previews/<name>/native/` for scripted montages.) A sheet over 4096 px is
+   split into pages: `sheet.png` is then an overview and each animation (models: each pose, every heading)
+   gets `sheet.<animation>.png` (continued in `sheet.<animation>.2.png`, ...): open the pages too.
+   Sprites meant to play together (a title, a hit and its sparks, a cutscene): put them in a
+   `scenes/<name>.timeline.yaml` (`pagan docs timeline`) and `pagan preview scenes/<name>.timeline.yaml
+   --at 1.9,2.0` -> look at `previews/<name>.timeline/at.png` (and timeline.gif).
+5. Self-review against STYLE.md and the reference assets (`pagan gallery` shows the whole set):
+   silhouette readable at 1x? light from the right side? ramps used dark->light? no pillow shading?
+   (flat style: clean shapes, even rims, no stray pixels.) Supersampled: judge `built_1x.png`, not the source.
+   consistent with the other assets' size and detail? For animations: the "changes" row should only
+   light up the parts that are meant to move - no jumps.
+6. Show the owner: the sheet path (and GIF paths), a one-line summary, and any choice you made.
+   If the owner isn't around, leave it `status: draft`, note it in BRIEF.md (wishlist: "awaiting review")
+   with the choices and open questions, and move on.
+7. On approval: `pagan mark <name> --status approved`, add it to BRIEF.md "Done" (and log feedback),
+   `pagan build` (add `--verify-godot` if GODOT is set). Uncached models and Godot print `pagan: ...`
+   progress on stderr; a first build of many big models can take minutes, so give the command a long
+   timeout rather than assuming it hung.
+8. **Report back** what the game side needs to use it (from `manifest.json`): the sheet / `.tres` paths,
+   animation names, frame size, and:
+   - **Pivot:** resources can't carry it. In Godot set `centered = true` and
+     `offset = Vector2(godot_offset[0], godot_offset[1])` on the AnimatedSprite2D/Sprite2D (manifest value);
+     elsewhere, draw the frame with its `pivot` pixel at the object's position.
+   - **3D models:** one animation per heading (`e`, `ne`, ...) plus `<anim>_<heading>`; the game picks
+     the heading from its movement direction.
+   - **Animation order:** `animation_order` (manifest keys are sorted alphabetically).
+   - **Tilesets:** a Godot `TileSet` `.tres` (`godot_tileset`) with every tile in atlas source 0 at the
+     coordinates in the manifest's `tiles` (`name -> [column, row]`); no terrains/collision yet, set those
+     up in the editor if needed.
+
+**Trying alternatives:** asset names must be unique across sprites, tiles and models, so give
+experiments their own names (`barrel_a`, `barrel_b`, or `pagan bake <model> --name <other>`), compare them
+in `pagan gallery`, then delete the losers and keep the winner under the real name.
 
 ## Recipes
+
+Recipes: common assets step by step.
+
+### Recipes
 
 **Top-down character (3D, ~22px tall in a 32x32 frame, walk cycle).** Separate parts with ids for
 everything that moves; poses offset them by whole voxels so the body never jumps:
@@ -447,52 +654,38 @@ braced ~30° so they read from every heading, `line` for spars, flags as small b
 **Icons and items (2D).** 16x16 sprite, `outline: auto`, light from the top-left, one or two ramps,
 `mirror: horizontal` only if the light can be symmetric.
 
-## Generator scripts: `pagan.api`
+## Config
 
-When a script is quicker than hand-written grids (effects, corner/terrain sets, families of ships), build
-on `from pagan import api` instead of copying PAGAN's maths; it's versioned with PAGAN (`api.API_VERSION`).
+Project settings: config show/set, camera, light, supersample; every pagan.toml key.
 
-- `api.Canvas(w, h)`: `put`, `rect`, `line` (`width=` for thick strokes, round ends), `circle`, `ellipse`, `ring`,
-  `polygon(points, key)`, `triangle(a, b, c, key)`, `blit`, `flip`; for rect/ellipse/ring a key can be a
-  function `(dx, dy) -> key` (offsets in radii, -1..1); for polygon/triangle a function `d -> key` (d = pixel
-  centre's distance to the nearest edge in pixels: `lambda d: "rim" if d < 2 else "fill"` = a 2px rim);
-  shapes fill pixels whose centres are strictly inside; `api.polygon_distance(points, x, y)` is the signed
-  distance (+ inside). `fade(amount, seed)` dissolves from the edge,
-  `scatter(n, key, seed, box, size)`, `orphans()` (exactly W001), `remove_orphans()`, `pair_orphans()`, `rows()`.
-- Big canvases (numpy): `Canvas.from_array(keys_array)` or `Canvas.from_array(index_array, "rstuv")` (negative =
-  transparent), `to_array()`, `mask()` (bool, opaque); `distance_field(mask)` (signed, exact Euclidean between
-  pixel centres: + inside, - outside), `bevel(mask, width, light)` -> 0..1 brightness of a bevelled shape,
-  `dither(keys, t, x, y, matrix=4)` (ordered Bayer dithering between ramp steps; scalars or arrays from `np.mgrid`).
-  Draw in numpy, hand PAGAN the keys.
-- Lettering with a project font sprite (`font:`): `canvas.text(api.load("sprites/font.sprite.yaml"), "THWACK!", x,
-  y, scale=1, key=None)` (a `Canvas` method; top-left at (x, y), the build's advances, `key` = one key for every pixel).
-- Built-in pixel fonts, no project or palette needed: `canvas.text(api.pixel_font("3x5"), "EXIT", x, y, key="k")`
-  (`key` required). `"3x5"` and `"5x7"`, printable ASCII, monospaced (advance 4 / 6 px, line height 6 / 8); the
-  3x5 font letters lowercase with its uppercase glyphs. Generators only: for in-game text, draw a `font:` sprite.
-- Lettering from a real typeface: `text_mask("A", font="fonts/Serif.ttf", cap_height=104, variation={"wght": 900},
-  anchor="baseline_centre", rotate=3, scale=(0.9, 1), supersample=4)` -> `.coverage` (0..1 floats), `.mask()`
-  (bool), `.origin` (the anchor in the mask), `.advance` (kerning included), `.bbox`. Rotate/scale turn about the
-  anchor, so a tilting letter's frames stay aligned; `variation` is axis values by tag or a named instance ("Bold").
-  Then `distance_field(text.mask())` / `bevel(...)` for bevels, outlines and extrusions.
-- Shading: `light_2d(project)` (the project's light for flat art), `sphere_light(dx, dy, light)`,
-  `ramp_pick(keys, t)`, `hash01(x, y, seed)`, `periodic_noise(x, y, period, seed)` (seamless), `smoothstep`.
-- Terrain: `corner_tiles(prefix, size, paint, seed, amp)` -> the 16 Match-Corners tiles
-  `<prefix>_<NW><NE><SW><SE>`; `paint(field, x, y, corners)` returns a key, `field(x, y) >= 0.5` = upper
-  terrain. `compose(tileset_asset, "a b\nb a")` -> a PIL image of a layout.
-- 3D: `shape_cells(shape, spec)` = the voxels a part fills; `hull_reach(x, length, beam, bow, stern, keel)`;
-  `sail_cells(at, width, height, bulge, brace, rig, yard)` -> cells with their cloth position (`u`, `row`),
-  e.g. to place patches or gun ports exactly on a sail or hull side.
-- 2D headings: `directional_frames(draw, size, directions=8)` -> one Canvas per heading, named like model
-  headings (e, ne, n, ...; h00-h31); `draw(canvas, angle)` paints the shape turned to `angle` degrees,
-  usually via `rotate_points(points, angle, about)` (a shape drawn facing east; counter-clockwise on screen).
-- Files (numpy numbers are fine in sizes and fields): `sprite_yaml(name, size, frames, animations, **fields)`, `tileset_yaml(...)`, `write(path, text)`
-  (writes only on change), `load(path)` -> parsed asset, `open_project(path)`, `palette(name, project)`.
-- Big generated sprites: `spec = api.frames_png("sprites/logo.frames.png", frames, size, palette=None, columns=8)`
-  writes the frames as an indexed PNG (only on change) and returns the `frames_png:` value; then
-  `sprite_yaml("logo", size, {}, animations, frames_png=spec)` (keep the sprite file next to the PNG).
-  `palette` only makes the PNG show real colours in image viewers.
+### 0c. Project settings are configurable, saved and shared
 
-## `pagan.toml`
+The project's look lives in `pagan.toml`, not in individual assets. **Run `pagan config show`** to see every
+setting, its current value, its default and what it means. Every one can change at any time:
+
+| Setting | Default | Change it when the owner says... |
+|---|---|---|
+| `camera.elevation` | 42 (top-down 3/4) | "the angle is too high/low", "more top-down", "more side-on" |
+| `light.direction` | [-0.5, 0.45, 0.75] (top-left) | "light from the right", "sun overhead" |
+| `light.ambient` / `light.shadow_strength` | 0.2 / 0.65 | "darker shadows", "softer shadows" |
+| `light.baked` + `export` "normals" | true / off | "the game has its own lighting" (flat colors + normal maps) |
+| `default_palette` | (chosen at setup) | "try a different palette" |
+| `camera.scale` | 1 | "everything 3D should be bigger/smaller" |
+| `camera.projection` + `tile` / `cell` / `z_step` | "orthographic" / [64, 32] / 16 / 0 | "models must match our 2:1 iso tiles exactly" -> "dimetric" (models: heading 45, directions 4) |
+| `supersample` | 1 (off) | "smooth edges", "sprites rotate freely", "not pixel art" (draw at 2x, build smooths) |
+| `godot.filter` / `godot.mipmaps` | inherit / false | "blurry/shimmering when rotated or scaled" (linear + mipmaps) |
+
+`[camera]`/`[light]` only matter for 3D models; `config show` marks them unused when there are none.
+
+`pagan config set <key> <value>` validates and saves the change (invalid values are rejected; nothing is
+written). It then tells you what refreshes: **3D models re-render automatically** on the next `pagan
+build`/`preview`; palette changes recolor every asset; **hand-drawn 2D sprites don't change**, so if they
+must match a new angle or light, `pagan style bump "..."` and redraw them (`pagan docs evolve`). Log the change in
+BRIEF.md's feedback log. Use the defaults until someone asks for something else, and say which defaults
+you used.
+
+
+### `pagan.toml`
 
 ```toml
 palette_mode = "strict"            # strict: palette files only | open: inline palettes allowed
@@ -542,11 +735,16 @@ require_outline = false            # E011
 require_opaque = false             # E015: no translucent "#rrggbbaa" colours in sprites/tilesets
 ```
 
-## Commands (all accept `--json`; non-zero exit on errors)
+## Commands
+
+Every command and its flags.
+
+### Commands (all accept `--json`; non-zero exit on errors)
 
 Slow steps (a model render that isn't cached yet, Godot) print `pagan: ...` progress lines on stderr
 (`--quiet` or `PAGAN_QUIET=1` turns them off; stdout and `--json` are unaffected). Models render in
-several processes (`PAGAN_JOBS=N`, default: the CPU count up to 8; `1` = one process); output is identical.
+several processes (`PAGAN_JOBS=N`, default: the CPU count up to 8, and at most one per GiB of available memory; `1` = one process);
+output is identical.
 Renders are cached in `<project>/.pagan-cache/`; `PAGAN_CACHE_DIR=/path` shares one cache between several
 checkouts of the same art (e.g. agents' git worktrees), so a fresh checkout doesn't re-render every model.
 Big sprites and tilesets (a megapixel or more of source pixels) are cached there too: the parsed frames, their
@@ -562,7 +760,7 @@ parallel (`PAGAN_JOBS`); output is identical.
 | `pagan new tiles <name> [--size] [--frames N]` | blank tileset |
 | `pagan new model <name> [--size 64x64] [--directions 8]` | starter model (`--directions 0`: a mesh-only model for 3D games) |
 | `pagan lint [paths] [--warnings-as-errors]` | errors + style warnings |
-| `pagan preview <model> --orbit \| --closeup PART \| --engine [--all-previews]` | 3D review: orbit.png (8 headings x elevations -30, 0, 30, 60, 90: undersides too), closeup_<PART>.png (one part filling the view, in place and alone), engine.png (the built .tscn through Godot: needs a display); only these unless `--all-previews` |
+| `pagan preview <model> --orbit \| --closeup PART \| --engine [--all-previews]` | 3D review: orbit.png (8 headings x elevations -30, 0, 30, 60, 90: undersides too), closeup_<PART>.png (one part filling the view, in place and alone), engine.png (the built .tscn through Godot: renders offscreen, needs Xvfb); only these unless `--all-previews` |
 | `pagan preview <asset...> [--scale N] [--grid] [--bg checker\|none\|#rrggbb] [--scene FILE] [--frame NAME] [--variants options\|all]` | sheet.png (labelled; over 4096 px on a side it's split into pages: sheet.png = overview (headings or frames outside animations, variants, as-built/tiling rows, an index of pages) + one page per animation, `sheet.<animation>.png` (models: per pose, every heading), each wrapped to 4096 px wide and continued in `sheet.<animation>.2.png`, `.3`, ... (the overview in `sheet.2.png`) when taller; the `--json` result lists them in `sheet_pages`), montage.png (frames/headings packed on the background, e.g. `--bg "#1d3b53"` sea), frames/ and GIFs, all at the printed scale, plus native/ (1x frames and sheet, as `pagan render`); variants.png + variants_1x.png (base and every variant side by side: the first frame with pixels, or `--frame`) when the asset has variants (with `variant_axes`: each axis option on its own, named `<axis>.<option>`; `--variants all` = every combination); `--scene` (tilesets): scene.png from a layout file (rows of tile names, `.` = empty) and scene_variants.png; supersampled assets also get an "as built" row and built_1x.png (what the game gets) |
 | `pagan preview scenes/<name>.timeline.yaml [--at 0.5,2.0] [--scale N] [--grid] [--bg ...]` | timeline: `previews/<name>.timeline/` frames/f0000.png..., timeline.gif, and with `--at` at.png (a contact sheet of those times) |
 | `pagan gallery` | every asset in one image |
@@ -577,19 +775,24 @@ parallel (`PAGAN_JOBS`); output is identical.
 | `pagan mark <asset...> [--status approved] [--current] [--outdated]` | record reviews |
 | `pagan style bump "note"` | new style version; flags older assets (W006) |
 | `pagan build [--verify-godot] [--godot-timeout S]` | final assets + manifest (+ Godot .tres); each Godot step may take S seconds (default 600) |
+| `pagan docs [topic...] [--search words]` | these docs: list the topics, print one, or find the paragraphs you need |
 | `pagan skill install [dir]` | install this skill into a repo's `.claude/skills/` |
-| `pagan mcp [--project DIR] [--allow-godot]` | MCP server over stdio (needs `pagan[mcp]`) |
+| `pagan mcp [--project DIR] [--allow-godot]` | MCP server over stdio (`uvx pagan-gen mcp` without an install) |
 
-**MCP tools** (same JSON as the commands above): `status`, `read_docs`, `write_doc`, `log_feedback`,
+**MCP tools** (same JSON as the commands above): `status`, `docs` (these topics), `read_docs`, `write_doc`, `log_feedback`,
 `config_show`/`config_set`/`config_unset`, `palette_list`, `palette_show` (image), `palette_write`,
 `palette_adjust` (dry run by default; image), `scaffold`, `read_asset`, `write_asset` (writes + lints +
 preview image), `lint`, `preview` (image: sheet, montage, variants, built, orbit, closeup with `part`, or engine; `page: <animation>` = that page of a split sheet), `gallery` (image), `fit` (`write: true` edits the model's size and pivot),
 `mark`, `style_bump`, `import_png` (path or base64), `build` (`verify_godot` needs `--allow-godot`),
-`manifest`. Resources: `pagan://workflow`, `pagan://reference`, `pagan://brief`, `pagan://style`,
+`manifest`. Resources: `pagan://workflow`, `pagan://docs/{topic}`, `pagan://brief`, `pagan://style`,
 `pagan://manifest`, `pagan://palette/{name}`, `pagan://asset/{name}`. Prompts: `setup_new_game`,
 `make_asset`, `change_the_look`, `review_asset`. Errors come back as results (`ok: false` + `findings`).
 
-## Lint rules
+## Lint
+
+Lint rules: what each means and how to fix it.
+
+### Lint rules
 
 Errors: E000 command/usage, E001 YAML/field, E002 unknown pixel key, E003 grid size, E004 missing
 animation frame, E005 palette problem, E006 variant problem, E007 outline or shadow clipped at the edge, E008 pivot,
@@ -608,7 +811,11 @@ W014 (any asset): the built sheet is over 16384 px on a side (many engines, Godo
 Turn warnings off project-wide with `[lint] disable`, or per asset/frame/animation with the file's `lint:`.
 W001 isn't checked on 3D models (a rendered orphan can't be fixed pixel by pixel).
 
-## Build output (any engine)
+## Build
+
+Build output (any engine): manifest.json, sheets, pivots.
+
+### Build output (any engine)
 
 `manifest.json` in `output_dir` describes everything: per asset its kind, sheet, frame rects, animations
 (frames, fps, loop, and `durations` when set; `loop_from` animations are split as below), pivot, `godot_offset`, headings (models), tiles (`name -> [column, row]` for
@@ -644,6 +851,10 @@ trimmed (E001 with an explicit `trim: true`; the project default skips them); ti
 
 ## Godot
 
+Godot: SpriteFrames, TileSets, fonts, meshes, filters.
+
+### Godot
+
 `pagan build` writes `sprites/<name>.png` + `<name>.tres` (SpriteFrames, one animation per PAGAN
 animation; sprites without animations get one per frame), `tiles/<name>.png` + `<name>.tres` (TileSet:
 one atlas source, every tile created, animated tiles as atlas tile animations; add terrains/physics in
@@ -658,3 +869,180 @@ Project settings for crisp pixels: Default Texture Filter = Nearest, stretch mod
 Smooth, freely rotated or scaled sprites: `[godot] filter = "linear"` (the SpriteFrames' CanvasTexture
 carries it) and `mipmaps = true` (PAGAN keeps `mipmaps/generate` in each PNG's `.import`; Godot keeps its
 other import settings). TileSets have no filter of their own: set `texture_filter` on the TileMapLayer.
+
+## Timeline
+
+Timeline previews: sprites composed in time.
+
+### Timeline preview - `scenes/<name>.timeline.yaml`
+
+Several sprites (or 3D models' frames) composed in time, to judge how they play together (does the flash
+line up with the hit, is the glint readable over the letters). A preview only: `pagan build` and the
+manifest never read it. `pagan lint` checks it with the project (E016; all problems, with lines and fixes).
+
+```yaml
+size: [640, 240]              # canvas, in output pixels (supersampled sprites are shown as built)
+fps: 30                       # timeline frames per second (frames/f0000.png at t = 0, 1/30, ...)
+duration: 6                   # seconds
+background: "#101018"         # optional; default transparent (previews then show --bg)
+layers:                       # drawn in list order (later on top), alpha-composited
+  - {sprite: bg_smoke, anim: smoke, at: [0, 0], alpha: 0.6}
+  - {sprite: letters, anim: a, at: [75, 200], start: 0.25, fade_in: 0.45}
+  - {sprite: arrow, anim: fly, from: [-400, -60], to: [583, 131], start: 1.87, duration: 0.12, then: shudder}
+  - {sprite: fx, anim: sparks, at: [583, 131], start: 1.99, variant: blue}
+```
+
+Layer fields (no others): `sprite` (asset name; sprites and 3D models, not tilesets), `anim` (an animation,
+or a frame name shown still), `at: [x, y]` (where the sprite's pivot goes), `start` (seconds, default 0),
+`duration`, `alpha` (0-1, default 1), `fade_in` / `fade_out` (seconds), `from` / `to` (instead of `at`:
+a straight move over `duration`, rounded to whole pixels; the layer then stays at `to`), `then` (the
+animation that follows when a one-shot `anim` (`loop: false`) ends; without it the last frame holds),
+`variant`. `duration` without `from`/`to` = how long the layer is shown (default: to the end); `fade_out`
+ends where the layer ends (with a move: the end of the timeline). Animations play from the layer's `start`
+with their own fps, loop and `durations`. No easing, rotation or scale: use derived frames for those.
+Times are exact (0.1 is 1/10 s), so output is identical on every machine.
+
+## Evolve
+
+Changing the look over time: palette adjust, config, style bump.
+
+### Changing the look over time
+
+Look changes go through the palette and the project light whenever possible, because then **every
+asset updates at once** and stays consistent:
+
+| Owner says | Do |
+|---|---|
+| "darker" / "lighter" | `pagan palette adjust <pal> --lightness -0.05` (or +) |
+| "more contrast" | `pagan palette adjust <pal> --contrast 1.15` |
+| "more pastel" / "muted" | `pagan palette adjust <pal> --saturation 0.6 --lightness 0.04` |
+| "more vivid" | `--saturation 1.2` |
+| "warmer" / "cooler" | `--warmth 0.02` / `--warmth -0.02` |
+| "only the greens darker" | add `--ramp <ramp>` (or `--keys ...`) |
+| "more / softer shadows" | `pagan config set light.ambient 0.1` (3D re-renders); 2D: needs redrawing (below) |
+| "light from the right" | `pagan config set light.direction "[0.5, 0.45, 0.75]"`; 2D: redraw (below) |
+| "lower / higher camera angle" | `pagan config set camera.elevation 30` (3D re-renders); 2D: redraw (below) |
+| "our engine does the lighting" | `pagan config set light.baked false` and add "normals" to `export` |
+| "try a different palette" | `--out <new>` to make a copy, or a new palette with the SAME keys, then switch `default_palette` (grids reference keys, so assets carry over) |
+
+Always use `--dry-run` or the before/after swatch it writes, then `pagan gallery` to check the whole
+set, and log the change in BRIEF.md's feedback log.
+
+**When existing 2D art must be redrawn** (more shading, new outline style, new proportions):
+1. `pagan style bump "what changed and why"` - bumps `style_version`, logs it in STYLE.md.
+2. Update STYLE.md's rules to match.
+3. `pagan status` lists every asset flagged "review for style vN" (lint W006).
+4. Go through them one by one: update, preview, look, then `pagan mark <name> --current`.
+5. `pagan gallery` at the end; `pagan build`.
+
+## Api
+
+Generator scripts: the pagan.api Python API.
+
+### Generator scripts: `pagan.api`
+
+When a script is quicker than hand-written grids (effects, corner/terrain sets, families of ships), build
+on `from pagan import api` instead of copying PAGAN's maths; it's versioned with PAGAN (`api.API_VERSION`).
+
+- `api.Canvas(w, h)`: `put`, `rect`, `line` (`width=` for thick strokes, round ends), `circle`, `ellipse`, `ring`,
+  `polygon(points, key)`, `triangle(a, b, c, key)`, `blit`, `flip`; for rect/ellipse/ring a key can be a
+  function `(dx, dy) -> key` (offsets in radii, -1..1); for polygon/triangle a function `d -> key` (d = pixel
+  centre's distance to the nearest edge in pixels: `lambda d: "rim" if d < 2 else "fill"` = a 2px rim);
+  shapes fill pixels whose centres are strictly inside; `api.polygon_distance(points, x, y)` is the signed
+  distance (+ inside). `fade(amount, seed)` dissolves from the edge,
+  `scatter(n, key, seed, box, size)`, `orphans()` (exactly W001), `remove_orphans()`, `pair_orphans()`, `rows()`.
+- Big canvases (numpy): `Canvas.from_array(keys_array)` or `Canvas.from_array(index_array, "rstuv")` (negative =
+  transparent), `to_array()`, `mask()` (bool, opaque); `distance_field(mask)` (signed, exact Euclidean between
+  pixel centres: + inside, - outside), `bevel(mask, width, light)` -> 0..1 brightness of a bevelled shape,
+  `dither(keys, t, x, y, matrix=4)` (ordered Bayer dithering between ramp steps; scalars or arrays from `np.mgrid`).
+  Draw in numpy, hand PAGAN the keys.
+- Lettering with a project font sprite (`font:`): `canvas.text(api.load("sprites/font.sprite.yaml"), "THWACK!", x,
+  y, scale=1, key=None)` (a `Canvas` method; top-left at (x, y), the build's advances, `key` = one key for every pixel).
+- Built-in pixel fonts, no project or palette needed: `canvas.text(api.pixel_font("3x5"), "EXIT", x, y, key="k")`
+  (`key` required). `"3x5"` and `"5x7"`, printable ASCII, monospaced (advance 4 / 6 px, line height 6 / 8); the
+  3x5 font letters lowercase with its uppercase glyphs. Generators only: for in-game text, draw a `font:` sprite.
+- Lettering from a real typeface: `text_mask("A", font="fonts/Serif.ttf", cap_height=104, variation={"wght": 900},
+  anchor="baseline_centre", rotate=3, scale=(0.9, 1), supersample=4)` -> `.coverage` (0..1 floats), `.mask()`
+  (bool), `.origin` (the anchor in the mask), `.advance` (kerning included), `.bbox`. Rotate/scale turn about the
+  anchor, so a tilting letter's frames stay aligned; `variation` is axis values by tag or a named instance ("Bold").
+  Then `distance_field(text.mask())` / `bevel(...)` for bevels, outlines and extrusions.
+- Shading: `light_2d(project)` (the project's light for flat art), `sphere_light(dx, dy, light)`,
+  `ramp_pick(keys, t)`, `hash01(x, y, seed)`, `periodic_noise(x, y, period, seed)` (seamless), `smoothstep`.
+- Terrain: `corner_tiles(prefix, size, paint, seed, amp)` -> the 16 Match-Corners tiles
+  `<prefix>_<NW><NE><SW><SE>`; `paint(field, x, y, corners)` returns a key, `field(x, y) >= 0.5` = upper
+  terrain. `compose(tileset_asset, "a b\nb a")` -> a PIL image of a layout.
+- 3D: `shape_cells(shape, spec)` = the voxels a part fills; `hull_reach(x, length, beam, bow, stern, keel)`;
+  `sail_cells(at, width, height, bulge, brace, rig, yard)` -> cells with their cloth position (`u`, `row`),
+  e.g. to place patches or gun ports exactly on a sail or hull side.
+- 2D headings: `directional_frames(draw, size, directions=8)` -> one Canvas per heading, named like model
+  headings (e, ne, n, ...; h00-h31); `draw(canvas, angle)` paints the shape turned to `angle` degrees,
+  usually via `rotate_points(points, angle, about)` (a shape drawn facing east; counter-clockwise on screen).
+- Files (numpy numbers are fine in sizes and fields): `sprite_yaml(name, size, frames, animations, **fields)`, `tileset_yaml(...)`, `write(path, text)`
+  (writes only on change), `load(path)` -> parsed asset, `open_project(path)`, `palette(name, project)`.
+- Big generated sprites: `spec = api.frames_png("sprites/logo.frames.png", frames, size, palette=None, columns=8)`
+  writes the frames as an indexed PNG (only on change) and returns the `frames_png:` value; then
+  `sprite_yaml("logo", size, {}, animations, frames_png=spec)` (keep the sprite file next to the PNG).
+  `palette` only makes the PNG show real colours in image viewers.
+
+## Follow up
+
+Follow-up requests: directions, new animations, enemies, variants, families, translucency.
+
+### Follow-up requests on existing assets
+
+- **"Give it 8 directions / rotations"**: if it's a 2D sprite, rebuild it as a model (`models/`) so
+  every heading is consistent (`directions: 8`), matching the approved sprite's colors and proportions,
+  then remove/rename the sprite (asset names must be unique). Models already have them: change
+  `directions`.
+- **New animation** (sword swing, walk, hop): models -> add parts with `id:` and an `animations:` entry
+  with one pose per frame (parts move by whole voxels; `roll`/`pitch` tilt the whole model, e.g. a ship
+  listing as it sinks; a part can rotate about a hinge, e.g. a falling mast). Damage and extras are
+  `hidden: true` parts (overlays: they never alter the normal frames; with `carve: true` they cut holes)
+  that poses `show`; 2D -> add frames (derive with `from`/`shift` where possible) and an
+  `animations` entry (squash/stretch, tipping and pulsing: `from` + `scale`/`rotate`). Keep everything that shouldn't move on exactly the same pixels; check the changes
+  row and W007. Typical frame counts: idle 2-4, walk 4-6, attack 3-5.
+- **"Make an enemy / another character"**: new asset in the same style - same palette, outline, light,
+  proportions; compare side by side with `pagan gallery`. Variants (`variants:` ramp_swap/key_swap/
+  palette) are the cheap way to make recolored versions (elite enemy, night version, team colours);
+  `pagan preview` writes variants.png to compare them. When the base colours are one of the set (team
+  cyan + red/orange/...), name them with `base_variant: cyan` so the manifest lists all of them uniformly. Many variants of big models multiply sheet sizes:
+  if the game can recolour in a shader, set `variant_sheets = false` and point it at each variant's
+  `swap` table in manifest.json. **A look for a whole set** ("everything on the map gets an arctic
+  version"): put the variant in the palette file (`variants: { arctic: { ramp_swap: ..., tags: [world] } }`),
+  not into every asset; tilesets compare variants on their first drawn tile (`--frame NAME` for another, and
+  `--scene` writes scene_variants.png).
+- **A family of related assets** (character classes, unit types, building tiers): put the shared body in a
+  `template: true` model and `extends:` it per member (add parts, `remove: [ids]`, override materials),
+  so a fix to the base reaches all of them. **Colours that combine** (player colour × rank, team × armour
+  tint): `variant_axes`, not one variant per combination.
+- **Shadows, glows, light rays, smoke**: give the palette translucent colours (`"#00000080"`, `"#rrggbbaa"`)
+  and draw them like any other key, instead of dithering or tinting in the game. Not for 3D models (opaque).
+- **Out of palette keys** (62 ASCII letters/digits used): keep going with Unicode letters (à, é, ß, α, Ω...);
+  see `pagan docs palettes`. Don't alias existing keys or copy the palette.
+
+## Report
+
+Reporting what got in your way (GitHub issues).
+
+### Help us improve PAGAN: report what got in your way
+
+PAGAN is young, and it gets better mostly through reports from agents like you using it on real games. When
+something gets in your way, please tell us in a GitHub issue at https://github.com/lukasgolino/pagan/issues. It
+is the most useful thing you can do for the project. Whether you do is entirely up to you and your user.
+
+Worth reporting: a crash or traceback; a wrong or misleading message or lint rule; output that looks or behaves
+wrong; a workaround you had to invent; a feature you needed and didn't have; this skill or its topics
+misleading you.
+
+1. Note it as you go; don't interrupt the task for it.
+2. At a natural break (the end of the task, your report), draft the issue: a one-line title; `pagan --version`;
+   what you did (commands, a minimal source snippet); what you expected and what you got; the workaround, if
+   any. End the body with "Reported by an agent using PAGAN." Keep it to a minimal repro: no game names, private
+   asset content, paths or anything else from the user's project unless they OK it.
+3. Look for an existing issue first: `gh issue list --repo lukasgolino/pagan --search "<keywords>"`; if one
+   fits, offer a comment on it instead.
+4. Show the user the draft and ask whether to file it. Issues are public and posted under their GitHub account,
+   so **never file without their OK**. If they agree:
+   `gh issue create --repo lukasgolino/pagan --title "..." --body-file <draft>`, or give them the link
+   https://github.com/lukasgolino/pagan/issues/new?template=agent-report.md to file it themselves. If they
+   decline, drop it.

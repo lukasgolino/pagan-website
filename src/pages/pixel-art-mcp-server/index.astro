@@ -1,4 +1,6 @@
 ---
+import { readJson } from "../../lib/data";
+const { pagan } = readJson("src/content/docs/meta.json");
 import Landing from "../../layouts/Landing.astro";
 ---
 
@@ -11,12 +13,12 @@ import Landing from "../../layouts/Landing.astro";
     "Previews come back as images, so the model looks at what it made and fixes it.",
     "Resources: the full workflow and notation reference, the project's brief, style guide and manifest.",
     "The same JSON as the CLI's <code>--json</code>: one contract for agents and scripts.",
-    "Works with Claude Desktop, Claude Code, Cursor or your own agent. Runs locally over stdio; no cloud, no key.",
+    "Works with Claude Desktop, Claude Code, Cursor or your own agent. Runs locally over stdio; no cloud, no key. Listed in the MCP Registry as io.github.lukasgolino/pagan.",
   ]}
-  code={`pip install "pagan[mcp] @ git+https://github.com/lukasgolino/PAGAN"
-claude mcp add pagan -- pagan mcp --project ./art
+  code={`claude mcp add pagan -- uvx pagan-gen@${pagan} mcp --project /path/to/art
 
-# any other client: command "pagan", args ["mcp", "--project", "./art"]`}
+# any other client: command "uvx", args ["pagan-gen@${pagan}", "mcp", "--project", "/path/to/art"]
+# or pip install pagan-gen==${pagan}, then command "pagan", args ["mcp", "--project", "/path/to/art"]`}
 >
   <p>
     Most pixel-art MCP servers let a model set pixels one call at a time. PAGAN's tools work on source

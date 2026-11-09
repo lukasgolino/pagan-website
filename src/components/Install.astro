@@ -4,13 +4,13 @@ import { escapeHtml } from "../scripts/highlight";
 
 const { pagan } = readJson("src/content/docs/meta.json");
 const tag = `v${pagan}`;
-const pkg = `git+https://github.com/lukasgolino/PAGAN@${tag}`;
+const pin = `pagan-gen==${pagan}`;
 const tabs = [
   {
     id: "skill",
     label: "Claude Code skill",
     steps: [
-      [`pip install "pagan @ ${pkg}"`, "install PAGAN (Python 3.11+)"],
+      [`pip install ${pin}`, "install PAGAN (Python 3.11+; on PyPI as pagan-gen)"],
       ["pagan skill install", "copy the skill into this repo's .claude/skills/"],
     ],
     then: `Then ask Claude: "I'm making a naval exploration game; make the player's ship, three masts, 8 headings."`,
@@ -19,16 +19,15 @@ const tabs = [
     id: "mcp",
     label: "MCP (any agent)",
     steps: [
-      [`pip install "pagan[mcp] @ ${pkg}"`, "PAGAN with the MCP server"],
-      ["claude mcp add pagan -- pagan mcp --project ./art", "or in any client: command `pagan mcp --project <dir>`"],
+      [`claude mcp add pagan -- uvx pagan-gen@${pagan} mcp --project /path/to/art`, "no install needed (uv); or `pagan mcp` after pip install"],
     ],
-    then: `Works with Claude Desktop, Claude Code, Cursor or your own agent. Add --allow-godot to let it verify builds in headless Godot.`,
+    then: `Works with Claude Desktop, Claude Code, Cursor or your own agent (command uvx, args pagan-gen@${pagan} mcp --project <dir>); listed in the MCP Registry as io.github.lukasgolino/pagan. Add --allow-godot to let it verify builds in headless Godot.`,
   },
   {
     id: "cli",
     label: "CLI",
     steps: [
-      [`pip install "pagan @ ${pkg}"`, "install"],
+      [`pip install ${pin}`, "install"],
       ["pagan init my-art --perspective top-down-3/4", "a project: palettes/, sprites/, tiles/, models/"],
       ["cd my-art && pagan new model ship --size 96x96 --directions 8", "write the art"],
       ["pagan lint && pagan preview ship && pagan build", "check it, look at it, build it"],
@@ -42,7 +41,7 @@ const tabs = [
   <div class="wrap">
     <span class="eyebrow">Install</span>
     <h2>One line, then ask</h2>
-    <p class="lede">Requires Python 3.11+. Pin a tag so your art builds the same way next year ({tag} is current).</p>
+    <p class="lede">Requires Python 3.11+. Pin a version so your art builds the same way next year ({tag} is current). Upgrading from a <code>pagan @ git+…</code> install? Run <code>pip uninstall pagan</code> first: both packages own the same files.</p>
     <div class="tabs panel" id="install-tabs">
       <div role="tablist" aria-label="Install method">
         {

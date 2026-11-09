@@ -59,4 +59,4 @@ fails if it's out of date.
 
 ## License
 
-MIT, like PAGAN: see [LICENSE](LICENSE).
+Apache 2.0, like PAGAN: see [LICENSE](LICENSE).

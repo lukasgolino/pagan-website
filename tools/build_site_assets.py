@@ -407,7 +407,12 @@ def docs(content: Path, pagan_repo: Path | None) -> None:
     out.mkdir(parents=True)
     skill = Path(api.__file__).parent / "skill"
     (out / "reference.md").write_text(reference(skill / "topics"), encoding="utf-8")
-    workflow = (skill / "SKILL.md").read_text(encoding="utf-8").replace("](reference.md)", "](../reference/)")
+    workflow = (skill / "SKILL.md").read_text(encoding="utf-8")
+    # on the site every `pagan docs` topic is a section of the reference page: say so under the first heading
+    head, sep, rest = workflow.partition("\n# ")
+    title, _, body = rest.partition("\n")
+    note = "> Every topic named here (`pagan docs <topic>`) is a section of the [reference](../reference/).\n"
+    workflow = f"{head}{sep}{title}\n\n{note}{body}" if sep else workflow
     (out / "workflow.md").write_text(workflow, encoding="utf-8")
     if pagan_repo is None or not (pagan_repo / "CHANGELOG.md").is_file():
         raise SystemExit("CHANGELOG.md not found: pass --pagan-repo <PAGAN checkout> or set PAGAN_REPO")

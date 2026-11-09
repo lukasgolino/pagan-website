@@ -19,9 +19,9 @@ const tabs = [
     id: "mcp",
     label: "MCP (any agent)",
     steps: [
-      ["claude mcp add pagan -- uvx pagan-gen mcp --project /path/to/art", "no install needed (uv); or `pagan mcp` after pip install"],
+      [`claude mcp add pagan -- uvx pagan-gen@${pagan} mcp --project /path/to/art`, "no install needed (uv); or `pagan mcp` after pip install"],
     ],
-    then: `Works with Claude Desktop, Claude Code, Cursor or your own agent (command uvx, args pagan-gen mcp --project <dir>); listed in the MCP Registry as io.github.lukasgolino/pagan. Add --allow-godot to let it verify builds in headless Godot.`,
+    then: `Works with Claude Desktop, Claude Code, Cursor or your own agent (command uvx, args pagan-gen@${pagan} mcp --project <dir>); listed in the MCP Registry as io.github.lukasgolino/pagan. Add --allow-godot to let it verify builds in headless Godot.`,
   },
   {
     id: "cli",

@@ -10,7 +10,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- Install from PyPI: `pip install pagan-gen==0.22.0`, and the MCP server through `uvx pagan-gen mcp` (listed in the MCP
+- Install from PyPI: `pip install pagan-gen==0.22.0`, and the MCP server through `uvx pagan-gen@0.22.0 mcp` (listed in the MCP
   Registry as `io.github.lukasgolino/pagan`). The old `pagan @ git+...` lines stop working from PAGAN 0.22.0, which
   is published as `pagan-gen`.
 - The site is built with PAGAN 0.22.0 (was 0.19.0). The docs reference page is assembled from the skill's topics,

@@ -5,6 +5,8 @@ description: Make and maintain pixel-art (and flat arcade) game assets with PAGA
 
 # PAGAN: game art as text
 
+> Every topic named here (`pagan docs <topic>`) is a section of the [reference](../reference/).
+
 You write palette-keyed grids (2D) or voxel shapes (3D) in YAML; the `pagan` CLI lints them against the
 project's style rules, renders previews you look at, and builds PNG sheets, `manifest.json` and Godot
 resources. This page is the core. Everything else is a topic: **`pagan docs <topic>`** prints one,

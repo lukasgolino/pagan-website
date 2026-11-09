@@ -1,6 +1,7 @@
 ---
 import Doc from "../../layouts/Doc.astro";
-import { asset } from "../../lib/data";
+import { asset, readJson } from "../../lib/data";
+const { pagan } = readJson("src/content/docs/meta.json");
 ---
 
 <Doc title="Docs" description="PAGAN documentation: the agent workflow, the full notation reference and the changelog.">
@@ -8,7 +9,7 @@ import { asset } from "../../lib/data";
   <p>
     These pages are generated from the files that ship with PAGAN, so they always match the release.
     The same text is what your agent reads: the skill installs it into your repo, and the MCP server
-    serves it as <code>pagan://workflow</code> and <code>pagan://reference</code>.
+    serves it as <code>pagan://workflow</code> and <code>pagan://docs/&#123;topic&#125;</code> (one per reference section).
   </p>
   <ul>
     <li><a href={asset("docs/workflow/")}>Workflow</a>: how an agent sets up a game's art, makes an asset, and changes the look over time.</li>
@@ -16,7 +17,7 @@ import { asset } from "../../lib/data";
     <li><a href={asset("docs/changelog/")}>Changelog</a>: every release, and what forces a version bump.</li>
   </ul>
   <h2>Five-minute start</h2>
-  <pre><code>pip install pagan-gen
+  <pre><code>pip install pagan-gen=={pagan}
 pagan init my-art --perspective top-down-3/4
 cd my-art
 pagan new palette dusk          # then: pagan config set default_palette dusk

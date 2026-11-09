@@ -31,9 +31,12 @@ if (!readFileSync(join(dist, "robots.txt"), "utf8").split("\n").includes(want)) 
 
 // Every page carries the analytics beacon (a page built outside Base.astro would silently go uncounted).
 const beacon = /static\.cloudflareinsights\.com\/beacon\.min\.js"[^>]*data-cf-beacon="[^"]*75c1d9f249eb4579bcd782b10cf7a8f0/;
+const umami = /cloud\.umami\.is\/script\.js"[^>]*data-website-id="6c3ba9da-9af9-49a9-a575-90c9cace445c"/;
 for (const u of built) {
   const file = join(dist, new URL(u).pathname.slice(base.pathname.length), "index.html");
-  if (!readFileSync(file, "utf8").match(beacon)) fail(`${u} has no analytics beacon`);
+  const html = readFileSync(file, "utf8");
+  if (!html.match(beacon)) fail(`${u} has no analytics beacon`);
+  if (!html.match(umami)) fail(`${u} has no Umami tag`);
 }
 
 if (!process.exitCode) console.log(`check-dist: ${built.size} pages, sitemap.xml and robots.txt match`);

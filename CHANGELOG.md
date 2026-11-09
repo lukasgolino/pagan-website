@@ -11,7 +11,7 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - Licensed under the Apache License 2.0 instead of MIT (#18). Releases up to 0.4.0 stay
-  available under MIT.
+  available under MIT. The site now pins PAGAN 0.22.1, the first Apache 2.0 release.
 
 ## [0.4.0] - 2026-11-09
 

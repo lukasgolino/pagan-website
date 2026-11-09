@@ -11,7 +11,7 @@ the project), then writes what the page shows:
   public/demo/features.json                  data for the feature sections (lint before/after, the zombie as a mesh)
   public/demo/features/zombie.glb (+ ramp)   the zombie as a 3D-game mesh, drawn in the browser with the ramp rule
   public/brand/                              the logo and icon (themselves PAGAN sprites, art/brand)
-  src/content/docs/                          reference.md, SKILL.md and CHANGELOG.md from the PAGAN checkout
+  src/content/docs/                          reference.md (the skill's topics), SKILL.md and CHANGELOG.md from the PAGAN checkout
 
 The site can't show art PAGAN doesn't produce. Output is deterministic, so re-runs don't churn; `--check`
 rebuilds into a temporary folder and fails if anything differs from the committed files.
@@ -380,19 +380,39 @@ def og_images(public: Path) -> None:
     card("zombie", graveyard, [(frame("zombie/03-night-horde", "zombie", h, v), x, 250) for h, v, x in (("se", "green+rag", 640), ("s", "pallid+scrubs", 860))], 5)
 
 
+# Reading order for the reference page; topics not listed follow alphabetically.
+TOPIC_ORDER = ["setup", "palettes", "sprites", "tilesets", "models", "meshes", "making", "recipes", "config", "commands",
+               "lint", "build", "godot", "timeline", "evolve", "api", "follow-up", "report"]
+
+
+def reference(topics: Path) -> str:
+    """The skill's topics (PAGAN 0.21+ ships them instead of one reference.md) as one page: each topic's headings
+    one level down under the page title, code blocks untouched."""
+    names = sorted(p.stem for p in topics.glob("*.md"))
+    parts = ["# PAGAN reference\n\nEverything an agent needs to write PAGAN files, one section per `pagan docs` topic.\n"]
+    for name in [n for n in TOPIC_ORDER if n in names] + [n for n in names if n not in TOPIC_ORDER]:
+        lines, fenced = [], False
+        for line in (topics / f"{name}.md").read_text(encoding="utf-8").splitlines():
+            if line.startswith("```"):
+                fenced = not fenced
+            lines.append("#" + line if not fenced and line.startswith("#") else line)
+        parts.append("\n".join(lines).strip() + "\n")
+    return "\n".join(parts)
+
+
 def docs(content: Path, pagan_repo: Path | None) -> None:
     """One source of truth: the reference and workflow ship inside the pagan package; the changelog
     comes from a PAGAN checkout (pass --pagan-repo or set PAGAN_REPO)."""
     out = content / "docs"
     out.mkdir(parents=True)
     skill = Path(api.__file__).parent / "skill"
-    shutil.copyfile(skill / "reference.md", out / "reference.md")
+    (out / "reference.md").write_text(reference(skill / "topics"), encoding="utf-8")
     workflow = (skill / "SKILL.md").read_text(encoding="utf-8").replace("](reference.md)", "](../reference/)")
     (out / "workflow.md").write_text(workflow, encoding="utf-8")
     if pagan_repo is None or not (pagan_repo / "CHANGELOG.md").is_file():
         raise SystemExit("CHANGELOG.md not found: pass --pagan-repo <PAGAN checkout> or set PAGAN_REPO")
     shutil.copyfile(pagan_repo / "CHANGELOG.md", out / "changelog.md")
-    write_json(out / "meta.json", {"pagan": metadata.version("pagan")})
+    write_json(out / "meta.json", {"pagan": metadata.version("pagan-gen")})
 
 
 # --- main ----------------------------------------------------------------------------------------
@@ -464,7 +484,7 @@ def main() -> None:
                 shutil.rmtree(target)
             shutil.copytree(fresh[key], target)
     steps = sum(len(s["steps"]) for s in scenarios)
-    print(f"Built {len(scenarios)} scenarios, {steps} steps with pagan {metadata.version('pagan')}.")
+    print(f"Built {len(scenarios)} scenarios, {steps} steps with pagan {metadata.version('pagan-gen')}.")
 
 
 if __name__ == "__main__":
